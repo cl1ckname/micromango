@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
-	"log"
+	"micromango/pkg/common"
 	pb "micromango/pkg/grpc/catalog"
 	"micromango/pkg/services/catalog/db"
-	"net"
 )
 
 type service struct {
@@ -42,19 +41,14 @@ func (s *service) AddManga(_ context.Context, req *pb.AddMangaRequest) (*pb.Mang
 }
 
 func Run() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 50002))
-	if err != nil {
-		panic(err)
-	}
-	s := grpc.NewServer()
-
 	database := db.Connect("catalog.sqlite")
 	serv := service{
 		db: database,
 	}
-	pb.RegisterCatalogServer(s, &serv)
-	log.Println("customer listens 3234")
-	if err := s.Serve(lis); err != nil {
+	addr := fmt.Sprintf(":%d", 50001)
+	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
+		pb.RegisterCatalogServer(registrar, &serv)
+	}); err != nil {
 		panic(err)
 	}
 }

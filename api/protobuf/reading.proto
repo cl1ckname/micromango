@@ -1,0 +1,43 @@
+syntax="proto3";
+package reading;
+option go_package="pkg/grpc/reading";
+
+service Reading {
+  rpc GetChapter(ChapterRequest) returns (ChapterResponse);
+  rpc GetPage(PageRequest) returns (PageResponse);
+  rpc AddChapter(AddChapterRequest) returns (ChapterResponse);
+  rpc AddPage(AddPageRequest) returns (PageResponse);
+}
+
+message AddChapterRequest {
+  string mangaId = 1;
+  string title = 2;
+}
+
+message ChapterRequest {
+  string mangaId = 1;
+  uint32 chapterNumber = 2;
+}
+
+message ChapterResponse {
+  string chapterId = 1;
+  string mangaId = 2;
+  uint32 chapterNumber = 3;
+  string title = 4;
+}
+
+message AddPageRequest {
+  string chapterId = 1;
+  string image = 2;
+}
+
+message PageRequest {
+  string chapterId = 1;
+  uint32 pageNumber = 2;
+}
+
+message PageResponse {
+  uint32 chapterId = 1;
+  uint32 pageNumber = 2;
+  string image = 3;
+}
