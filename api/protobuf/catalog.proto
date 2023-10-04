@@ -1,0 +1,26 @@
+syntax="proto3";
+package catalog;
+option go_package="pkg/grpc/catalog";
+
+service Catalog {
+  rpc GetManga(MangaRequest) returns (MangaResponse);
+  rpc AddManga(AddMangaRequest) returns (MangaResponse);
+}
+
+message MangaRequest {
+  string mangaId = 1;
+}
+
+message MangaResponse {
+  string mangaId = 1;
+  string title = 2;
+  string cover = 3;
+  string description = 4;
+  uint32 chapterNumber = 5;
+}
+
+message AddMangaRequest {
+  string title = 1;
+  string cover = 2;
+  string description = 3;
+}
