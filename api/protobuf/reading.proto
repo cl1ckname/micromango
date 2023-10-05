@@ -3,10 +3,29 @@ package reading;
 option go_package="pkg/grpc/reading";
 
 service Reading {
+  rpc GetMangaContent(MangaContentRequest) returns (MangaContentResponse);
+  rpc AddMangaContent(MangaContentResponse) returns (MangaContentResponse);
   rpc GetChapter(ChapterRequest) returns (ChapterResponse);
-  rpc GetPage(PageRequest) returns (PageResponse);
   rpc AddChapter(AddChapterRequest) returns (ChapterResponse);
+  rpc GetPage(PageRequest) returns (PageResponse);
   rpc AddPage(AddPageRequest) returns (PageResponse);
+}
+
+message AddMangaContentRequest {}
+
+message MangaContentRequest {
+  string mangaId = 1;
+}
+
+message MangaContentResponse {
+  string mangaId = 1;
+
+  message ChapterHead {
+    string chapterId = 1;
+    uint32 chapterNumber = 2;
+    string title = 4;
+  }
+  repeated ChapterHead chapters = 2;
 }
 
 message AddChapterRequest {
@@ -15,7 +34,7 @@ message AddChapterRequest {
 }
 
 message ChapterRequest {
-  string mangaId = 1;
+  string chapterId = 1;
   uint32 chapterNumber = 2;
 }
 
@@ -24,20 +43,26 @@ message ChapterResponse {
   string mangaId = 2;
   uint32 chapterNumber = 3;
   string title = 4;
+  message PageHead {
+    string pageId = 1;
+    uint32 pageNumber = 3;
+  }
+  repeated PageHead pages = 5;
 }
 
 message AddPageRequest {
   string chapterId = 1;
-  string image = 2;
+  uint32 pageNumber = 2;
+  string image = 3;
 }
 
 message PageRequest {
-  string chapterId = 1;
-  uint32 pageNumber = 2;
+  string pageId = 1;
 }
 
 message PageResponse {
-  uint32 chapterId = 1;
-  uint32 pageNumber = 2;
-  string image = 3;
+  string pageId = 1;
+  string chapterId = 2;
+  uint32 pageNumber = 3;
+  string image = 4;
 }

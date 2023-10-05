@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 	"micromango/pkg/common"
 	pb "micromango/pkg/grpc/catalog"
-	"micromango/pkg/services/catalog/db"
 )
 
 type service struct {
@@ -16,7 +15,7 @@ type service struct {
 }
 
 func (s *service) GetManga(_ context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
-	m, err := db.GetManga(s.db, req.GetMangaId())
+	m, err := GetManga(s.db, req.GetMangaId())
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +29,7 @@ func (s *service) GetManga(_ context.Context, req *pb.MangaRequest) (*pb.MangaRe
 }
 
 func (s *service) AddManga(_ context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
-	m, err := db.AddManga(s.db, req)
+	m, err := AddManga(s.db, req)
 	return &pb.MangaResponse{
 		MangaId:       m.MangaId.String(),
 		Title:         m.Title,
@@ -41,7 +40,7 @@ func (s *service) AddManga(_ context.Context, req *pb.AddMangaRequest) (*pb.Mang
 }
 
 func Run() {
-	database := db.Connect("catalog.sqlite")
+	database := Connect("catalog.sqlite")
 	serv := service{
 		db: database,
 	}
