@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: Micromango gateway
+  description: Micromango gateway
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /user/:userId:
+    get:
+      summary: get user by id
+      responses:
+        '200':
+          description: user found
+          content:
+            application/json:
+              schema:
+                $ref: "./protobuf/user.swagger.json/#/definitions/userUserResponse"
+  /register:
+    post:
+      summary: register new user
+      responses:
+        '201':
+          description: user registered
+          content:
+            application/json:
+              schema:
+                $ref: "./protobuf/user.swagger.json/#/definitions/userUserResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+
+
+components:
+  schemas:
+    'userSchema':
+      type: object
+      description: 'basic user response'

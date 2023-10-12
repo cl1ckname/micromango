@@ -4,16 +4,19 @@ option go_package="pkg/grpc/reading";
 
 service Reading {
   rpc GetMangaContent(MangaContentRequest) returns (MangaContentResponse);
-  rpc AddMangaContent(MangaContentResponse) returns (MangaContentResponse);
+  rpc AddMangaContent(AddMangaContentRequest) returns (MangaContentResponse);
   rpc GetChapter(ChapterRequest) returns (ChapterResponse);
   rpc AddChapter(AddChapterRequest) returns (ChapterResponse);
   rpc GetPage(PageRequest) returns (PageResponse);
   rpc AddPage(AddPageRequest) returns (PageResponse);
 }
 
-message AddMangaContentRequest {}
+message AddMangaContentRequest {
+  string mangaId =1;
+}
 
 message MangaContentRequest {
+  // @gotags: body:manga
   string mangaId = 1;
 }
 
@@ -35,7 +38,6 @@ message AddChapterRequest {
 
 message ChapterRequest {
   string chapterId = 1;
-  uint32 chapterNumber = 2;
 }
 
 message ChapterResponse {

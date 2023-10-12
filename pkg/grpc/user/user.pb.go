@@ -286,7 +286,8 @@ type GetUserRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId string `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	// @gotags: param:"userId"
+	UserId string `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty" param:"userId"`
 }
 
 func (x *GetUserRequest) Reset() {

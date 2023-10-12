@@ -37,6 +37,7 @@ message LoginResponse {
 }
 
 message GetUserRequest {
+  // @gotags: param:"userId"
   string userId = 1;
 }
 
