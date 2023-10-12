@@ -1,12 +1,10 @@
-package catalog
+package user
 
 import (
-	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
-	pb "micromango/pkg/grpc/catalog"
 	"os"
 	"time"
 )
@@ -25,35 +23,19 @@ func Connect(addr string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{
 		Logger: newLogger,
 	})
-	if err := db.AutoMigrate(&Manga{}); err != nil {
-		panic(err)
-	}
 	if err != nil {
 		log.Fatal(err)
 	}
 	return db
 }
 
-func GetManga(db *gorm.DB, mangaId string) (Manga, error) {
-	mangaUUID, err := uuid.Parse(mangaId)
-	if err != nil {
-		return Manga{}, err
-	}
-	m := Manga{MangaId: mangaUUID}
-	if res := db.First(&m); res.Error != nil {
-		return Manga{}, res.Error
-	}
-	return m, nil
+func saveUser(db *gorm.DB, user User) (u User, err error) {
+	err = db.Save(&user).Error
+	return
 }
 
-func AddManga(db *gorm.DB, req *pb.AddMangaRequest) (Manga, error) {
-	m := Manga{
-		Title:       req.Title,
-		Cover:       req.Cover,
-		Description: req.Description,
-	}
-	if res := db.Create(m); res.Error != nil {
-		return Manga{}, res.Error
-	}
-	return m, nil
+func findByEmail(db *gorm.DB, email string) (u User, err error) {
+	u.Email = email
+	err = db.First(&u).Error
+	return
 }
