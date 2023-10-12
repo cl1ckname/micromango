@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -36,6 +37,15 @@ func saveUser(db *gorm.DB, user User) (u User, err error) {
 
 func findByEmail(db *gorm.DB, email string) (u User, err error) {
 	u.Email = email
+	err = db.First(&u).Error
+	return
+}
+
+func findById(db *gorm.DB, id string) (u User, err error) {
+	u.UserId, err = uuid.Parse(id)
+	if err != nil {
+		return
+	}
 	err = db.First(&u).Error
 	return
 }

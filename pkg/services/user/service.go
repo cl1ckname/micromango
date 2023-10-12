@@ -78,3 +78,24 @@ func (s *service) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRespo
 		AccessTokenExpired: timestamppb.New(accessTokenExpired.Time),
 	}, nil
 }
+
+func (s *service) Auth(_ context.Context, req *pb.AuthRequest) (*pb.UserResponse, error) {
+	claims, err := s.auth(req.Token)
+	if err != nil {
+		return nil, err
+	}
+	userId := claims.UserId
+	u, err := findById(s.db, userId)
+	if err != nil {
+		return nil, err
+	}
+	return u.ToPb(), nil
+}
+
+func (s *service) GetUser(_ context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
+	u, err := findById(s.db, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return u.ToPb(), nil
+}

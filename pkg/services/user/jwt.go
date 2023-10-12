@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -31,4 +32,21 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 		UserId: userModel.UserId.String(),
 	})
 	return token, nil
+}
+
+func (s *service) auth(token string) (Claims, error) {
+	t, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(s.jwtSecret), nil
+	})
+	if err != nil {
+		return Claims{}, err
+	}
+	if !t.Valid {
+		return Claims{}, fmt.Errorf("invalid token")
+	}
+	claims, ok := t.Claims.(*Claims)
+	if !ok {
+		return Claims{}, fmt.Errorf("invalid claims")
+	}
+	return *claims, nil
 }
