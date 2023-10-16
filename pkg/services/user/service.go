@@ -11,14 +11,14 @@ import (
 	pb "micromango/pkg/grpc/user"
 )
 
-func Run() {
-	database := Connect("reading.sqlite")
+func Run(c Config) {
+	database := Connect(c.DbAddr)
 	serv := service{
 		db:        database,
-		salt:      "qwerty",
-		jwtSecret: "generateLater",
+		salt:      c.Salt,
+		jwtSecret: c.JwtSecret,
 	}
-	addr := fmt.Sprintf(":%d", 50001)
+	addr := fmt.Sprintf(c.Addr)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterUserServer(registrar, &serv)
 	}); err != nil {

@@ -9,6 +9,19 @@ import (
 	pb "micromango/pkg/grpc/catalog"
 )
 
+func Run(c Config) {
+	database := Connect(c.DbAddr)
+	serv := service{
+		db: database,
+	}
+	addr := fmt.Sprintf(c.Addr)
+	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
+		pb.RegisterCatalogServer(registrar, &serv)
+	}); err != nil {
+		panic(err)
+	}
+}
+
 type service struct {
 	pb.UnimplementedCatalogServer
 	db *gorm.DB
@@ -37,17 +50,4 @@ func (s *service) AddManga(_ context.Context, req *pb.AddMangaRequest) (*pb.Mang
 		Description:   m.Description,
 		ChapterNumber: 0,
 	}, err
-}
-
-func Run() {
-	database := Connect("catalog.sqlite")
-	serv := service{
-		db: database,
-	}
-	addr := fmt.Sprintf(":%d", 50002)
-	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
-		pb.RegisterCatalogServer(registrar, &serv)
-	}); err != nil {
-		panic(err)
-	}
 }

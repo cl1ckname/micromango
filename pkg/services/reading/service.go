@@ -14,12 +14,12 @@ type service struct {
 	db *gorm.DB
 }
 
-func Run() {
-	database := Connect("reading.sqlite")
+func Run(c Config) {
+	database := Connect(c.DbAddr)
 	serv := service{
 		db: database,
 	}
-	addr := fmt.Sprintf(":%d", 50003)
+	addr := fmt.Sprintf(c.Addr)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterReadingServer(registrar, &serv)
 	}); err != nil {

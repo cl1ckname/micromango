@@ -9,23 +9,23 @@ import (
 	"micromango/pkg/grpc/user"
 )
 
-func Run() {
+func Run(c Config) {
 	e := echo.New()
 	serv := server{}
 
-	conn, err := grpc.Dial(":50001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 	serv.user = user.NewUserClient(conn)
 
-	conn, err = grpc.Dial(":50002", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err = grpc.Dial(c.CatalogAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 	serv.catalog = catalog.NewCatalogClient(conn)
 
-	conn, err = grpc.Dial(":50003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err = grpc.Dial(c.ReadingAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func Run() {
 
 	applyHandlers(e, serv)
 
-	panic(e.Start(":8080"))
+	panic(e.Start(c.Addr))
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
