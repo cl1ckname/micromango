@@ -12,8 +12,7 @@ func (s *server) GetManga(ctx echo.Context) error {
 	getMangaReq.MangaId = ctx.Param("mangaId")
 	resp, err := s.catalog.GetManga(context.TODO(), &getMangaReq)
 	if err != nil {
-		ctx.Error(err)
-		return nil
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, resp)
 }
@@ -21,13 +20,11 @@ func (s *server) GetManga(ctx echo.Context) error {
 func (s *server) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
 	if err := ctx.Bind(&addMangaReq); err != nil {
-		ctx.Error(err)
-		return nil
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	resp, err := s.catalog.AddManga(context.TODO(), &addMangaReq)
 	if err != nil {
-		ctx.Error(err)
-		return nil
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, resp)
 }
