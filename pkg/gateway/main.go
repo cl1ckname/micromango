@@ -2,6 +2,8 @@ package gateway
 
 import (
 	"github.com/labstack/echo/v4"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/user"
@@ -11,6 +13,30 @@ func Run() {
 	e := echo.New()
 	serv := server{}
 
+	conn, err := grpc.Dial(":50001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.user = user.NewUserClient(conn)
+
+	conn, err = grpc.Dial(":50002", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.catalog = catalog.NewCatalogClient(conn)
+
+	conn, err = grpc.Dial(":50003", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.reading = reading.NewReadingClient(conn)
+
+	applyHandlers(e, serv)
+
+	panic(e.Start(":8080"))
+}
+
+func applyHandlers(e *echo.Echo, serv server) {
 	e.POST("user/register", serv.Register)
 	e.POST("user/login", serv.Login)
 	e.GET("user/:userId", serv.Login)
@@ -22,8 +48,8 @@ func Run() {
 	e.GET("content/:mangaId/chapter/:chapterId/page/:pageId", serv.GetPage)
 	e.POST("content/:mangaId/chapter/:chapterId/page", serv.AddChapter)
 
-	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	e.GET("catalog/:mangaId", serv.GetManga)
+	e.POST("catalog", serv.AddManga)
 }
 
 type server struct {

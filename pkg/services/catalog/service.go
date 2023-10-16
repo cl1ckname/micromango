@@ -44,7 +44,7 @@ func Run() {
 	serv := service{
 		db: database,
 	}
-	addr := fmt.Sprintf(":%d", 50001)
+	addr := fmt.Sprintf(":%d", 50002)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterCatalogServer(registrar, &serv)
 	}); err != nil {

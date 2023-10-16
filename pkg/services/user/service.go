@@ -18,7 +18,7 @@ func Run() {
 		salt:      "qwerty",
 		jwtSecret: "generateLater",
 	}
-	addr := fmt.Sprintf(":%d", 50002)
+	addr := fmt.Sprintf(":%d", 50001)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterUserServer(registrar, &serv)
 	}); err != nil {

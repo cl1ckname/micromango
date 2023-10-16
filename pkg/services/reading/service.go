@@ -19,7 +19,7 @@ func Run() {
 	serv := service{
 		db: database,
 	}
-	addr := fmt.Sprintf(":%d", 50002)
+	addr := fmt.Sprintf(":%d", 50003)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterReadingServer(registrar, &serv)
 	}); err != nil {
@@ -36,7 +36,7 @@ func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest
 	return resp, nil
 }
 
-func (s *service) AddMangaContent(context.Context, *pb.MangaContentResponse) (*pb.MangaContentResponse, error) {
+func (s *service) AddMangaContent(context.Context, *pb.AddMangaContentRequest) (*pb.MangaContentResponse, error) {
 	m, err := addMangaContent(s.db)
 	return mangaContentToPb(m), err
 }
