@@ -19,4 +19,8 @@ message MangaResponse {
   uint32 chapterNumber = 5;
 }
 
-message AddMangaRequest {}
+message AddMangaRequest {
+  string title = 1;
+  string cover = 2;
+  string description = 3;
+}
