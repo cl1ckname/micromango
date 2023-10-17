@@ -3,6 +3,7 @@ package reading
 import (
 	"context"
 	"fmt"
+	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
@@ -20,6 +21,7 @@ func Run(c Config) {
 		db: database,
 	}
 	addr := fmt.Sprintf(c.Addr)
+	log.Info("reading service started at ", addr)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterReadingServer(registrar, &serv)
 	}); err != nil {

@@ -7,7 +7,7 @@ import (
 
 type MangaContent struct {
 	MangaId  uuid.UUID `json:"mangaId" gorm:"primaryKey;type:uuid"`
-	Chapters []Chapter `json:"chapters"`
+	Chapters []Chapter `json:"chapters"  gorm:"foreignKey:MangaId"`
 }
 
 func (content *MangaContent) BeforeCreate(*gorm.DB) error {

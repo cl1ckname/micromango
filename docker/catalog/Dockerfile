@@ -8,4 +8,5 @@ RUN go mod download
 COPY cmd ./cmd
 COPY pkg ./pkg
 
-CMD go run cmd/catalog/main.go
+RUN go build -o service cmd/catalog/main.go
+CMD ./service

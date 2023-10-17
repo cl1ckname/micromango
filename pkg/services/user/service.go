@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -19,6 +20,7 @@ func Run(c Config) {
 		jwtSecret: c.JwtSecret,
 	}
 	addr := fmt.Sprintf(c.Addr)
+	log.Info("user service started at ", addr)
 	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
 		pb.RegisterUserServer(registrar, &serv)
 	}); err != nil {
