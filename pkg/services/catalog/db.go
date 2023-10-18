@@ -52,7 +52,7 @@ func AddManga(db *gorm.DB, req *pb.AddMangaRequest) (Manga, error) {
 		Cover:       req.Cover,
 		Description: req.Description,
 	}
-	if res := db.Create(m); res.Error != nil {
+	if res := db.Create(&m); res.Error != nil {
 		return Manga{}, res.Error
 	}
 	return m, nil

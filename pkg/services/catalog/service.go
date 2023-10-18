@@ -32,7 +32,7 @@ func (s *service) GetManga(_ context.Context, req *pb.MangaRequest) (*pb.MangaRe
 	return &pb.MangaResponse{
 		MangaId:       m.MangaId.String(),
 		Title:         m.Title,
-		Cover:         m.Title,
+		Cover:         m.Cover,
 		Description:   m.Description,
 		ChapterNumber: 0,
 	}, nil
