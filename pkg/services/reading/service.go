@@ -2,8 +2,6 @@ package reading
 
 import (
 	"context"
-	"fmt"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
@@ -15,18 +13,15 @@ type service struct {
 	db *gorm.DB
 }
 
-func Run(c Config) {
+func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 	serv := service{
 		db: database,
 	}
-	addr := fmt.Sprintf(c.Addr)
-	log.Info("reading service started at ", addr)
-	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
-		pb.RegisterReadingServer(registrar, &serv)
-	}); err != nil {
-		panic(err)
-	}
+	baseServer := grpc.NewServer()
+	pb.RegisterReadingServer(baseServer, &serv)
+
+	return common.StartGrpcService(ctx, c.Addr, baseServer)
 }
 
 func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest) (*pb.MangaContentResponse, error) {

@@ -2,26 +2,21 @@ package catalog
 
 import (
 	"context"
-	"fmt"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
 	pb "micromango/pkg/grpc/catalog"
 )
 
-func Run(c Config) {
+func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 	serv := service{
 		db: database,
 	}
-	addr := fmt.Sprintf(c.Addr)
-	log.Info("Starting catalog service on ", addr)
-	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
-		pb.RegisterCatalogServer(registrar, &serv)
-	}); err != nil {
-		panic(err)
-	}
+	baseServer := grpc.NewServer()
+	pb.RegisterCatalogServer(baseServer, &serv)
+
+	return common.StartGrpcService(ctx, c.Addr, baseServer)
 }
 
 type service struct {

@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+	"log"
 	"micromango/pkg/services/catalog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -10,5 +14,18 @@ func main() {
 		Addr:   os.Getenv("CATALOG_ADDR"),
 		DbAddr: os.Getenv("CATALOG_DB_ADDR"),
 	}
-	catalog.Run(config)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ok := catalog.Run(ctx, config)
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	select {
+	case err := <-ok:
+		log.Fatal("Server stopped: ", err)
+	case s := <-sigCh:
+		log.Printf("got signal %v, attempting graceful shutdown", s)
+		cancel()
+	}
+	log.Println("Graceful shutdown")
 }

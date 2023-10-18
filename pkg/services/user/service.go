@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -12,20 +10,16 @@ import (
 	pb "micromango/pkg/grpc/user"
 )
 
-func Run(c Config) {
+func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 	serv := service{
 		db:        database,
 		salt:      c.Salt,
 		jwtSecret: c.JwtSecret,
 	}
-	addr := fmt.Sprintf(c.Addr)
-	log.Info("user service started at ", addr)
-	if err := common.RunGRPCServer(addr, func(registrar grpc.ServiceRegistrar) {
-		pb.RegisterUserServer(registrar, &serv)
-	}); err != nil {
-		panic(err)
-	}
+	baseServer := grpc.NewServer()
+	pb.RegisterUserServer(baseServer, &serv)
+	return common.StartGrpcService(ctx, c.Addr, baseServer)
 }
 
 type service struct {
