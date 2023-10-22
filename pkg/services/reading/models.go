@@ -11,7 +11,9 @@ type MangaContent struct {
 }
 
 func (content *MangaContent) BeforeCreate(*gorm.DB) error {
-	content.MangaId = uuid.New()
+	if content.MangaId == uuid.Nil {
+		content.MangaId = uuid.New()
+	}
 	return nil
 }
 
@@ -24,7 +26,9 @@ type Chapter struct {
 }
 
 func (chapter *Chapter) BeforeCreate(*gorm.DB) error {
-	chapter.ChapterId = uuid.New()
+	if chapter.ChapterId == uuid.Nil {
+		chapter.ChapterId = uuid.New()
+	}
 	return nil
 }
 
@@ -36,6 +40,8 @@ type Page struct {
 }
 
 func (page *Page) BeforeCreate(*gorm.DB) error {
-	page.ChapterId = uuid.New()
+	if page.ChapterId == uuid.Nil {
+		page.ChapterId = uuid.New()
+	}
 	return nil
 }

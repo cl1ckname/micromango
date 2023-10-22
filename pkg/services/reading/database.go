@@ -49,9 +49,9 @@ func getMangaContent(db *gorm.DB, mangaId string) (m MangaContent, err error) {
 	return
 }
 
-func addMangaContent(db *gorm.DB) (m MangaContent, err error) {
-	err = db.Create(&m).Error
-	return
+func addMangaContent(db *gorm.DB, mangaContent MangaContent) (m MangaContent, err error) {
+	err = db.Create(&mangaContent).Error
+	return mangaContent, err
 }
 
 func getChapter(db *gorm.DB, chapterId string) (c Chapter, err error) {

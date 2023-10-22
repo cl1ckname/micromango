@@ -2,6 +2,7 @@ package reading
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
@@ -33,8 +34,15 @@ func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest
 	return resp, nil
 }
 
-func (s *service) AddMangaContent(context.Context, *pb.AddMangaContentRequest) (*pb.MangaContentResponse, error) {
-	m, err := addMangaContent(s.db)
+func (s *service) AddMangaContent(_ context.Context, req *pb.AddMangaContentRequest) (*pb.MangaContentResponse, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	mc := MangaContent{
+		MangaId: mangaId,
+	}
+	m, err := addMangaContent(s.db, mc)
 	return mangaContentToPb(m), err
 }
 

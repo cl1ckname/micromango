@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	pb "micromango/pkg/grpc/catalog"
@@ -30,23 +31,16 @@ func TestService(t *testing.T) {
 		Cover:       "favicon.ico",
 		Description: "my test manga",
 	})
-	if err != nil {
-		t.Error(err)
-	}
-	if resp == nil {
-		t.Error("empty response")
-	}
+	require.NoError(t, err)
+	require.NotNil(t, resp)
 	if resp.Title != "micromango" || resp.Cover != "favicon.ico" || resp.Description != "my test manga" {
 		t.Error("invalid fields")
 	}
-	if _, err := uuid.Parse(resp.MangaId); err != nil {
-		t.Error("invalid manga id: ", err.Error())
-	}
+	_, err = uuid.Parse(resp.MangaId)
+	require.NoError(t, err)
 
 	getResp, err := cc.GetManga(context.TODO(), &pb.MangaRequest{MangaId: resp.MangaId})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 	if getResp.Title != resp.Title {
 		t.Error("invalid title")
 	}
