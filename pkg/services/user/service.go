@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -39,15 +40,15 @@ func (s *service) Register(_ context.Context, req *pb.RegisterRequest) (*pb.User
 	u.Username = req.Username
 	u.Email = req.Email
 	u.PasswordHash = hashString(req.Password, s.salt)
-	u, err = saveUser(s.db, u)
+	savedU, err := saveUser(s.db, u)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.UserResponse{
-		UserId:   u.UserId.String(),
-		Username: u.Username,
-		Email:    u.Email,
-		Picture:  u.Picture,
+		UserId:   savedU.UserId.String(),
+		Username: savedU.Username,
+		Email:    savedU.Email,
+		Picture:  savedU.Picture,
 	}, nil
 }
 
@@ -62,6 +63,7 @@ func (s *service) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRespo
 	}
 	accessToken, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
+		fmt.Println("invalid token: ", err.Error())
 		return nil, err
 	}
 	accessTokenExpired, err := token.Claims.GetExpirationTime()

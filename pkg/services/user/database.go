@@ -24,6 +24,9 @@ func Connect(addr string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{
 		Logger: newLogger,
 	})
+	if err := db.AutoMigrate(&User{}); err != nil {
+		log.Fatal(err)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +35,7 @@ func Connect(addr string) *gorm.DB {
 
 func saveUser(db *gorm.DB, user User) (u User, err error) {
 	err = db.Save(&user).Error
-	return
+	return user, err
 }
 
 func findByEmail(db *gorm.DB, email string) (u User, err error) {

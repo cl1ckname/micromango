@@ -7,7 +7,7 @@ import (
 )
 
 type Claims struct {
-	jwt.Claims
+	jwt.RegisteredClaims
 	UserId string `json:"userId"`
 }
 
@@ -23,8 +23,8 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 		return nil, err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, &Claims{
-		Claims: jwt.RegisteredClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    userModel.UserId.String(),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 			NotBefore: jwt.NewNumericDate(time.Now()),
