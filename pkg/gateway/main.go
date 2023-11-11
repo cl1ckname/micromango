@@ -22,7 +22,9 @@ func Run(ctx context.Context, c Config) <-chan error {
 	}
 	serv.user = user.NewUserClient(conn)
 
-	conn, err = grpc.Dial(c.CatalogAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err = grpc.Dial(c.CatalogAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -70,6 +72,7 @@ func applyHandlers(e *echo.Echo, serv server) {
 	e.GET("content/:mangaId/chapter/:chapterId/page/:pageId", serv.GetPage)
 	e.POST("content/:mangaId/chapter/:chapterId/page", serv.AddChapter)
 
+	e.GET("catalog", serv.GetMangas)
 	e.GET("catalog/:mangaId", serv.GetManga)
 	e.POST("catalog", serv.AddManga)
 }

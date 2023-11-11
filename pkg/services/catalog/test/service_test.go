@@ -51,6 +51,14 @@ func TestService(t *testing.T) {
 		t.Error("invalid cover: ", getResp.Cover, " ", resp.Cover)
 	}
 
+	getsResp, err := cc.GetMangas(context.TODO(), &pb.Empty{})
+	if err != nil {
+		t.Error("error call getMangas: ", err)
+	}
+	if len(getsResp.Mangas) != 1 {
+		t.Error("empty getMangas response")
+	}
+
 	defer cancel()
 
 }

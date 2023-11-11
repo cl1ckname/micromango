@@ -17,6 +17,14 @@ func (s *server) GetManga(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
+func (s *server) GetMangas(ctx echo.Context) error {
+	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.Empty{})
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+	}
+	return ctx.JSON(http.StatusOK, mangas)
+}
+
 func (s *server) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
 	if err := ctx.Bind(&addMangaReq); err != nil {

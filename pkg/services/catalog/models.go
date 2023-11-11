@@ -3,6 +3,7 @@ package catalog
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	pb "micromango/pkg/grpc/catalog"
 )
 
 type Manga struct {
@@ -12,7 +13,17 @@ type Manga struct {
 	Description string    `json:"description"`
 }
 
-func (manga *Manga) BeforeCreate(*gorm.DB) error {
-	manga.MangaId = uuid.New()
+func (m *Manga) BeforeCreate(*gorm.DB) error {
+	m.MangaId = uuid.New()
 	return nil
+}
+
+func (m *Manga) ToResponse() *pb.MangaResponse {
+	return &pb.MangaResponse{
+		MangaId:       m.MangaId.String(),
+		Title:         m.Title,
+		Cover:         m.Cover,
+		Description:   m.Description,
+		ChapterNumber: 0,
+	}
 }

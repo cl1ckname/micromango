@@ -26,25 +26,19 @@ type service struct {
 
 func (s *service) GetManga(_ context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
 	m, err := GetManga(s.db, req.GetMangaId())
-	if err != nil {
-		return nil, err
-	}
-	return &pb.MangaResponse{
-		MangaId:       m.MangaId.String(),
-		Title:         m.Title,
-		Cover:         m.Cover,
-		Description:   m.Description,
-		ChapterNumber: 0,
-	}, nil
+	return m.ToResponse(), err
 }
 
 func (s *service) AddManga(_ context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
 	m, err := AddManga(s.db, req)
-	return &pb.MangaResponse{
-		MangaId:       m.MangaId.String(),
-		Title:         m.Title,
-		Cover:         m.Cover,
-		Description:   m.Description,
-		ChapterNumber: 0,
-	}, err
+	return m.ToResponse(), err
+}
+
+func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, error) {
+	ms, err := GetMangas(s.db)
+	mangas := make([]*pb.MangaResponse, len(ms))
+	for i, m := range ms {
+		mangas[i] = m.ToResponse()
+	}
+	return &pb.MangasResponse{Mangas: mangas}, err
 }

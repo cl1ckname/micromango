@@ -46,6 +46,14 @@ func GetManga(db *gorm.DB, mangaId string) (Manga, error) {
 	return m, nil
 }
 
+func GetMangas(db *gorm.DB) ([]Manga, error) {
+	var mangas []Manga
+	if res := db.Find(&mangas); res.Error != nil {
+		return nil, res.Error
+	}
+	return mangas, nil
+}
+
 func AddManga(db *gorm.DB, req *pb.AddMangaRequest) (Manga, error) {
 	m := Manga{
 		Title:       req.Title,
