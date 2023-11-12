@@ -40,3 +40,10 @@ services:
       - reading
       - catalog
       - static
+  client:
+    build:
+      context: micromango-client/
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    network_mode: "host"

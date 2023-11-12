@@ -14,6 +14,9 @@ func (s *server) GetManga(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
+	if resp == nil {
+		return ctx.JSON(http.StatusOK, make([]catalog.MangaResponse, 0))
+	}
 	return ctx.JSON(http.StatusOK, resp)
 }
 
