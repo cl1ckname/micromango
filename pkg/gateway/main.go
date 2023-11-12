@@ -64,20 +64,20 @@ func Run(ctx context.Context, c Config) <-chan error {
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
-	e.POST("user/register", serv.Register)
-	e.POST("user/login", serv.Login)
-	e.GET("user/:userId", serv.Login)
+	e.POST("api/user/register", serv.Register)
+	e.POST("api/user/login", serv.Login)
+	e.GET("api/user/:userId", serv.Login)
 
-	e.GET("content/:mangaId", serv.GetMangaContent)
-	e.POST("content", serv.AddMangaContent)
-	e.GET("content/:mangaId/chapter/:chapterId", serv.GetChapter)
-	e.POST("content/:mangaId/chapter", serv.AddChapter)
-	e.GET("content/:mangaId/chapter/:chapterId/page/:pageId", serv.GetPage)
-	e.POST("content/:mangaId/chapter/:chapterId/page", serv.AddChapter)
+	e.GET("api/content/:mangaId", serv.GetMangaContent)
+	e.POST("api/content", serv.AddMangaContent)
+	e.GET("api/content/:mangaId/chapter/:chapterId", serv.GetChapter)
+	e.POST("api/content/:mangaId/chapter", serv.AddChapter)
+	e.GET("api/content/:mangaId/chapter/:chapterId/page/:pageId", serv.GetPage)
+	e.POST("api/content/:mangaId/chapter/:chapterId/page", serv.AddChapter)
 
-	e.GET("catalog", serv.GetMangas)
-	e.GET("catalog/:mangaId", serv.GetManga)
-	e.POST("catalog", serv.AddManga)
+	e.GET("api/catalog", serv.GetMangas)
+	e.GET("api/catalog/:mangaId", serv.GetManga)
+	e.POST("api/catalog", serv.AddManga)
 }
 
 func applyStaticProxy(e *echo.Echo, c Config) {
