@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"log"
 	"micromango/pkg/services/user"
 	"os"
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
+	}
 	c := user.Config{
 		Addr:      os.Getenv("USER_ADDR"),
 		DbAddr:    os.Getenv("USER_DB_ADDR"),

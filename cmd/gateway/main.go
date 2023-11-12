@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"log"
 	"micromango/pkg/gateway"
 	"os"
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
+	}
 	c := gateway.Config{
 		Addr:        os.Getenv("GATEWAY_ADDR"),
 		UserAddr:    os.Getenv("USER_ADDR"),
