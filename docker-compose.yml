@@ -21,6 +21,13 @@ services:
     env_file:
       - .env
     network_mode: "host"
+  static:
+    build:
+      context: .
+      dockerfile: docker/static/Dockerfile
+    env_file:
+      - .env
+    network_mode: "host"
   gateway:
     build:
       context: .
@@ -32,3 +39,4 @@ services:
       - user
       - reading
       - catalog
+      - static

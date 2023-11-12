@@ -5,4 +5,5 @@ type Config struct {
 	UserAddr    string
 	CatalogAddr string
 	ReadingAddr string
+	StaticAddr  string
 }
