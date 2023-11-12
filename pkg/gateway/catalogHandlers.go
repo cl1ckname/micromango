@@ -22,7 +22,7 @@ func (s *server) GetMangas(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
-	return ctx.JSON(http.StatusOK, mangas)
+	return ctx.JSON(http.StatusOK, mangas.Mangas)
 }
 
 func (s *server) AddManga(ctx echo.Context) error {
