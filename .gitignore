@@ -3,5 +3,5 @@
 *.sqlite
 vendor
 static/
-/*/static
+/static
 micromango-client
