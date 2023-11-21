@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -17,6 +18,7 @@ import (
 func Run(ctx context.Context, c Config) <-chan error {
 	e := echo.New()
 	serv := server{}
+	e.Use(middleware.CORS())
 
 	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
