@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.25.0
-// source: api/protobuf/catalog.proto
+// source: catalog.proto
 
 package catalog
 
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Catalog_GetManga_FullMethodName  = "/catalog.Catalog/GetManga"
-	Catalog_GetMangas_FullMethodName = "/catalog.Catalog/GetMangas"
-	Catalog_AddManga_FullMethodName  = "/catalog.Catalog/AddManga"
+	Catalog_GetManga_FullMethodName  = "/micromango.Catalog/GetManga"
+	Catalog_GetMangas_FullMethodName = "/micromango.Catalog/GetMangas"
+	Catalog_AddManga_FullMethodName  = "/micromango.Catalog/AddManga"
 )
 
 // CatalogClient is the client API for Catalog service.
@@ -162,7 +162,7 @@ func _Catalog_AddManga_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Catalog_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "catalog.Catalog",
+	ServiceName: "micromango.Catalog",
 	HandlerType: (*CatalogServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -179,5 +179,5 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/protobuf/catalog.proto",
+	Metadata: "catalog.proto",
 }

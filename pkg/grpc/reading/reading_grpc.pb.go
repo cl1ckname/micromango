@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.25.0
-// source: api/protobuf/reading.proto
+// source: reading.proto
 
 package reading
 
@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Reading_GetMangaContent_FullMethodName = "/reading.Reading/GetMangaContent"
-	Reading_AddMangaContent_FullMethodName = "/reading.Reading/AddMangaContent"
-	Reading_GetChapter_FullMethodName      = "/reading.Reading/GetChapter"
-	Reading_AddChapter_FullMethodName      = "/reading.Reading/AddChapter"
-	Reading_GetPage_FullMethodName         = "/reading.Reading/GetPage"
-	Reading_AddPage_FullMethodName         = "/reading.Reading/AddPage"
+	Reading_GetMangaContent_FullMethodName = "/micromango.Reading/GetMangaContent"
+	Reading_AddMangaContent_FullMethodName = "/micromango.Reading/AddMangaContent"
+	Reading_GetChapter_FullMethodName      = "/micromango.Reading/GetChapter"
+	Reading_AddChapter_FullMethodName      = "/micromango.Reading/AddChapter"
+	Reading_GetPage_FullMethodName         = "/micromango.Reading/GetPage"
+	Reading_AddPage_FullMethodName         = "/micromango.Reading/AddPage"
 )
 
 // ReadingClient is the client API for Reading service.
@@ -261,7 +261,7 @@ func _Reading_AddPage_Handler(srv interface{}, ctx context.Context, dec func(int
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Reading_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "reading.Reading",
+	ServiceName: "micromango.Reading",
 	HandlerType: (*ReadingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -290,5 +290,5 @@ var Reading_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/protobuf/reading.proto",
+	Metadata: "reading.proto",
 }

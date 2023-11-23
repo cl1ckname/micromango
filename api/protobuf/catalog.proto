@@ -1,10 +1,12 @@
 syntax="proto3";
-package catalog;
+package micromango;
 option go_package="pkg/grpc/catalog";
+
+import "reading.proto";
 
 service Catalog {
   rpc GetManga(MangaRequest) returns (MangaResponse);
-  rpc GetMangas(Empty) returns (MangasResponse);
+  rpc GetMangas(Empty) returns (MangaPreviewResponse);
   rpc AddManga(AddMangaRequest) returns (MangaResponse);
 }
 
@@ -24,6 +26,13 @@ message MangaResponse {
   string cover = 3;
   string description = 4;
   uint32 chapterNumber = 5;
+  MangaContentResponse content = 6;
+}
+
+message MangaPreviewResponse {
+  string mangaId = 1;
+  string title = 2;
+  string cover = 3;
 }
 
 message AddMangaRequest {
