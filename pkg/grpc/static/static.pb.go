@@ -20,7 +20,100 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type UploadCoverRequest struct {
+type ImageFormat int32
+
+const (
+	ImageFormat_PNG ImageFormat = 0
+	ImageFormat_JPG ImageFormat = 1
+)
+
+// Enum value maps for ImageFormat.
+var (
+	ImageFormat_name = map[int32]string{
+		0: "PNG",
+		1: "JPG",
+	}
+	ImageFormat_value = map[string]int32{
+		"PNG": 0,
+		"JPG": 1,
+	}
+)
+
+func (x ImageFormat) Enum() *ImageFormat {
+	p := new(ImageFormat)
+	*p = x
+	return p
+}
+
+func (x ImageFormat) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImageFormat) Descriptor() protoreflect.EnumDescriptor {
+	return file_static_proto_enumTypes[0].Descriptor()
+}
+
+func (ImageFormat) Type() protoreflect.EnumType {
+	return &file_static_proto_enumTypes[0]
+}
+
+func (x ImageFormat) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImageFormat.Descriptor instead.
+func (ImageFormat) EnumDescriptor() ([]byte, []int) {
+	return file_static_proto_rawDescGZIP(), []int{0}
+}
+
+type GetImageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ImageId string `protobuf:"bytes,1,opt,name=imageId,proto3" json:"imageId,omitempty"`
+}
+
+func (x *GetImageRequest) Reset() {
+	*x = GetImageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_static_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetImageRequest) ProtoMessage() {}
+
+func (x *GetImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_static_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetImageRequest.ProtoReflect.Descriptor instead.
+func (*GetImageRequest) Descriptor() ([]byte, []int) {
+	return file_static_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetImageRequest) GetImageId() string {
+	if x != nil {
+		return x.ImageId
+	}
+	return ""
+}
+
+type ImageResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -28,10 +121,58 @@ type UploadCoverRequest struct {
 	Image []byte `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 }
 
+func (x *ImageResponse) Reset() {
+	*x = ImageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_static_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImageResponse) ProtoMessage() {}
+
+func (x *ImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_static_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImageResponse.ProtoReflect.Descriptor instead.
+func (*ImageResponse) Descriptor() ([]byte, []int) {
+	return file_static_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ImageResponse) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
+}
+
+type UploadCoverRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Image  []byte      `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Format ImageFormat `protobuf:"varint,2,opt,name=format,proto3,enum=micromango.ImageFormat" json:"format,omitempty"`
+}
+
 func (x *UploadCoverRequest) Reset() {
 	*x = UploadCoverRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_static_proto_msgTypes[0]
+		mi := &file_static_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -44,7 +185,7 @@ func (x *UploadCoverRequest) String() string {
 func (*UploadCoverRequest) ProtoMessage() {}
 
 func (x *UploadCoverRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_static_proto_msgTypes[0]
+	mi := &file_static_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +198,7 @@ func (x *UploadCoverRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadCoverRequest.ProtoReflect.Descriptor instead.
 func (*UploadCoverRequest) Descriptor() ([]byte, []int) {
-	return file_static_proto_rawDescGZIP(), []int{0}
+	return file_static_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *UploadCoverRequest) GetImage() []byte {
@@ -65,6 +206,13 @@ func (x *UploadCoverRequest) GetImage() []byte {
 		return x.Image
 	}
 	return nil
+}
+
+func (x *UploadCoverRequest) GetFormat() ImageFormat {
+	if x != nil {
+		return x.Format
+	}
+	return ImageFormat_PNG
 }
 
 type UploadImageResponse struct {
@@ -78,7 +226,7 @@ type UploadImageResponse struct {
 func (x *UploadImageResponse) Reset() {
 	*x = UploadImageResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_static_proto_msgTypes[1]
+		mi := &file_static_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -91,7 +239,7 @@ func (x *UploadImageResponse) String() string {
 func (*UploadImageResponse) ProtoMessage() {}
 
 func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_static_proto_msgTypes[1]
+	mi := &file_static_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +252,7 @@ func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadImageResponse.ProtoReflect.Descriptor instead.
 func (*UploadImageResponse) Descriptor() ([]byte, []int) {
-	return file_static_proto_rawDescGZIP(), []int{1}
+	return file_static_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UploadImageResponse) GetImageId() string {
@@ -118,21 +266,36 @@ var File_static_proto protoreflect.FileDescriptor
 
 var file_static_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x73, 0x74, 0x61, 0x74, 0x69, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0a,
-	0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x22, 0x2a, 0x0a, 0x12, 0x55, 0x70,
-	0x6c, 0x6f, 0x61, 0x64, 0x43, 0x6f, 0x76, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
-	0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x22, 0x2f, 0x0a, 0x13, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
-	0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a,
+	0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x22, 0x2b, 0x0a, 0x0f, 0x47, 0x65,
+	0x74, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a,
 	0x07, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
-	0x69, 0x6d, 0x61, 0x67, 0x65, 0x49, 0x64, 0x32, 0x58, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x69,
-	0x63, 0x12, 0x4e, 0x0a, 0x0b, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x6f, 0x76, 0x65, 0x72,
-	0x12, 0x1e, 0x2e, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x55, 0x70,
-	0x6c, 0x6f, 0x61, 0x64, 0x43, 0x6f, 0x76, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x1f, 0x2e, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x55, 0x70,
-	0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x42, 0x1c, 0x5a, 0x1a, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2f,
-	0x70, 0x6b, 0x67, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x69, 0x63, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x6d, 0x61, 0x67, 0x65, 0x49, 0x64, 0x22, 0x25, 0x0a, 0x0d, 0x49, 0x6d, 0x61, 0x67, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x22, 0x5b,
+	0x0a, 0x12, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x6f, 0x76, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x2f, 0x0a, 0x06, 0x66, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x17, 0x2e, 0x6d, 0x69, 0x63,
+	0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x46, 0x6f, 0x72,
+	0x6d, 0x61, 0x74, 0x52, 0x06, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x22, 0x2f, 0x0a, 0x13, 0x55,
+	0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x49, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x49, 0x64, 0x2a, 0x1f, 0x0a, 0x0b,
+	0x49, 0x6d, 0x61, 0x67, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x07, 0x0a, 0x03, 0x50,
+	0x4e, 0x47, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x4a, 0x50, 0x47, 0x10, 0x01, 0x32, 0x9c, 0x01,
+	0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x69, 0x63, 0x12, 0x42, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x12, 0x1b, 0x2e, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67,
+	0x6f, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x19, 0x2e, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4e, 0x0a, 0x0b,
+	0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43, 0x6f, 0x76, 0x65, 0x72, 0x12, 0x1e, 0x2e, 0x6d, 0x69,
+	0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x43,
+	0x6f, 0x76, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x6d, 0x69,
+	0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x1c, 0x5a, 0x1a,
+	0x6d, 0x69, 0x63, 0x72, 0x6f, 0x6d, 0x61, 0x6e, 0x67, 0x6f, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x67,
+	0x72, 0x70, 0x63, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x69, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -147,19 +310,26 @@ func file_static_proto_rawDescGZIP() []byte {
 	return file_static_proto_rawDescData
 }
 
-var file_static_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_static_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_static_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_static_proto_goTypes = []interface{}{
-	(*UploadCoverRequest)(nil),  // 0: micromango.UploadCoverRequest
-	(*UploadImageResponse)(nil), // 1: micromango.UploadImageResponse
+	(ImageFormat)(0),            // 0: micromango.ImageFormat
+	(*GetImageRequest)(nil),     // 1: micromango.GetImageRequest
+	(*ImageResponse)(nil),       // 2: micromango.ImageResponse
+	(*UploadCoverRequest)(nil),  // 3: micromango.UploadCoverRequest
+	(*UploadImageResponse)(nil), // 4: micromango.UploadImageResponse
 }
 var file_static_proto_depIdxs = []int32{
-	0, // 0: micromango.Static.UploadCover:input_type -> micromango.UploadCoverRequest
-	1, // 1: micromango.Static.UploadCover:output_type -> micromango.UploadImageResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: micromango.UploadCoverRequest.format:type_name -> micromango.ImageFormat
+	1, // 1: micromango.Static.GetImage:input_type -> micromango.GetImageRequest
+	3, // 2: micromango.Static.UploadCover:input_type -> micromango.UploadCoverRequest
+	2, // 3: micromango.Static.GetImage:output_type -> micromango.ImageResponse
+	4, // 4: micromango.Static.UploadCover:output_type -> micromango.UploadImageResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_static_proto_init() }
@@ -169,7 +339,7 @@ func file_static_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_static_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UploadCoverRequest); i {
+			switch v := v.(*GetImageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -181,6 +351,30 @@ func file_static_proto_init() {
 			}
 		}
 		file_static_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ImageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_static_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadCoverRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_static_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UploadImageResponse); i {
 			case 0:
 				return &v.state
@@ -198,13 +392,14 @@ func file_static_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_static_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_static_proto_goTypes,
 		DependencyIndexes: file_static_proto_depIdxs,
+		EnumInfos:         file_static_proto_enumTypes,
 		MessageInfos:      file_static_proto_msgTypes,
 	}.Build()
 	File_static_proto = out.File

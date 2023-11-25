@@ -1,13 +1,28 @@
-syntax="proto3";
+syntax = "proto3";
 package micromango;
-option go_package="micromango/pkg/grpc/static";
+option go_package = "micromango/pkg/grpc/static";
 
 service Static {
- rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
+  rpc GetImage(GetImageRequest) returns (ImageResponse);
+  rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
+}
+
+enum ImageFormat {
+  PNG = 0;
+  JPG = 1;
+}
+
+message GetImageRequest {
+  string imageId = 1;
+}
+
+message ImageResponse {
+  bytes image = 1;
 }
 
 message UploadCoverRequest {
   bytes image = 1;
+  ImageFormat format = 2;
 }
 
 message UploadImageResponse {

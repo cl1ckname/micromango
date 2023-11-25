@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Static_GetImage_FullMethodName    = "/micromango.Static/GetImage"
 	Static_UploadCover_FullMethodName = "/micromango.Static/UploadCover"
 )
 
@@ -26,6 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StaticClient interface {
+	GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*ImageResponse, error)
 	UploadCover(ctx context.Context, in *UploadCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 }
 
@@ -35,6 +37,15 @@ type staticClient struct {
 
 func NewStaticClient(cc grpc.ClientConnInterface) StaticClient {
 	return &staticClient{cc}
+}
+
+func (c *staticClient) GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*ImageResponse, error) {
+	out := new(ImageResponse)
+	err := c.cc.Invoke(ctx, Static_GetImage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *staticClient) UploadCover(ctx context.Context, in *UploadCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
@@ -50,6 +61,7 @@ func (c *staticClient) UploadCover(ctx context.Context, in *UploadCoverRequest, 
 // All implementations must embed UnimplementedStaticServer
 // for forward compatibility
 type StaticServer interface {
+	GetImage(context.Context, *GetImageRequest) (*ImageResponse, error)
 	UploadCover(context.Context, *UploadCoverRequest) (*UploadImageResponse, error)
 	mustEmbedUnimplementedStaticServer()
 }
@@ -58,6 +70,9 @@ type StaticServer interface {
 type UnimplementedStaticServer struct {
 }
 
+func (UnimplementedStaticServer) GetImage(context.Context, *GetImageRequest) (*ImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetImage not implemented")
+}
 func (UnimplementedStaticServer) UploadCover(context.Context, *UploadCoverRequest) (*UploadImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadCover not implemented")
 }
@@ -72,6 +87,24 @@ type UnsafeStaticServer interface {
 
 func RegisterStaticServer(s grpc.ServiceRegistrar, srv StaticServer) {
 	s.RegisterService(&Static_ServiceDesc, srv)
+}
+
+func _Static_GetImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaticServer).GetImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Static_GetImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaticServer).GetImage(ctx, req.(*GetImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Static_UploadCover_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -99,6 +132,10 @@ var Static_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "micromango.Static",
 	HandlerType: (*StaticServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetImage",
+			Handler:    _Static_GetImage_Handler,
+		},
 		{
 			MethodName: "UploadCover",
 			Handler:    _Static_UploadCover_Handler,
