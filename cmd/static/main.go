@@ -18,7 +18,7 @@ func main() {
 
 	config := static.Config{
 		ServerAddr: os.Getenv("STATIC_ADDR"),
-		StaticDir:  "/static",
+		StaticDir:  "static",
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

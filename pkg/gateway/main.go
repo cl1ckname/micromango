@@ -9,9 +9,8 @@ import (
 	"log"
 	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/reading"
+	"micromango/pkg/grpc/static"
 	"micromango/pkg/grpc/user"
-	"net/http/httputil"
-	"net/url"
 	"time"
 )
 
@@ -40,8 +39,13 @@ func Run(ctx context.Context, c Config) <-chan error {
 	}
 	serv.reading = reading.NewReadingClient(conn)
 
+	conn, err = grpc.Dial(c.StaticAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.static = static.NewStaticClient(conn)
+
 	applyHandlers(e, serv)
-	applyStaticProxy(e, c)
 
 	ok := make(chan error)
 
@@ -80,14 +84,8 @@ func applyHandlers(e *echo.Echo, serv server) {
 	e.GET("api/catalog", serv.GetMangas)
 	e.GET("api/catalog/:mangaId", serv.GetManga)
 	e.POST("api/catalog", serv.AddManga)
-}
 
-func applyStaticProxy(e *echo.Echo, c Config) {
-	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "http",
-		Host:   c.StaticAddr,
-	})
-	e.Any("/", echo.WrapHandler(proxy))
+	e.GET("static/:id", serv.GetStatic)
 }
 
 type server struct {
@@ -95,4 +93,5 @@ type server struct {
 	user    user.UserClient
 	reading reading.ReadingClient
 	catalog catalog.CatalogClient
+	static  static.StaticClient
 }

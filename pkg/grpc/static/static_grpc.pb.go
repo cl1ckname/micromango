@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StaticClient interface {
 	GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*ImageResponse, error)
-	UploadCover(ctx context.Context, in *UploadCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
+	UploadCover(ctx context.Context, in *UploadImageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 }
 
 type staticClient struct {
@@ -48,7 +48,7 @@ func (c *staticClient) GetImage(ctx context.Context, in *GetImageRequest, opts .
 	return out, nil
 }
 
-func (c *staticClient) UploadCover(ctx context.Context, in *UploadCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
+func (c *staticClient) UploadCover(ctx context.Context, in *UploadImageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
 	out := new(UploadImageResponse)
 	err := c.cc.Invoke(ctx, Static_UploadCover_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *staticClient) UploadCover(ctx context.Context, in *UploadCoverRequest, 
 // for forward compatibility
 type StaticServer interface {
 	GetImage(context.Context, *GetImageRequest) (*ImageResponse, error)
-	UploadCover(context.Context, *UploadCoverRequest) (*UploadImageResponse, error)
+	UploadCover(context.Context, *UploadImageRequest) (*UploadImageResponse, error)
 	mustEmbedUnimplementedStaticServer()
 }
 
@@ -73,7 +73,7 @@ type UnimplementedStaticServer struct {
 func (UnimplementedStaticServer) GetImage(context.Context, *GetImageRequest) (*ImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetImage not implemented")
 }
-func (UnimplementedStaticServer) UploadCover(context.Context, *UploadCoverRequest) (*UploadImageResponse, error) {
+func (UnimplementedStaticServer) UploadCover(context.Context, *UploadImageRequest) (*UploadImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadCover not implemented")
 }
 func (UnimplementedStaticServer) mustEmbedUnimplementedStaticServer() {}
@@ -108,7 +108,7 @@ func _Static_GetImage_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Static_UploadCover_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UploadCoverRequest)
+	in := new(UploadImageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func _Static_UploadCover_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: Static_UploadCover_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaticServer).UploadCover(ctx, req.(*UploadCoverRequest))
+		return srv.(StaticServer).UploadCover(ctx, req.(*UploadImageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

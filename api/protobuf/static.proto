@@ -4,12 +4,12 @@ option go_package = "micromango/pkg/grpc/static";
 
 service Static {
   rpc GetImage(GetImageRequest) returns (ImageResponse);
-  rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
+  rpc UploadCover(UploadImageRequest) returns (UploadImageResponse);
 }
 
-enum ImageFormat {
-  PNG = 0;
-  JPG = 1;
+enum ImageType {
+  JPG = 0;
+  PNG = 1;
 }
 
 message GetImageRequest {
@@ -20,9 +20,9 @@ message ImageResponse {
   bytes image = 1;
 }
 
-message UploadCoverRequest {
+message UploadImageRequest {
   bytes image = 1;
-  ImageFormat format = 2;
+  ImageType type = 2;
 }
 
 message UploadImageResponse {

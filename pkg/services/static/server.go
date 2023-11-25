@@ -22,23 +22,31 @@ type server struct {
 	pb.UnimplementedStaticServer
 }
 
-func (s *server) UploadCover(_ context.Context, req *pb.UploadCoverRequest) (*pb.UploadImageResponse, error) {
+func (s *server) UploadCover(_ context.Context, req *pb.UploadImageRequest) (*pb.UploadImageResponse, error) {
 	id := uuid.NewString()
 	var ext string
-	if req.Format == pb.ImageFormat_JPG {
+	var imageBytes []byte
+	if req.Type == pb.ImageType_JPG {
 		ext = ".jpg"
-	} else if req.Format == pb.ImageFormat_PNG {
+		imageBytes = req.Image
+	} else if req.Type == pb.ImageType_PNG {
 		ext = ".png"
+		jpgBytes, err := ToJpeg(req.Image)
+		if err != nil {
+			return nil, err
+		}
+		imageBytes = jpgBytes
 	} else {
-		return nil, fmt.Errorf("forbiden image format: %v", req.Format)
+		return nil, fmt.Errorf("forbiden image format: %v", req.Type)
 	}
+
 	extFilePath := id + ext
 	filePath := path.Join(s.staticDir, extFilePath)
 	f, err := os.Create(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if _, err := f.Write(req.Image); err != nil {
+	if _, err := f.Write(imageBytes); err != nil {
 		return nil, err
 	}
 	return &pb.UploadImageResponse{ImageId: extFilePath}, nil

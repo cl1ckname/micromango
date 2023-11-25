@@ -63,7 +63,7 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
 	var coverAddr string
 	if len(req.Cover) != 0 {
-		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{Image: req.Cover})
+		uploadResp, err := s.static.UploadCover(ctx, &static.UploadImageRequest{Image: req.Cover})
 		if err != nil {
 			return nil, err
 		}
