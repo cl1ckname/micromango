@@ -64,9 +64,13 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 
 func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, error) {
 	ms, err := GetMangas(s.db)
-	mangas := make([]*pb.MangaResponse, len(ms))
+	mangas := make([]*pb.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
-		mangas[i] = m.ToResponse()
+		mangas[i] = &pb.MangaPreviewResponse{
+			MangaId: m.MangaId.String(),
+			Title:   m.Title,
+			Cover:   m.Cover,
+		}
 	}
 	return &pb.MangasResponse{Mangas: mangas}, err
 }

@@ -1,6 +1,6 @@
 syntax="proto3";
 package micromango;
-option go_package="pkg/grpc/reading";
+option go_package="micromango/pkg/grpc/reading";
 
 service Reading {
   rpc GetMangaContent(MangaContentRequest) returns (MangaContentResponse);
