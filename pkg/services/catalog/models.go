@@ -20,10 +20,9 @@ func (m *Manga) BeforeCreate(*gorm.DB) error {
 
 func (m *Manga) ToResponse() *pb.MangaResponse {
 	return &pb.MangaResponse{
-		MangaId:       m.MangaId.String(),
-		Title:         m.Title,
-		Cover:         m.Cover,
-		Description:   m.Description,
-		ChapterNumber: 0,
+		MangaId:     m.MangaId.String(),
+		Title:       m.Title,
+		Cover:       m.Cover,
+		Description: m.Description,
 	}
 }

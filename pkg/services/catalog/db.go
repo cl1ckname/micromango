@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
-	pb "micromango/pkg/grpc/catalog"
 	"os"
 	"time"
 )
@@ -54,12 +53,7 @@ func GetMangas(db *gorm.DB) ([]Manga, error) {
 	return mangas, nil
 }
 
-func AddManga(db *gorm.DB, req *pb.AddMangaRequest) (Manga, error) {
-	m := Manga{
-		Title:       req.Title,
-		Cover:       req.Cover,
-		Description: req.Description,
-	}
+func AddManga(db *gorm.DB, m Manga) (Manga, error) {
 	if res := db.Create(&m); res.Error != nil {
 		return Manga{}, res.Error
 	}

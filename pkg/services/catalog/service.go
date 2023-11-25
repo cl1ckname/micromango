@@ -7,8 +7,10 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"micromango/pkg/common"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/reading"
+	"micromango/pkg/grpc/static"
 )
 
 func Run(ctx context.Context, c Config) <-chan error {
@@ -20,9 +22,16 @@ func Run(ctx context.Context, c Config) <-chan error {
 	}
 	readingService := reading.NewReadingClient(conn)
 
+	conn, err = grpc.Dial(c.StaticServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	staticService := static.NewStaticClient(conn)
+
 	serv := service{
 		db:      database,
 		reading: readingService,
+		static:  staticService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterCatalogServer(baseServer, &serv)
@@ -34,6 +43,7 @@ type service struct {
 	pb.UnimplementedCatalogServer
 	db      *gorm.DB
 	reading reading.ReadingClient
+	static  static.StaticClient
 }
 
 func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
@@ -51,7 +61,20 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 }
 
 func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
-	m, err := AddManga(s.db, req)
+	var coverAddr string
+	if len(req.Cover) != 0 {
+		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{Image: req.Cover})
+		if err != nil {
+			return nil, err
+		}
+		coverAddr = uploadResp.ImageId
+	}
+
+	m, err := AddManga(s.db, Manga{
+		Title:       req.Title,
+		Cover:       coverAddr,
+		Description: utils.DerefOrDefault(req.Description, ""),
+	})
 	if err != nil {
 		return nil, err
 	}

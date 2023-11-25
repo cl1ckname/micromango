@@ -25,7 +25,6 @@ message MangaResponse {
   string title = 2;
   string cover = 3;
   string description = 4;
-  uint32 chapterNumber = 5;
   MangaContentResponse content = 6;
 }
 
@@ -37,6 +36,6 @@ message MangaPreviewResponse {
 
 message AddMangaRequest {
   string title = 1;
-  string cover = 2;
-  string description = 3;
+  optional bytes cover = 2;
+  optional string description = 3;
 }
