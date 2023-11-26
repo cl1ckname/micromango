@@ -3,7 +3,10 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"io"
+	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/catalog"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -30,12 +33,32 @@ func (s *server) GetMangas(ctx echo.Context) error {
 
 func (s *server) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
-	if err := ctx.Bind(&addMangaReq); err != nil {
+	addMangaReq.Title = ctx.FormValue("title")
+	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
+	formFile, err := ctx.FormFile("cover")
+	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
+	imageBytes, err := readFormFile(formFile)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+	}
+	addMangaReq.Cover = imageBytes
 	resp, err := s.catalog.AddManga(context.TODO(), &addMangaReq)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, resp)
+}
+
+func readFormFile(formFile *multipart.FileHeader) ([]byte, error) {
+	file, err := formFile.Open()
+	if err != nil {
+		return nil, err
+	}
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return imageBytes, nil
 }

@@ -13,12 +13,14 @@ import (
 )
 
 type Config struct {
-	ServerAddr string
-	StaticDir  string
+	ServerAddr  string
+	GatewayAddr string
+	StaticDir   string
 }
 
 type server struct {
-	staticDir string
+	staticDir   string
+	gatewayAddr string
 	pb.UnimplementedStaticServer
 }
 
@@ -40,8 +42,8 @@ func (s *server) UploadCover(_ context.Context, req *pb.UploadImageRequest) (*pb
 		return nil, fmt.Errorf("forbiden image format: %v", req.Type)
 	}
 
-	extFilePath := id + ext
-	filePath := path.Join(s.staticDir, extFilePath)
+	filename := id + ext
+	filePath := path.Join(s.staticDir, filename)
 	f, err := os.Create(filePath)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,8 @@ func (s *server) UploadCover(_ context.Context, req *pb.UploadImageRequest) (*pb
 	if _, err := f.Write(imageBytes); err != nil {
 		return nil, err
 	}
-	return &pb.UploadImageResponse{ImageId: extFilePath}, nil
+	extFileName := s.gatewayAddr + "/static/" + filename
+	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
 func (s *server) GetImage(_ context.Context, req *pb.GetImageRequest) (*pb.ImageResponse, error) {
@@ -68,7 +71,8 @@ func (s *server) GetImage(_ context.Context, req *pb.GetImageRequest) (*pb.Image
 
 func Run(ctx context.Context, c Config) <-chan error {
 	s := server{
-		staticDir: c.StaticDir,
+		staticDir:   c.StaticDir,
+		gatewayAddr: c.GatewayAddr,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterStaticServer(baseServer, &s)
