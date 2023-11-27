@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	pb "micromango/pkg/grpc/catalog"
+	"time"
 )
 
 type Manga struct {
@@ -11,10 +12,12 @@ type Manga struct {
 	Title       string    `json:"title"`
 	Cover       string    `json:"cover"`
 	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 func (m *Manga) BeforeCreate(*gorm.DB) error {
 	m.MangaId = uuid.New()
+	m.CreatedAt = time.Now()
 	return nil
 }
 
@@ -24,5 +27,6 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Title:       m.Title,
 		Cover:       m.Cover,
 		Description: m.Description,
+		CreatedAt:   m.CreatedAt.String(),
 	}
 }

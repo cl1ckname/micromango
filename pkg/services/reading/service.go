@@ -70,6 +70,7 @@ func mangaContentToPb(m MangaContent) *pb.MangaContentResponse {
 			ChapterId: c.ChapterId.String(),
 			Number:    c.Number,
 			Title:     c.Title,
+			CreatedAt: c.CreatedAt.String(),
 		}
 	}
 	return &pb.MangaContentResponse{
@@ -120,6 +121,7 @@ func chapterToPb(c Chapter) *pb.ChapterResponse {
 		Number:    c.Number,
 		Title:     c.Title,
 		Pages:     pages,
+		CreatedAt: c.CreatedAt.String(),
 	}
 }
 

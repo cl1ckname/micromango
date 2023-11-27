@@ -26,6 +26,7 @@ message MangaResponse {
   string cover = 3;
   string description = 4;
   MangaContentResponse content = 6;
+  string createdAt = 5;
 }
 
 message MangaPreviewResponse {

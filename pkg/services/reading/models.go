@@ -3,6 +3,7 @@ package reading
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"time"
 )
 
 type MangaContent struct {
@@ -23,12 +24,14 @@ type Chapter struct {
 	Title     string    `json:"title"`
 	Number    float32   `json:"number"`
 	Pages     []Page    `json:"pages"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func (chapter *Chapter) BeforeCreate(*gorm.DB) error {
 	if chapter.ChapterId == uuid.Nil {
 		chapter.ChapterId = uuid.New()
 	}
+	chapter.CreatedAt = time.Now()
 	return nil
 }
 

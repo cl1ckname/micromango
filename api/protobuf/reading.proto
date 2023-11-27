@@ -28,6 +28,7 @@ message MangaContentResponse {
     string chapterId = 1;
     float number = 2;
     string title = 4;
+    string createdAt = 5;
   }
   repeated ChapterHead chapters = 2;
 }
@@ -59,6 +60,7 @@ message ChapterResponse {
     string image = 4;
   }
   repeated PageHead pages = 5;
+  string createdAt = 6;
 }
 
 message AddPageRequest {
