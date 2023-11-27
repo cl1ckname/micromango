@@ -136,7 +136,12 @@ func (s *service) GetPage(_ context.Context, req *pb.PageRequest) (*pb.PageRespo
 func (s *service) AddPage(ctx context.Context, req *pb.AddPageRequest) (*pb.PageResponse, error) {
 	var imageUrl string
 	if len(req.Image) > 0 {
-		res, err := s.static.UploadCover(ctx, &static.UploadImageRequest{Image: req.Image})
+		res, err := s.static.UploadPage(ctx, &static.UploadPageRequest{
+			MangaId:   req.MangaId,
+			ChapterId: req.ChapterId,
+			Image:     req.Image,
+			Type:      0, // FIXME
+		})
 		if err != nil {
 			return nil, err
 		}

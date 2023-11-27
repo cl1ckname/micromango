@@ -3,6 +3,7 @@ package catalog
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -67,9 +68,14 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 }
 
 func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
+	mangaId := uuid.New()
 	var coverAddr string
 	if len(req.Cover) != 0 {
-		uploadResp, err := s.static.UploadCover(ctx, &static.UploadImageRequest{Image: req.Cover})
+		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{
+			MangaId: mangaId.String(),
+			Image:   req.Cover,
+			Type:    0, // FIXME
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -77,6 +83,7 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 	}
 
 	m, err := AddManga(s.db, Manga{
+		MangaId:     mangaId,
 		Title:       req.Title,
 		Cover:       coverAddr,
 		Description: utils.DerefOrDefault(req.Description, ""),

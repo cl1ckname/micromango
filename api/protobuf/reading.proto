@@ -64,9 +64,10 @@ message ChapterResponse {
 }
 
 message AddPageRequest {
-  string chapterId = 1;
-  uint32 number = 2;
-  bytes image = 3;
+  string mangaId = 1;
+  string chapterId = 2;
+  uint32 number = 3;
+  bytes image = 4;
 }
 
 message PageRequest {

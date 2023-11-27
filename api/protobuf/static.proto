@@ -4,7 +4,9 @@ option go_package = "micromango/pkg/grpc/static";
 
 service Static {
   rpc GetImage(GetImageRequest) returns (ImageResponse);
-  rpc UploadCover(UploadImageRequest) returns (UploadImageResponse);
+  rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
+  rpc UploadPage(UploadPageRequest) returns (UploadImageResponse);
+
 }
 
 enum ImageType {
@@ -18,6 +20,19 @@ message GetImageRequest {
 
 message ImageResponse {
   bytes image = 1;
+}
+
+message UploadCoverRequest {
+  string mangaId = 1;
+  bytes image = 2;
+  ImageType type = 3;
+}
+
+message UploadPageRequest {
+  string mangaId = 1;
+  string chapterId = 2;
+  bytes image = 3;
+  ImageType type = 4;
 }
 
 message UploadImageRequest {
