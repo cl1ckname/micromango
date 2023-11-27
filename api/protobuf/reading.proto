@@ -7,6 +7,7 @@ service Reading {
   rpc AddMangaContent(AddMangaContentRequest) returns (MangaContentResponse);
   rpc GetChapter(ChapterRequest) returns (ChapterResponse);
   rpc AddChapter(AddChapterRequest) returns (ChapterResponse);
+  rpc UpdateChapter(UpdateChapterRequest) returns (ChapterResponse);
   rpc GetPage(PageRequest) returns (PageResponse);
   rpc AddPage(AddPageRequest) returns (PageResponse);
 }
@@ -35,6 +36,12 @@ message AddChapterRequest {
   string mangaId = 1;
   string title = 2;
   float number = 3;
+}
+
+message UpdateChapterRequest {
+  string chapterId = 1;
+  optional string title = 2;
+  optional float number = 3;
 }
 
 message ChapterRequest {

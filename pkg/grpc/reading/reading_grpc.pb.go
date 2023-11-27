@@ -23,6 +23,7 @@ const (
 	Reading_AddMangaContent_FullMethodName = "/micromango.Reading/AddMangaContent"
 	Reading_GetChapter_FullMethodName      = "/micromango.Reading/GetChapter"
 	Reading_AddChapter_FullMethodName      = "/micromango.Reading/AddChapter"
+	Reading_UpdateChapter_FullMethodName   = "/micromango.Reading/UpdateChapter"
 	Reading_GetPage_FullMethodName         = "/micromango.Reading/GetPage"
 	Reading_AddPage_FullMethodName         = "/micromango.Reading/AddPage"
 )
@@ -35,6 +36,7 @@ type ReadingClient interface {
 	AddMangaContent(ctx context.Context, in *AddMangaContentRequest, opts ...grpc.CallOption) (*MangaContentResponse, error)
 	GetChapter(ctx context.Context, in *ChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
 	AddChapter(ctx context.Context, in *AddChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
+	UpdateChapter(ctx context.Context, in *UpdateChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
 	GetPage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*PageResponse, error)
 	AddPage(ctx context.Context, in *AddPageRequest, opts ...grpc.CallOption) (*PageResponse, error)
 }
@@ -83,6 +85,15 @@ func (c *readingClient) AddChapter(ctx context.Context, in *AddChapterRequest, o
 	return out, nil
 }
 
+func (c *readingClient) UpdateChapter(ctx context.Context, in *UpdateChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error) {
+	out := new(ChapterResponse)
+	err := c.cc.Invoke(ctx, Reading_UpdateChapter_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *readingClient) GetPage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*PageResponse, error) {
 	out := new(PageResponse)
 	err := c.cc.Invoke(ctx, Reading_GetPage_FullMethodName, in, out, opts...)
@@ -109,6 +120,7 @@ type ReadingServer interface {
 	AddMangaContent(context.Context, *AddMangaContentRequest) (*MangaContentResponse, error)
 	GetChapter(context.Context, *ChapterRequest) (*ChapterResponse, error)
 	AddChapter(context.Context, *AddChapterRequest) (*ChapterResponse, error)
+	UpdateChapter(context.Context, *UpdateChapterRequest) (*ChapterResponse, error)
 	GetPage(context.Context, *PageRequest) (*PageResponse, error)
 	AddPage(context.Context, *AddPageRequest) (*PageResponse, error)
 	mustEmbedUnimplementedReadingServer()
@@ -129,6 +141,9 @@ func (UnimplementedReadingServer) GetChapter(context.Context, *ChapterRequest) (
 }
 func (UnimplementedReadingServer) AddChapter(context.Context, *AddChapterRequest) (*ChapterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddChapter not implemented")
+}
+func (UnimplementedReadingServer) UpdateChapter(context.Context, *UpdateChapterRequest) (*ChapterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateChapter not implemented")
 }
 func (UnimplementedReadingServer) GetPage(context.Context, *PageRequest) (*PageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPage not implemented")
@@ -221,6 +236,24 @@ func _Reading_AddChapter_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Reading_UpdateChapter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateChapterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReadingServer).UpdateChapter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Reading_UpdateChapter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReadingServer).UpdateChapter(ctx, req.(*UpdateChapterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Reading_GetPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PageRequest)
 	if err := dec(in); err != nil {
@@ -279,6 +312,10 @@ var Reading_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddChapter",
 			Handler:    _Reading_AddChapter_Handler,
+		},
+		{
+			MethodName: "UpdateChapter",
+			Handler:    _Reading_UpdateChapter_Handler,
 		},
 		{
 			MethodName: "GetPage",

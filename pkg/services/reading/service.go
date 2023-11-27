@@ -94,6 +94,17 @@ func (s *service) AddChapter(_ context.Context, req *pb.AddChapterRequest) (*pb.
 	return chapterToPb(c), nil
 }
 
+func (s *service) UpdateChapter(_ context.Context, req *pb.UpdateChapterRequest) (*pb.ChapterResponse, error) {
+	c, err := updateChapter(s.db, req)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("chapter %s not found", req.ChapterId))
+		}
+		return nil, err
+	}
+	return chapterToPb(c), nil
+}
+
 func chapterToPb(c Chapter) *pb.ChapterResponse {
 	pages := make([]*pb.ChapterResponse_PageHead, len(c.Pages))
 	for i, p := range c.Pages {

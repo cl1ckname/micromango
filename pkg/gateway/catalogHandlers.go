@@ -15,6 +15,13 @@ func (s *server) GetManga(ctx echo.Context) error {
 	getMangaReq.MangaId = ctx.Param("mangaId")
 	resp, err := s.catalog.GetManga(context.TODO(), &getMangaReq)
 	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+		if st.Code() == codes.NotFound {
+			return ctx.JSON(http.StatusNotFound, struct{ Message string }{err.Error()})
+		}
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	if resp == nil {
@@ -26,13 +33,6 @@ func (s *server) GetManga(ctx echo.Context) error {
 func (s *server) GetMangas(ctx echo.Context) error {
 	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.Empty{})
 	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
-		}
-		if st.Code() == codes.NotFound {
-			return ctx.JSON(http.StatusNotFound, struct{ Message string }{err.Error()})
-		}
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, mangas.Mangas)

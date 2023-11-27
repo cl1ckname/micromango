@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/reading"
 	"os"
 	"time"
@@ -72,6 +73,20 @@ func addChapter(db *gorm.DB, req *pb.AddChapterRequest) (c Chapter, err error) {
 	c.MangaId = mangaId
 	c.Number = req.Number
 	err = db.Create(&c).Error
+	return
+}
+
+func updateChapter(db *gorm.DB, req *pb.UpdateChapterRequest) (c Chapter, err error) {
+	c.ChapterId, err = uuid.Parse(req.ChapterId)
+	if err != nil {
+		return
+	}
+	if err = db.First(&c).Error; err != nil {
+		return
+	}
+	c.Title = utils.DerefOrDefault(req.Title, c.Title)
+	c.Number = utils.DerefOrDefault(req.Number, c.Number)
+	err = db.Save(&c).Error
 	return
 }
 
