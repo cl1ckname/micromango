@@ -84,13 +84,7 @@ func getPage(db *gorm.DB, pageId string) (p Page, err error) {
 	return p, err
 }
 
-func addPage(db *gorm.DB, req *pb.AddPageRequest) (p Page, err error) {
-	p.ChapterId, err = uuid.Parse(req.ChapterId)
-	if err != nil {
-		return Page{}, err
-	}
-	p.PageNumber = req.PageNumber
-	p.Image = req.Image
-	err = db.Create(&p).Error
-	return
+func addPage(db *gorm.DB, req Page) (Page, error) {
+	err := db.Create(&req).Error
+	return req, err
 }

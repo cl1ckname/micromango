@@ -1,6 +1,7 @@
 package reading
 
 type Config struct {
-	Addr   string
-	DbAddr string
+	Addr              string
+	DbAddr            string
+	StaticServiceAddr string
 }

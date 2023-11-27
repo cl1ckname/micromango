@@ -3,10 +3,10 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"io"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/catalog"
-	"mime/multipart"
 	"net/http"
 )
 
@@ -26,6 +26,13 @@ func (s *server) GetManga(ctx echo.Context) error {
 func (s *server) GetMangas(ctx echo.Context) error {
 	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.Empty{})
 	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+		if st.Code() == codes.NotFound {
+			return ctx.JSON(http.StatusNotFound, struct{ Message string }{err.Error()})
+		}
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, mangas.Mangas)
@@ -39,7 +46,7 @@ func (s *server) AddManga(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
-	imageBytes, err := readFormFile(formFile)
+	imageBytes, err := utils.ReadFormFile(formFile)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
@@ -49,16 +56,4 @@ func (s *server) AddManga(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, resp)
-}
-
-func readFormFile(formFile *multipart.FileHeader) ([]byte, error) {
-	file, err := formFile.Open()
-	if err != nil {
-		return nil, err
-	}
-	imageBytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-	return imageBytes, nil
 }

@@ -33,10 +33,10 @@ func (chapter *Chapter) BeforeCreate(*gorm.DB) error {
 }
 
 type Page struct {
-	PageId     uuid.UUID `json:"pageId" gorm:"primaryKey;type:uuid"`
-	ChapterId  uuid.UUID `json:"chapterId"`
-	PageNumber uint32    `json:"pageNumber"`
-	Image      string    `json:"image"`
+	PageId    uuid.UUID `json:"pageId" gorm:"primaryKey;type:uuid"`
+	ChapterId uuid.UUID `json:"chapterId"`
+	Number    uint32    `json:"number"`
+	Image     string    `json:"image"`
 }
 
 func (page *Page) BeforeCreate(*gorm.DB) error {

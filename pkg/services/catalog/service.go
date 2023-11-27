@@ -2,8 +2,11 @@ package catalog
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 	"log"
 	"micromango/pkg/common"
@@ -49,6 +52,9 @@ type service struct {
 func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
 	m, err := GetManga(s.db, req.GetMangaId())
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
+		}
 		return nil, err
 	}
 	content, err := s.reading.GetMangaContent(ctx, &reading.MangaContentRequest{MangaId: m.MangaId.String()})

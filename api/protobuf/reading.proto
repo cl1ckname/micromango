@@ -48,15 +48,16 @@ message ChapterResponse {
   string title = 4;
   message PageHead {
     string pageId = 1;
-    uint32 pageNumber = 3;
+    uint32 number = 3;
+    string image = 4;
   }
   repeated PageHead pages = 5;
 }
 
 message AddPageRequest {
   string chapterId = 1;
-  uint32 pageNumber = 2;
-  string image = 3;
+  uint32 number = 2;
+  bytes image = 3;
 }
 
 message PageRequest {
@@ -66,6 +67,6 @@ message PageRequest {
 message PageResponse {
   string pageId = 1;
   string chapterId = 2;
-  uint32 pageNumber = 3;
+  uint32 number = 3;
   string image = 4;
 }

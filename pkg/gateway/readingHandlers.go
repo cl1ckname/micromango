@@ -3,8 +3,10 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/reading"
 	"net/http"
+	"strconv"
 )
 
 func (s *server) GetMangaContent(ctx echo.Context) error {
@@ -74,10 +76,24 @@ func (s *server) GetPage(ctx echo.Context) error {
 
 func (s *server) AddPage(ctx echo.Context) error {
 	var addMangaContentRequest reading.AddPageRequest
-	addMangaContentRequest.ChapterId = ctx.Param("chapterId")
-	if err := ctx.Bind(&addMangaContentRequest); err != nil {
+	addMangaContentRequest.ChapterId = ctx.FormValue("chapterId")
+	chapterNumberStr := ctx.FormValue("number")
+	chapterNumber, err := strconv.ParseUint(chapterNumberStr, 10, 32)
+	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
+	addMangaContentRequest.Number = uint32(chapterNumber)
+	file, err := ctx.FormFile("image")
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+	}
+	fileBytes, err := utils.ReadFormFile(file)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+	}
+	addMangaContentRequest.Image = fileBytes
+	addMangaContentRequest.ChapterId = ctx.Param("chapterId")
+
 	resp, err := s.reading.AddPage(context.TODO(), &addMangaContentRequest)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
