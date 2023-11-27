@@ -70,6 +70,7 @@ func addChapter(db *gorm.DB, req *pb.AddChapterRequest) (c Chapter, err error) {
 	}
 	c.Title = req.Title
 	c.MangaId = mangaId
+	c.Number = req.Number
 	err = db.Create(&c).Error
 	return
 }

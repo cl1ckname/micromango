@@ -50,9 +50,9 @@ func mangaContentToPb(m MangaContent) *pb.MangaContentResponse {
 	chapters := make([]*pb.MangaContentResponse_ChapterHead, len(m.Chapters))
 	for i, c := range m.Chapters {
 		chapters[i] = &pb.MangaContentResponse_ChapterHead{
-			ChapterId:     c.ChapterId.String(),
-			ChapterNumber: c.ChapterNumber,
-			Title:         c.Title,
+			ChapterId: c.ChapterId.String(),
+			Number:    c.Number,
+			Title:     c.Title,
 		}
 	}
 	return &pb.MangaContentResponse{
@@ -86,11 +86,11 @@ func chapterToPb(c Chapter) *pb.ChapterResponse {
 		}
 	}
 	return &pb.ChapterResponse{
-		ChapterId:     c.ChapterId.String(),
-		MangaId:       c.MangaId.String(),
-		ChapterNumber: c.ChapterNumber,
-		Title:         c.Title,
-		Pages:         pages,
+		ChapterId: c.ChapterId.String(),
+		MangaId:   c.MangaId.String(),
+		Number:    c.Number,
+		Title:     c.Title,
+		Pages:     pages,
 	}
 }
 

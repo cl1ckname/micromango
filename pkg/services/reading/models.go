@@ -18,11 +18,11 @@ func (content *MangaContent) BeforeCreate(*gorm.DB) error {
 }
 
 type Chapter struct {
-	ChapterId     uuid.UUID `json:"chapterId" gorm:"primaryKey;type:uuid"`
-	MangaId       uuid.UUID `json:"mangaId"`
-	Title         string    `json:"title"`
-	ChapterNumber uint32    `json:"chapterNumber"`
-	Pages         []Page    `json:"pages"`
+	ChapterId uuid.UUID `json:"chapterId" gorm:"primaryKey;type:uuid"`
+	MangaId   uuid.UUID `json:"mangaId"`
+	Title     string    `json:"title"`
+	Number    float32   `json:"number"`
+	Pages     []Page    `json:"pages"`
 }
 
 func (chapter *Chapter) BeforeCreate(*gorm.DB) error {

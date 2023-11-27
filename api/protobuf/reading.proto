@@ -25,7 +25,7 @@ message MangaContentResponse {
 
   message ChapterHead {
     string chapterId = 1;
-    uint32 chapterNumber = 2;
+    float number = 2;
     string title = 4;
   }
   repeated ChapterHead chapters = 2;
@@ -34,6 +34,7 @@ message MangaContentResponse {
 message AddChapterRequest {
   string mangaId = 1;
   string title = 2;
+  float number = 3;
 }
 
 message ChapterRequest {
@@ -43,7 +44,7 @@ message ChapterRequest {
 message ChapterResponse {
   string chapterId = 1;
   string mangaId = 2;
-  uint32 chapterNumber = 3;
+  float number = 3;
   string title = 4;
   message PageHead {
     string pageId = 1;
