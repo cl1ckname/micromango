@@ -83,9 +83,10 @@ func applyHandlers(e *echo.Echo, serv server) {
 	e.POST("api/content/:mangaId/chapter/:chapterId/page", serv.AddPage)
 
 	e.GET("api/catalog", serv.GetMangas)
-	e.GET("api/catalog/:mangaId", serv.GetManga)
 	e.POST("api/catalog", serv.AddManga)
+	e.GET("api/catalog/:mangaId", serv.GetManga)
 	e.PUT("api/catalog/:mangaId", serv.UpdateManga)
+	e.DELETE("api/catalog/:mangaId", serv.DeleteManga)
 
 	e.GET("static/:id", serv.GetStatic)
 }

@@ -138,3 +138,8 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 	}
 	return updatedManga.ToResponse(), nil
 }
+
+func (s *service) DeleteManga(_ context.Context, req *pb.DeleteMangaRequest) (*pb.Empty, error) {
+	empty := new(pb.Empty)
+	return empty, DeleteManga(s.db, req.MangaId)
+}

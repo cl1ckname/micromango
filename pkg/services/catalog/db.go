@@ -66,3 +66,12 @@ func SaveManga(db *gorm.DB, m Manga) (Manga, error) {
 	}
 	return m, nil
 }
+
+func DeleteManga(db *gorm.DB, mangaId string) error {
+	mangaUuid, err := uuid.Parse(mangaId)
+	if err != nil {
+		return err
+	}
+	toDelete := Manga{MangaId: mangaUuid}
+	return db.Delete(&toDelete).Error
+}

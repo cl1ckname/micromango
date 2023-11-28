@@ -9,6 +9,7 @@ service Catalog {
   rpc GetMangas(Empty) returns (MangasResponse);
   rpc AddManga(AddMangaRequest) returns (MangaResponse);
   rpc UpdateManga(UpdateMangaRequest) returns (MangaResponse);
+  rpc DeleteManga(DeleteMangaRequest) returns (Empty);
 }
 
 message Empty {}
@@ -47,4 +48,8 @@ message UpdateMangaRequest {
   optional string title = 2;
   optional bytes cover = 3;
   optional string description = 4;
+}
+
+message DeleteMangaRequest {
+  string mangaId = 1;
 }

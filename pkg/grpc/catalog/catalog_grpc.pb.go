@@ -23,6 +23,7 @@ const (
 	Catalog_GetMangas_FullMethodName   = "/micromango.Catalog/GetMangas"
 	Catalog_AddManga_FullMethodName    = "/micromango.Catalog/AddManga"
 	Catalog_UpdateManga_FullMethodName = "/micromango.Catalog/UpdateManga"
+	Catalog_DeleteManga_FullMethodName = "/micromango.Catalog/DeleteManga"
 )
 
 // CatalogClient is the client API for Catalog service.
@@ -33,6 +34,7 @@ type CatalogClient interface {
 	GetMangas(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MangasResponse, error)
 	AddManga(ctx context.Context, in *AddMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
 	UpdateManga(ctx context.Context, in *UpdateMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
+	DeleteManga(ctx context.Context, in *DeleteMangaRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type catalogClient struct {
@@ -79,6 +81,15 @@ func (c *catalogClient) UpdateManga(ctx context.Context, in *UpdateMangaRequest,
 	return out, nil
 }
 
+func (c *catalogClient) DeleteManga(ctx context.Context, in *DeleteMangaRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Catalog_DeleteManga_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogServer is the server API for Catalog service.
 // All implementations must embed UnimplementedCatalogServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type CatalogServer interface {
 	GetMangas(context.Context, *Empty) (*MangasResponse, error)
 	AddManga(context.Context, *AddMangaRequest) (*MangaResponse, error)
 	UpdateManga(context.Context, *UpdateMangaRequest) (*MangaResponse, error)
+	DeleteManga(context.Context, *DeleteMangaRequest) (*Empty, error)
 	mustEmbedUnimplementedCatalogServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedCatalogServer) AddManga(context.Context, *AddMangaRequest) (*
 }
 func (UnimplementedCatalogServer) UpdateManga(context.Context, *UpdateMangaRequest) (*MangaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateManga not implemented")
+}
+func (UnimplementedCatalogServer) DeleteManga(context.Context, *DeleteMangaRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteManga not implemented")
 }
 func (UnimplementedCatalogServer) mustEmbedUnimplementedCatalogServer() {}
 
@@ -191,6 +206,24 @@ func _Catalog_UpdateManga_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Catalog_DeleteManga_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteMangaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServer).DeleteManga(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Catalog_DeleteManga_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServer).DeleteManga(ctx, req.(*DeleteMangaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Catalog_ServiceDesc is the grpc.ServiceDesc for Catalog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateManga",
 			Handler:    _Catalog_UpdateManga_Handler,
+		},
+		{
+			MethodName: "DeleteManga",
+			Handler:    _Catalog_DeleteManga_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
