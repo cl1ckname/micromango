@@ -110,3 +110,31 @@ func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, err
 	}
 	return &pb.MangasResponse{Mangas: mangas}, err
 }
+
+func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (*pb.MangaResponse, error) {
+	mangaToUpdate, err := GetManga(s.db, req.MangaId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
+		}
+		return nil, err
+	}
+	mangaToUpdate.Title = utils.DerefOrDefault(req.Title, mangaToUpdate.Title)
+	mangaToUpdate.Description = utils.DerefOrDefault(req.Description, mangaToUpdate.Description)
+	if len(req.Cover) != 0 {
+		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{
+			MangaId: req.MangaId,
+			Image:   req.Cover,
+			Type:    0, // FIXME
+		})
+		if err != nil {
+			return nil, err
+		}
+		mangaToUpdate.Cover = uploadResp.ImageId
+	}
+	updatedManga, err := SaveManga(s.db, mangaToUpdate)
+	if err != nil {
+		return nil, err
+	}
+	return updatedManga.ToResponse(), nil
+}

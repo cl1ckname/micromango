@@ -57,3 +57,23 @@ func (s *server) AddManga(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, resp)
 }
+
+func (s *server) UpdateManga(ctx echo.Context) error {
+	var updateMangaReq catalog.UpdateMangaRequest
+	if err := ctx.Bind(&updateMangaReq); err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	updateMangaReq.MangaId = ctx.Param("mangaId")
+	if description := ctx.FormValue("description"); description != "" {
+		updateMangaReq.Description = utils.Ptr(description)
+	}
+	if title := ctx.FormValue("title"); title != "" {
+		updateMangaReq.Title = utils.Ptr(title)
+	}
+	res, err := s.catalog.UpdateManga(context.TODO(), &updateMangaReq)
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, res)
+
+}

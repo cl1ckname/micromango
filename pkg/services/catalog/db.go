@@ -59,3 +59,10 @@ func AddManga(db *gorm.DB, m Manga) (Manga, error) {
 	}
 	return m, nil
 }
+
+func SaveManga(db *gorm.DB, m Manga) (Manga, error) {
+	if res := db.Save(&m); res.Error != nil {
+		return Manga{}, res.Error
+	}
+	return m, nil
+}

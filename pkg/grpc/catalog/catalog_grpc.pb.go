@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Catalog_GetManga_FullMethodName  = "/micromango.Catalog/GetManga"
-	Catalog_GetMangas_FullMethodName = "/micromango.Catalog/GetMangas"
-	Catalog_AddManga_FullMethodName  = "/micromango.Catalog/AddManga"
+	Catalog_GetManga_FullMethodName    = "/micromango.Catalog/GetManga"
+	Catalog_GetMangas_FullMethodName   = "/micromango.Catalog/GetMangas"
+	Catalog_AddManga_FullMethodName    = "/micromango.Catalog/AddManga"
+	Catalog_UpdateManga_FullMethodName = "/micromango.Catalog/UpdateManga"
 )
 
 // CatalogClient is the client API for Catalog service.
@@ -31,6 +32,7 @@ type CatalogClient interface {
 	GetManga(ctx context.Context, in *MangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
 	GetMangas(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MangasResponse, error)
 	AddManga(ctx context.Context, in *AddMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
+	UpdateManga(ctx context.Context, in *UpdateMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
 }
 
 type catalogClient struct {
@@ -68,6 +70,15 @@ func (c *catalogClient) AddManga(ctx context.Context, in *AddMangaRequest, opts 
 	return out, nil
 }
 
+func (c *catalogClient) UpdateManga(ctx context.Context, in *UpdateMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error) {
+	out := new(MangaResponse)
+	err := c.cc.Invoke(ctx, Catalog_UpdateManga_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogServer is the server API for Catalog service.
 // All implementations must embed UnimplementedCatalogServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type CatalogServer interface {
 	GetManga(context.Context, *MangaRequest) (*MangaResponse, error)
 	GetMangas(context.Context, *Empty) (*MangasResponse, error)
 	AddManga(context.Context, *AddMangaRequest) (*MangaResponse, error)
+	UpdateManga(context.Context, *UpdateMangaRequest) (*MangaResponse, error)
 	mustEmbedUnimplementedCatalogServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedCatalogServer) GetMangas(context.Context, *Empty) (*MangasRes
 }
 func (UnimplementedCatalogServer) AddManga(context.Context, *AddMangaRequest) (*MangaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddManga not implemented")
+}
+func (UnimplementedCatalogServer) UpdateManga(context.Context, *UpdateMangaRequest) (*MangaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateManga not implemented")
 }
 func (UnimplementedCatalogServer) mustEmbedUnimplementedCatalogServer() {}
 
@@ -158,6 +173,24 @@ func _Catalog_AddManga_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Catalog_UpdateManga_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMangaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServer).UpdateManga(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Catalog_UpdateManga_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServer).UpdateManga(ctx, req.(*UpdateMangaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Catalog_ServiceDesc is the grpc.ServiceDesc for Catalog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddManga",
 			Handler:    _Catalog_AddManga_Handler,
+		},
+		{
+			MethodName: "UpdateManga",
+			Handler:    _Catalog_UpdateManga_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
