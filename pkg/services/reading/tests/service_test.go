@@ -48,18 +48,16 @@ func TestService(t *testing.T) {
 	_, err = uuid.Parse(chapterId)
 	require.NoError(t, err)
 	cexpected := &pb.ChapterResponse{
-		ChapterId:     chapterId,
-		MangaId:       mangaUuid,
-		ChapterNumber: 0,
-		Title:         chapterTitle,
-		Pages:         nil,
+		ChapterId: chapterId,
+		MangaId:   mangaUuid,
+		Title:     chapterTitle,
+		Pages:     nil,
 	}
 	require.True(t, proto.Equal(cres, cexpected))
 
 	expected.Chapters = append(expected.Chapters, &pb.MangaContentResponse_ChapterHead{
-		ChapterId:     chapterId,
-		ChapterNumber: 0,
-		Title:         chapterTitle,
+		ChapterId: chapterId,
+		Title:     chapterTitle,
 	})
 	res, err = cc.GetMangaContent(context.TODO(), &pb.MangaContentRequest{MangaId: mangaUuid})
 	require.NoError(t, err)
@@ -71,25 +69,22 @@ func TestService(t *testing.T) {
 
 	image := "http://localhost:1234/static/page1.jpg"
 	pres, err := cc.AddPage(context.TODO(), &pb.AddPageRequest{
-		ChapterId:  chapterId,
-		PageNumber: 1,
-		Image:      image,
+		ChapterId: chapterId,
+		Image:     []byte(image),
 	})
 	require.NoError(t, err)
 	pid := pres.PageId
 	_, err = uuid.Parse(pid)
 	require.NoError(t, err)
 	pexpected := pb.PageResponse{
-		PageId:     pid,
-		ChapterId:  chapterId,
-		PageNumber: 1,
-		Image:      image,
+		PageId:    pid,
+		ChapterId: chapterId,
+		Image:     image,
 	}
 	require.True(t, proto.Equal(&pexpected, pres))
 
 	cexpected.Pages = append(cexpected.Pages, &pb.ChapterResponse_PageHead{
-		PageId:     pid,
-		PageNumber: 1,
+		PageId: pid,
 	})
 	cres, err = cc.GetChapter(context.TODO(), &pb.ChapterRequest{ChapterId: chapterId})
 	require.NoError(t, err)

@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
 	"micromango/pkg/services/catalog"
 	"testing"
@@ -28,8 +29,8 @@ func TestService(t *testing.T) {
 
 	resp, err := cc.AddManga(context.TODO(), &pb.AddMangaRequest{
 		Title:       "micromango",
-		Cover:       "favicon.ico",
-		Description: "my test manga",
+		Cover:       []byte("favicon.ico"),
+		Description: utils.Ptr("my test manga"),
 	})
 	require.NoError(t, err)
 	require.NotNil(t, resp)

@@ -3,16 +3,17 @@ package micromango;
 option go_package="micromango/pkg/grpc/profile";
 
 service Profile {
-  rpc CreateProfile(CreateProfileRequest) returns (ProfileResponse);
-  rpc UpdateProfile(UpdateProfileRequest) returns (ProfileResponse);
+  rpc Create(CreateRequest) returns (Response);
+  rpc Update(UpdateRequest) returns (Response);
+  rpc Get(GetRequest) returns (Response);
 }
 
-message CreateProfileRequest {
+message CreateRequest {
   string userId = 1;
   string username = 2;
 }
 
-message ProfileResponse {
+message Response {
   string userId = 1;
   string username = 2;
   string picture = 3;
@@ -20,9 +21,13 @@ message ProfileResponse {
   string createdAt = 5;
 }
 
-message UpdateProfileRequest {
+message UpdateRequest {
   string userId = 1;
   optional string username = 2;
   optional bytes picture = 3;
   optional string bio = 4;
+}
+
+message GetRequest {
+  string userId = 1;
 }

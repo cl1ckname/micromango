@@ -21,8 +21,8 @@ func (m *Profile) BeforeCreate(*gorm.DB) error {
 	return nil
 }
 
-func (m *Profile) ToResponse() *pb.ProfileResponse {
-	return &pb.ProfileResponse{
+func (m *Profile) ToResponse() *pb.Response {
+	return &pb.Response{
 		UserId:    m.UserId.String(),
 		Username:  m.Username,
 		Picture:   m.Picture,

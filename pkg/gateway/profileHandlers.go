@@ -9,7 +9,7 @@ import (
 )
 
 func (s *server) UpdateProfile(ctx echo.Context) error {
-	var updateReq profile.UpdateProfileRequest
+	var updateReq profile.UpdateRequest
 	updateReq.UserId = ctx.Param("userId")
 	if username := ctx.FormValue("username"); username != "" {
 		updateReq.Username = utils.Ptr(username)
@@ -30,9 +30,19 @@ func (s *server) UpdateProfile(ctx echo.Context) error {
 		}
 		updateReq.Picture = imageBytes
 	}
-	resp, err := s.profile.UpdateProfile(context.TODO(), &updateReq)
+	resp, err := s.profile.Update(context.TODO(), &updateReq)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
 	return ctx.JSON(http.StatusOK, resp)
+}
+
+func (s *server) GetProfile(ctx echo.Context) error {
+	var getReq profile.GetRequest
+	getReq.UserId = ctx.Param("userId")
+	p, err := s.profile.Get(context.TODO(), &getReq)
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, p)
 }

@@ -95,6 +95,7 @@ func applyHandlers(e *echo.Echo, serv server) {
 	e.PUT("api/catalog/:mangaId", serv.UpdateManga)
 	e.DELETE("api/catalog/:mangaId", serv.DeleteManga)
 
+	e.GET("api/profile/:userId", serv.GetProfile)
 	e.PUT("api/profile/:userId", serv.UpdateProfile)
 
 	e.GET("static/:id", serv.GetStatic)
