@@ -1,0 +1,27 @@
+syntax="proto3";
+package micromango;
+option go_package="micromango/pkg/grpc/profile";
+
+service Profile {
+  rpc CreateProfile(CreateProfileRequest) returns (ProfileResponse);
+}
+
+message CreateProfileRequest {
+  string userId = 1;
+  string username = 2;
+}
+
+message ProfileResponse {
+  string userId = 1;
+  string username = 2;
+  string picture = 3;
+  string bio = 4;
+  string createdAt = 5;
+}
+
+message UpdateProfile {
+  string userId = 1;
+  optional string username = 2;
+  optional bytes picture = 3;
+  optional string bio = 4;
+}

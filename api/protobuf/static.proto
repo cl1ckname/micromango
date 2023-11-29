@@ -6,7 +6,7 @@ service Static {
   rpc GetImage(GetImageRequest) returns (ImageResponse);
   rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
   rpc UploadPage(UploadPageRequest) returns (UploadImageResponse);
-
+  rpc UploadProfilePicture(UploadProfilePictureRequest) returns (UploadImageResponse);
 }
 
 enum ImageType {
@@ -44,3 +44,7 @@ message UploadImageResponse {
   string imageId = 1;
 }
 
+message UploadProfilePictureRequest {
+  string userId = 1;
+  bytes image = 2;
+}

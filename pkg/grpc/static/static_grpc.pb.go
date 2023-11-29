@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Static_GetImage_FullMethodName    = "/micromango.Static/GetImage"
-	Static_UploadCover_FullMethodName = "/micromango.Static/UploadCover"
-	Static_UploadPage_FullMethodName  = "/micromango.Static/UploadPage"
+	Static_GetImage_FullMethodName             = "/micromango.Static/GetImage"
+	Static_UploadCover_FullMethodName          = "/micromango.Static/UploadCover"
+	Static_UploadPage_FullMethodName           = "/micromango.Static/UploadPage"
+	Static_UploadProfilePicture_FullMethodName = "/micromango.Static/UploadProfilePicture"
 )
 
 // StaticClient is the client API for Static service.
@@ -31,6 +32,7 @@ type StaticClient interface {
 	GetImage(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*ImageResponse, error)
 	UploadCover(ctx context.Context, in *UploadCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 	UploadPage(ctx context.Context, in *UploadPageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
+	UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 }
 
 type staticClient struct {
@@ -68,6 +70,15 @@ func (c *staticClient) UploadPage(ctx context.Context, in *UploadPageRequest, op
 	return out, nil
 }
 
+func (c *staticClient) UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
+	out := new(UploadImageResponse)
+	err := c.cc.Invoke(ctx, Static_UploadProfilePicture_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StaticServer is the server API for Static service.
 // All implementations must embed UnimplementedStaticServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type StaticServer interface {
 	GetImage(context.Context, *GetImageRequest) (*ImageResponse, error)
 	UploadCover(context.Context, *UploadCoverRequest) (*UploadImageResponse, error)
 	UploadPage(context.Context, *UploadPageRequest) (*UploadImageResponse, error)
+	UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*UploadImageResponse, error)
 	mustEmbedUnimplementedStaticServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedStaticServer) UploadCover(context.Context, *UploadCoverReques
 }
 func (UnimplementedStaticServer) UploadPage(context.Context, *UploadPageRequest) (*UploadImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadPage not implemented")
+}
+func (UnimplementedStaticServer) UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*UploadImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadProfilePicture not implemented")
 }
 func (UnimplementedStaticServer) mustEmbedUnimplementedStaticServer() {}
 
@@ -158,6 +173,24 @@ func _Static_UploadPage_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Static_UploadProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadProfilePictureRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaticServer).UploadProfilePicture(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Static_UploadProfilePicture_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaticServer).UploadProfilePicture(ctx, req.(*UploadProfilePictureRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Static_ServiceDesc is the grpc.ServiceDesc for Static service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var Static_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadPage",
 			Handler:    _Static_UploadPage_Handler,
+		},
+		{
+			MethodName: "UploadProfilePicture",
+			Handler:    _Static_UploadProfilePicture_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
