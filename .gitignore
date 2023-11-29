@@ -5,3 +5,4 @@ vendor
 static/
 /static
 micromango-client
+db
