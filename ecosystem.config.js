@@ -16,5 +16,9 @@ module.exports = {
             name: "static",
             script: "go run cmd/static/main.go",
         },
+        {
+            name: "user",
+            script: "go run cmd/user/main.go"
+        }
     ]
 }
