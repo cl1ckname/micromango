@@ -21,6 +21,7 @@ func main() {
 		CatalogAddr: os.Getenv("CATALOG_ADDR"),
 		ReadingAddr: os.Getenv("READING_ADDR"),
 		StaticAddr:  os.Getenv("STATIC_ADDR"),
+		ProfileAddr: os.Getenv("PROFILE_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

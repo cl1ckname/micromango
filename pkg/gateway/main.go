@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"micromango/pkg/grpc/catalog"
+	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/static"
 	"micromango/pkg/grpc/user"
@@ -44,6 +45,12 @@ func Run(ctx context.Context, c Config) <-chan error {
 		panic(err)
 	}
 	serv.static = static.NewStaticClient(conn)
+
+	conn, err = grpc.Dial(c.ProfileAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.profile = profile.NewProfileClient(conn)
 
 	applyHandlers(e, serv)
 
@@ -88,6 +95,8 @@ func applyHandlers(e *echo.Echo, serv server) {
 	e.PUT("api/catalog/:mangaId", serv.UpdateManga)
 	e.DELETE("api/catalog/:mangaId", serv.DeleteManga)
 
+	e.PUT("api/profile/:userId", serv.UpdateProfile)
+
 	e.GET("static/:id", serv.GetStatic)
 }
 
@@ -97,4 +106,5 @@ type server struct {
 	reading reading.ReadingClient
 	catalog catalog.CatalogClient
 	static  static.StaticClient
+	profile profile.ProfileClient
 }

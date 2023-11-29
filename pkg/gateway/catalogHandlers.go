@@ -5,7 +5,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/catalog"
 	"net/http"
@@ -50,7 +49,6 @@ func (s *server) AddManga(ctx echo.Context) error {
 		}
 	}
 	if formFile != nil {
-		log.Println(formFile.Size)
 		imageBytes, err := utils.ReadFormFile(formFile)
 		if err != nil {
 			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})

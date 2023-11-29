@@ -6,4 +6,5 @@ type Config struct {
 	CatalogAddr string
 	ReadingAddr string
 	StaticAddr  string
+	ProfileAddr string
 }
