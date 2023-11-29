@@ -49,7 +49,6 @@ func (s *server) saveCoverImage(mangaId, filename string, img image.Image) error
 		return err
 	}
 	filePath := path.Join(mangaDirPath, filename)
-	log.Println(filePath)
 	return SaveImage(filePath, img)
 }
 
@@ -80,6 +79,28 @@ func (s *server) savePageImage(mangaId, chapterId, filename string, img image.Im
 	}
 	filePath := path.Join(chapterDirPath, filename)
 	return SaveImage(filePath, img)
+}
+
+func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePictureRequest) (*pb.UploadImageResponse, error) {
+	profilePicturePath := path.Join(s.staticDir, "profile")
+	if err := createFolderIfNotExists(profilePicturePath); err != nil {
+		return nil, err
+	}
+	profilePicturePath = path.Join(profilePicturePath, req.UserId)
+	if err := createFolderIfNotExists(profilePicturePath); err != nil {
+		return nil, err
+	}
+	profilePicturePath = path.Join(profilePicturePath, "profile.jpg")
+
+	img, err := ToImage(req.Image, req.Type)
+	if err != nil {
+		return nil, err
+	}
+	if err := SaveImage(profilePicturePath, img); err != nil {
+		return nil, err
+	}
+	extPath := path.Join("profile", req.UserId, "profile.jpg")
+	return &pb.UploadImageResponse{ImageId: extPath}, nil
 }
 
 func createFolderIfNotExists(folderPath string) error {
