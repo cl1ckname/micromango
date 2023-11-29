@@ -72,7 +72,7 @@ func Run(ctx context.Context, c Config) <-chan error {
 func applyHandlers(e *echo.Echo, serv server) {
 	e.POST("api/user/register", serv.Register)
 	e.POST("api/user/login", serv.Login)
-	e.GET("api/user/:userId", serv.Login)
+	e.GET("api/user/:userId", serv.GetUser)
 
 	e.GET("api/content/:mangaId", serv.GetMangaContent)
 	e.POST("api/content", serv.AddMangaContent)

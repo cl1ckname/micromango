@@ -8,7 +8,8 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserId string `json:"userId"`
+	UserId   string `json:"userId"`
+	Username string `json:"username"`
 }
 
 func (s *service) login(email string, password string) (*jwt.Token, error) {
@@ -29,7 +30,8 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
-		UserId: userModel.UserId.String(),
+		UserId:   userModel.UserId.String(),
+		Username: userModel.Username,
 	})
 	return token, nil
 }
