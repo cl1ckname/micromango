@@ -16,10 +16,11 @@ func main() {
 		log.Println("Error loading .env file")
 	}
 	c := user.Config{
-		Addr:      os.Getenv("USER_ADDR"),
-		DbAddr:    os.Getenv("USER_DB_ADDR"),
-		Salt:      os.Getenv("USER_SALT"),
-		JwtSecret: os.Getenv("USER_JWT_SECRET"),
+		Addr:        os.Getenv("USER_ADDR"),
+		DbAddr:      os.Getenv("USER_DB_ADDR"),
+		Salt:        os.Getenv("USER_SALT"),
+		JwtSecret:   os.Getenv("USER_JWT_SECRET"),
+		ProfileAddr: os.Getenv("PROFILE_ADDR"),
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	ok := user.Run(ctx, c)

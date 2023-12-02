@@ -16,7 +16,6 @@ type Profile struct {
 }
 
 func (m *Profile) BeforeCreate(*gorm.DB) error {
-	m.UserId = uuid.New()
 	m.CreatedAt = time.Now()
 	return nil
 }

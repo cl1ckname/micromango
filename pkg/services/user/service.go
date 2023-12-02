@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
+	"micromango/pkg/grpc/profile"
 	pb "micromango/pkg/grpc/user"
 )
 
@@ -18,6 +20,13 @@ func Run(ctx context.Context, c Config) <-chan error {
 		salt:      c.Salt,
 		jwtSecret: c.JwtSecret,
 	}
+
+	conn, err := grpc.Dial(c.ProfileAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	serv.profile = profile.NewProfileClient(conn)
+
 	baseServer := grpc.NewServer()
 	pb.RegisterUserServer(baseServer, &serv)
 	return common.StartGrpcService(ctx, c.Addr, baseServer)
@@ -28,9 +37,10 @@ type service struct {
 	db        *gorm.DB
 	salt      string
 	jwtSecret string
+	profile   profile.ProfileClient
 }
 
-func (s *service) Register(_ context.Context, req *pb.RegisterRequest) (*pb.UserResponse, error) {
+func (s *service) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.UserResponse, error) {
 	u, err := findByEmail(s.db, req.Email)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -42,6 +52,12 @@ func (s *service) Register(_ context.Context, req *pb.RegisterRequest) (*pb.User
 	u.PasswordHash = hashString(req.Password, s.salt)
 	savedU, err := saveUser(s.db, u)
 	if err != nil {
+		return nil, err
+	}
+	if _, err := s.profile.Create(ctx, &profile.CreateRequest{
+		UserId:   savedU.UserId.String(),
+		Username: savedU.Username,
+	}); err != nil {
 		return nil, err
 	}
 	return &pb.UserResponse{

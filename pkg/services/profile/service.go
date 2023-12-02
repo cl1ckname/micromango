@@ -45,7 +45,7 @@ type service struct {
 	static static.StaticClient
 }
 
-func (s *service) CreateProfile(_ context.Context, req *pb.CreateRequest) (*pb.Response, error) {
+func (s *service) Create(_ context.Context, req *pb.CreateRequest) (*pb.Response, error) {
 	userUuid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (s *service) CreateProfile(_ context.Context, req *pb.CreateRequest) (*pb.R
 	return newProfile.ToResponse(), nil
 }
 
-func (s *service) UpdateProfile(ctx context.Context, req *pb.UpdateRequest) (*pb.Response, error) {
+func (s *service) Update(ctx context.Context, req *pb.UpdateRequest) (*pb.Response, error) {
 	userUuid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, err
