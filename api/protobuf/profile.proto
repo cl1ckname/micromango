@@ -1,12 +1,24 @@
 syntax="proto3";
-package micromango;
 option go_package="micromango/pkg/grpc/profile";
+
+enum ListName {
+  FAVORITE = 0;
+  READING = 1;
+  TOREAD = 2;
+  COMPLETED = 3;
+  DROP =  4;
+}
 
 service Profile {
   rpc Create(CreateRequest) returns (Response);
   rpc Update(UpdateRequest) returns (Response);
   rpc Get(GetRequest) returns (Response);
+  rpc GetList(GetListRequest) returns (ListResponse);
+  rpc AddToList(AddToListRequest) returns (Empty);
+  rpc RemoveFromList(RemoveFromListRequest) returns (Empty);
 }
+
+message Empty {}
 
 message CreateRequest {
   string userId = 1;
@@ -30,4 +42,25 @@ message UpdateRequest {
 
 message GetRequest {
   string userId = 1;
+}
+
+message GetListRequest {
+  string profileId = 1;
+  ListName list = 2;
+}
+
+message ListResponse {
+  repeated string mangaId = 1;
+}
+
+message AddToListRequest {
+  string profileId = 1;
+  string mangaId = 2;
+  ListName list = 3;
+}
+
+message RemoveFromListRequest {
+  string profileId = 1;
+  string mangaId = 2;
+  ListName list = 3;
 }

@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	pb "micromango/pkg/grpc/profile"
 	"os"
 	"time"
 )
@@ -47,4 +48,53 @@ func FindOne(db *gorm.DB, userId uuid.UUID) (p Profile, err error) {
 	p.UserId = userId
 	err = db.First(&p).Error
 	return
+}
+
+func GetList(db *gorm.DB, req *pb.GetListRequest) ([]ListRecord, error) {
+	userUuid, err := uuid.Parse(req.ProfileId)
+	if err != nil {
+		return nil, err
+	}
+
+	var lr []ListRecord
+	cond := ListRecord{
+		UserId:   userUuid,
+		ListName: req.List,
+	}
+	err = db.Find(&lr, cond).Error
+	return lr, err
+}
+
+func AddToList(db *gorm.DB, req *pb.AddToListRequest) error {
+	userUUID, err := uuid.Parse(req.ProfileId)
+	if err != nil {
+		return err
+	}
+	mangaUUID, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return err
+	}
+	lr := ListRecord{
+		UserId:   userUUID,
+		MangaId:  mangaUUID,
+		ListName: req.List,
+	}
+	return db.Save(&lr).Error
+}
+
+func RemoveFromList(db *gorm.DB, req *pb.RemoveFromListRequest) error {
+	userUUID, err := uuid.Parse(req.ProfileId)
+	if err != nil {
+		return err
+	}
+	mangaUUID, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return err
+	}
+	lr := ListRecord{
+		UserId:   userUUID,
+		MangaId:  mangaUUID,
+		ListName: req.List,
+	}
+	return db.Delete(&lr).Error
 }

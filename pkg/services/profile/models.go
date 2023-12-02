@@ -30,3 +30,15 @@ func (m *Profile) ToResponse() *pb.Response {
 		CreatedAt: m.CreatedAt.String(),
 	}
 }
+
+type ListRecord struct {
+	UserId    uuid.UUID   `json:"userId" gorm:"primaryKey;type:uuid"`
+	MangaId   uuid.UUID   `json:"mangaId" gorm:"primaryKey;type:uuid"`
+	ListName  pb.ListName `json:"listName" gorm:"primaryKey;type:uint"`
+	CreatedAt time.Time   `json:"createdAt"`
+}
+
+func (lr *ListRecord) BeforeCreate(*gorm.DB) error {
+	lr.CreatedAt = time.Now()
+	return nil
+}

@@ -99,3 +99,29 @@ func (s *service) Get(_ context.Context, req *pb.GetRequest) (*pb.Response, erro
 	p, err := FindOne(s.db, userUuid)
 	return p.ToResponse(), err
 }
+
+func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.ListResponse, error) {
+	lr, err := GetList(s.db, req)
+	if err != nil {
+		return nil, err
+	}
+	lrsp := make([]string, len(lr))
+	for i := 0; i < len(lr); i++ {
+		lrsp[i] = lr[i].MangaId.String()
+	}
+	return &pb.ListResponse{MangaId: lrsp}, err
+}
+
+func (s *service) AddToList(_ context.Context, req *pb.AddToListRequest) (*pb.Empty, error) {
+	return &pb.Empty{}, AddToList(s.db, req)
+}
+
+func (s *service) RemoveFromList(_ context.Context, req *pb.RemoveFromListRequest) (*pb.Empty, error) {
+	if err := RemoveFromList(s.db, req); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, err
+	}
+	return &pb.Empty{}, nil
+}
