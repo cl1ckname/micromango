@@ -34,7 +34,7 @@ func (m *Profile) ToResponse() *pb.Response {
 type ListRecord struct {
 	UserId    uuid.UUID   `json:"userId" gorm:"primaryKey;type:uuid"`
 	MangaId   uuid.UUID   `json:"mangaId" gorm:"primaryKey;type:uuid"`
-	ListName  pb.ListName `json:"listName" gorm:"primaryKey;type:uint"`
+	ListName  pb.ListName `json:"listName" gorm:"type:uint"`
 	CreatedAt time.Time   `json:"createdAt"`
 }
 

@@ -2,11 +2,10 @@ syntax="proto3";
 option go_package="micromango/pkg/grpc/profile";
 
 enum ListName {
-  FAVORITE = 0;
-  READING = 1;
-  TOREAD = 2;
-  COMPLETED = 3;
-  DROP =  4;
+  READING = 0;
+  TOREAD = 1;
+  COMPLETED = 2;
+  DROP =  3;
 }
 
 service Profile {
@@ -62,5 +61,4 @@ message AddToListRequest {
 message RemoveFromListRequest {
   string profileId = 1;
   string mangaId = 2;
-  ListName list = 3;
 }

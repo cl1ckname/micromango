@@ -6,6 +6,7 @@ import (
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
 	"net/http"
+	"strconv"
 )
 
 func (s *server) UpdateProfile(ctx echo.Context) error {
@@ -45,4 +46,45 @@ func (s *server) GetProfile(ctx echo.Context) error {
 		return utils.ErrorToResponse(ctx, err)
 	}
 	return ctx.JSON(http.StatusOK, p)
+}
+
+func (s *server) AddToList(ctx echo.Context) error {
+	var addToListReq profile.AddToListRequest
+	addToListReq.ProfileId = ctx.Param("userId")
+	if err := ctx.Bind(&addToListReq); err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	res, err := s.profile.AddToList(context.TODO(), &addToListReq)
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, res)
+}
+
+func (s *server) RemoveFromList(ctx echo.Context) error {
+	var removeFromListReq profile.RemoveFromListRequest
+	removeFromListReq.ProfileId = ctx.Param("userId")
+	if err := ctx.Bind(&removeFromListReq); err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	res, err := s.profile.RemoveFromList(context.TODO(), &removeFromListReq)
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, res)
+}
+
+func (s *server) GetList(ctx echo.Context) error {
+	var getListReq profile.GetListRequest
+	listStr := ctx.QueryParam("list")
+	list, err := strconv.ParseInt(listStr, 10, 32)
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	getListReq.List = profile.ListName(list)
+	getListReq.ProfileId = ctx.Param("userId")
+	if _, err := s.profile.GetList(context.TODO(), &getListReq); err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.String(http.StatusOK, "ok")
 }

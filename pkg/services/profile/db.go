@@ -28,6 +28,9 @@ func Connect(addr string) *gorm.DB {
 	if err := db.AutoMigrate(&Profile{}); err != nil {
 		panic(err)
 	}
+	if err := db.AutoMigrate(&ListRecord{}); err != nil {
+		panic(err)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,9 +95,8 @@ func RemoveFromList(db *gorm.DB, req *pb.RemoveFromListRequest) error {
 		return err
 	}
 	lr := ListRecord{
-		UserId:   userUUID,
-		MangaId:  mangaUUID,
-		ListName: req.List,
+		UserId:  userUUID,
+		MangaId: mangaUUID,
 	}
 	return db.Delete(&lr).Error
 }

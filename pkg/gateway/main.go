@@ -97,6 +97,9 @@ func applyHandlers(e *echo.Echo, serv server) {
 
 	e.GET("api/profile/:userId", serv.GetProfile)
 	e.PUT("api/profile/:userId", serv.UpdateProfile)
+	e.GET("api/profile/:userId/list", serv.GetList)
+	e.POST("api/profile/:userId/list", serv.AddToList)
+	e.DELETE("api/profile/:userId/list", serv.RemoveFromList)
 
 	e.GET("static/:id", serv.GetStatic)
 }
