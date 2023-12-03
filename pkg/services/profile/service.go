@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"micromango/pkg/common"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/static"
 )
@@ -74,6 +75,8 @@ func (s *service) Update(ctx context.Context, req *pb.UpdateRequest) (*pb.Respon
 		return nil, err
 	}
 
+	userToUpdate.Username = utils.DerefOrDefault(req.Username, userToUpdate.Username)
+	userToUpdate.Bio = utils.DerefOrDefault(req.Bio, userToUpdate.Bio)
 	if len(req.Picture) != 0 {
 		uploadRes, err := s.static.UploadProfilePicture(ctx, &static.UploadProfilePictureRequest{
 			UserId: req.UserId,
