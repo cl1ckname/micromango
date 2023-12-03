@@ -30,8 +30,7 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
-		UserId:   userModel.UserId.String(),
-		Username: userModel.Username,
+		UserId: userModel.UserId.String(),
 	})
 	return token, nil
 }

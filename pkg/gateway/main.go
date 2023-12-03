@@ -18,7 +18,14 @@ import (
 func Run(ctx context.Context, c Config) <-chan error {
 	e := echo.New()
 	serv := server{}
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: nil,
+		AllowOriginFunc: func(origin string) (bool, error) {
+			return true, nil
+		},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
+		AllowCredentials: true,
+	}))
 
 	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -79,7 +86,6 @@ func Run(ctx context.Context, c Config) <-chan error {
 func applyHandlers(e *echo.Echo, serv server) {
 	e.POST("api/user/register", serv.Register)
 	e.POST("api/user/login", serv.Login)
-	e.GET("api/user/:userId", serv.GetUser)
 
 	e.GET("api/content/:mangaId", serv.GetMangaContent)
 	e.POST("api/content", serv.AddMangaContent)
