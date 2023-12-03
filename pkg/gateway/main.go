@@ -26,6 +26,7 @@ func Run(ctx context.Context, c Config) <-chan error {
 		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
 		AllowCredentials: true,
 	}))
+	e.Use(serv.AuthMiddleware)
 
 	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
