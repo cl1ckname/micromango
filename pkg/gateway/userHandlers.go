@@ -28,17 +28,12 @@ func (s *server) Login(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
-	return ctx.JSON(http.StatusOK, resp)
-}
-
-func (s *server) GetUser(ctx echo.Context) error {
-	var getUserReq user.GetUserRequest
-	if err := ctx.Bind(&getUserReq); err != nil {
-		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
-	}
-	resp, err := s.user.GetUser(context.TODO(), &getUserReq)
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
-	}
+	cookie := new(http.Cookie)
+	cookie.Name = "auth"
+	cookie.Value = resp.AccessToken
+	cookie.HttpOnly = true
+	//cookie.Expires = time.Now().Add(time.Hour * 24)
+	cookie.Path = "/"
+	ctx.SetCookie(cookie)
 	return ctx.JSON(http.StatusOK, resp)
 }

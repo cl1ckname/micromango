@@ -7,11 +7,16 @@ import (
 	"google.golang.org/grpc/status"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/catalog"
+	"micromango/pkg/grpc/user"
 	"net/http"
 )
 
 func (s *server) GetManga(ctx echo.Context) error {
 	var getMangaReq catalog.MangaRequest
+	if claims, ok := ctx.Get("claims").(*user.UserResponse); ok {
+		getMangaReq.UserId = &claims.UserId
+	}
+
 	getMangaReq.MangaId = ctx.Param("mangaId")
 	resp, err := s.catalog.GetManga(context.TODO(), &getMangaReq)
 	if err != nil {

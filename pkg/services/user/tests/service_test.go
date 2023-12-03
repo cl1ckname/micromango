@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"micromango/pkg/common"
 	pb "micromango/pkg/grpc/user"
 	"micromango/pkg/services/user"
 	"testing"
@@ -47,8 +48,6 @@ func TestService(t *testing.T) {
 	expected := pb.UserResponse{
 		UserId:   uid,
 		Username: "clickname",
-		Email:    "click@name.ru",
-		Picture:  "",
 	}
 	expBytes, _ := json.Marshal(&expected)
 	resBytes, _ := json.Marshal(res)
@@ -63,7 +62,7 @@ func TestService(t *testing.T) {
 	require.NoError(t, err)
 
 	tokenS := loginRes.AccessToken
-	var claims user.Claims
+	var claims common.Claims
 	token, err := jwt.ParseWithClaims(tokenS, &claims, func(*jwt.Token) (interface{}, error) {
 		return []byte(jwtSecret), nil
 	})
