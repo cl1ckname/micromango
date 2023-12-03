@@ -8,7 +8,6 @@ service User {
   rpc Register(RegisterRequest) returns (UserResponse);
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Auth(AuthRequest) returns (UserResponse);
-  rpc GetUser(GetUserRequest) returns (UserResponse);
 }
 
 message RegisterRequest {
@@ -20,8 +19,6 @@ message RegisterRequest {
 message UserResponse {
   string userId = 1;
   string username = 2;
-  string email = 3;
-  string picture = 4;
 }
 
 message LoginRequest {
@@ -34,11 +31,6 @@ message LoginResponse {
   google.protobuf.Timestamp accessTokenExpired = 2;
   string refreshToken = 3;
   google.protobuf.Timestamp refreshTokenExpired = 4;
-}
-
-message GetUserRequest {
-  // @gotags: param:"userId"
-  string userId = 1;
 }
 
 message AuthRequest {

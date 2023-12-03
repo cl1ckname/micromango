@@ -47,7 +47,6 @@ func (s *service) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Us
 			return nil, err
 		}
 	}
-	u.Username = req.Username
 	u.Email = req.Email
 	u.PasswordHash = hashString(req.Password, s.salt)
 	savedU, err := saveUser(s.db, u)
@@ -56,15 +55,13 @@ func (s *service) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Us
 	}
 	if _, err := s.profile.Create(ctx, &profile.CreateRequest{
 		UserId:   savedU.UserId.String(),
-		Username: savedU.Username,
+		Username: req.Username,
 	}); err != nil {
 		return nil, err
 	}
 	return &pb.UserResponse{
 		UserId:   savedU.UserId.String(),
-		Username: savedU.Username,
-		Email:    savedU.Email,
-		Picture:  savedU.Picture,
+		Username: req.Username,
 	}, nil
 }
 
@@ -98,18 +95,8 @@ func (s *service) Auth(_ context.Context, req *pb.AuthRequest) (*pb.UserResponse
 	if err != nil {
 		return nil, err
 	}
-	userId := claims.UserId
-	u, err := findById(s.db, userId)
-	if err != nil {
-		return nil, err
-	}
-	return u.ToPb(), nil
-}
-
-func (s *service) GetUser(_ context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
-	u, err := findById(s.db, req.UserId)
-	if err != nil {
-		return nil, err
-	}
-	return u.ToPb(), nil
+	return &pb.UserResponse{
+		UserId:   claims.UserId,
+		Username: claims.Username,
+	}, nil
 }

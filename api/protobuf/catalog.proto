@@ -20,6 +20,7 @@ message MangasResponse {
 
 message MangaRequest {
   string mangaId = 1;
+  optional string userId = 2;
 }
 
 message MangaResponse {
@@ -29,6 +30,7 @@ message MangaResponse {
   string description = 4;
   MangaContentResponse content = 6;
   string createdAt = 5;
+  optional uint32 list = 7;
 }
 
 message MangaPreviewResponse {
