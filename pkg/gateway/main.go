@@ -3,9 +3,8 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"micromango/pkg/common/utils"
 	"micromango/pkg/gateway/handlers"
 	mw "micromango/pkg/gateway/middleware"
 	"micromango/pkg/grpc/catalog"
@@ -54,36 +53,19 @@ func waitContextShutdown(ctx context.Context, e *echo.Echo, ok chan error) {
 }
 
 func (s *server) connectServices(c Config) {
-	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
+	conn := utils.GrpcDialOrFatal(c.UserAddr)
 	s.user = user.NewUserClient(conn)
 
-	conn, err = grpc.Dial(c.CatalogAddr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		panic(err)
-	}
+	conn = utils.GrpcDialOrFatal(c.CatalogAddr)
 	s.catalog = catalog.NewCatalogClient(conn)
 
-	conn, err = grpc.Dial(c.ReadingAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
+	conn = utils.GrpcDialOrFatal(c.ReadingAddr)
 	s.reading = reading.NewReadingClient(conn)
 
-	conn, err = grpc.Dial(c.StaticAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
+	conn = utils.GrpcDialOrFatal(c.StaticAddr)
 	s.static = static.NewStaticClient(conn)
 
-	conn, err = grpc.Dial(c.ProfileAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
+	conn = utils.GrpcDialOrFatal(c.ProfileAddr)
 	s.profile = profile.NewProfileClient(conn)
 }
 

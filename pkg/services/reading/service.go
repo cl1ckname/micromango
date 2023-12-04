@@ -6,11 +6,10 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
 	"micromango/pkg/common"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/static"
 )
@@ -23,10 +22,7 @@ type service struct {
 
 func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
-	conn, err := grpc.Dial(c.StaticServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
+	conn := utils.GrpcDialOrFatal(c.StaticServiceAddr)
 	staticService := static.NewStaticClient(conn)
 
 	serv := service{
