@@ -128,3 +128,7 @@ func (s *service) RemoveFromList(_ context.Context, req *pb.RemoveFromListReques
 	}
 	return &pb.Empty{}, nil
 }
+
+func (s *service) IsInList(_ context.Context, req *pb.IsInListRequest) (*pb.IsInListResponse, error) {
+	return FindListRecord(s.db, req)
+}

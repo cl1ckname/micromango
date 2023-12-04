@@ -1,8 +1,10 @@
 syntax="proto3";
 package micromango;
 option go_package="micromango/pkg/grpc/catalog";
-
 import "reading.proto";
+import "share.proto";
+
+message Empty {}
 
 service Catalog {
   rpc GetManga(MangaRequest) returns (MangaResponse);
@@ -11,8 +13,6 @@ service Catalog {
   rpc UpdateManga(UpdateMangaRequest) returns (MangaResponse);
   rpc DeleteManga(DeleteMangaRequest) returns (Empty);
 }
-
-message Empty {}
 
 message MangasResponse {
   repeated MangaPreviewResponse mangas = 1;
@@ -30,7 +30,7 @@ message MangaResponse {
   string description = 4;
   MangaContentResponse content = 6;
   string createdAt = 5;
-  optional uint32 list = 7;
+  optional ListName list = 7;
 }
 
 message MangaPreviewResponse {

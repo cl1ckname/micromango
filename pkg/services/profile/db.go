@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/profile"
 	"os"
 	"time"
@@ -99,4 +100,28 @@ func RemoveFromList(db *gorm.DB, req *pb.RemoveFromListRequest) error {
 		MangaId: mangaUUID,
 	}
 	return db.Delete(&lr).Error
+}
+
+func FindListRecord(db *gorm.DB, req *pb.IsInListRequest) (*pb.IsInListResponse, error) {
+	userUUID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	mangaUUID, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+
+	lr := ListRecord{UserId: userUUID, MangaId: mangaUUID}
+	err = db.First(&lr).Error
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return nil, err
+		}
+		return &pb.IsInListResponse{}, nil
+	}
+	return &pb.IsInListResponse{
+		In:        utils.Ptr(lr.ListName),
+		Timestamp: lr.CreatedAt.String(),
+	}, nil
 }

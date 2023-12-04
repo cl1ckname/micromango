@@ -6,13 +6,12 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
+	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/static"
 )
@@ -20,22 +19,20 @@ import (
 func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 
-	conn, err := grpc.Dial(c.ReadingServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
+	conn := utils.GrpcDialOrFatal(c.ReadingServiceAddr)
 	readingService := reading.NewReadingClient(conn)
 
-	conn, err = grpc.Dial(c.StaticServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
+	conn = utils.GrpcDialOrFatal(c.StaticServiceAddr)
 	staticService := static.NewStaticClient(conn)
+
+	conn = utils.GrpcDialOrFatal(c.ProfileServiceAddr)
+	profileService := profile.NewProfileClient(conn)
 
 	serv := service{
 		db:      database,
 		reading: readingService,
 		static:  staticService,
+		profile: profileService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterCatalogServer(baseServer, &serv)
@@ -48,6 +45,7 @@ type service struct {
 	db      *gorm.DB
 	reading reading.ReadingClient
 	static  static.StaticClient
+	profile profile.ProfileClient
 }
 
 func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
@@ -63,6 +61,14 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 		return nil, err
 	}
 	resp := m.ToResponse()
+
+	if req.UserId != nil {
+		isInResp, err := s.profile.IsInList(ctx, &profile.IsInListRequest{UserId: *req.UserId, MangaId: req.MangaId})
+		if err != nil {
+			return nil, err
+		}
+		resp.List = isInResp.In
+	}
 	resp.Content = content
 	return resp, nil
 }

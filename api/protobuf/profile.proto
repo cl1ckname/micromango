@@ -1,12 +1,8 @@
 syntax="proto3";
 option go_package="micromango/pkg/grpc/profile";
+import "share.proto";
 
-enum ListName {
-  READING = 0;
-  TOREAD = 1;
-  COMPLETED = 2;
-  DROP =  3;
-}
+message Empty {}
 
 service Profile {
   rpc Create(CreateRequest) returns (Response);
@@ -15,9 +11,8 @@ service Profile {
   rpc GetList(GetListRequest) returns (ListResponse);
   rpc AddToList(AddToListRequest) returns (Empty);
   rpc RemoveFromList(RemoveFromListRequest) returns (Empty);
+  rpc IsInList(IsInListRequest) returns (IsInListResponse);
 }
-
-message Empty {}
 
 message CreateRequest {
   string userId = 1;
@@ -61,4 +56,14 @@ message AddToListRequest {
 message RemoveFromListRequest {
   string profileId = 1;
   string mangaId = 2;
+}
+
+message IsInListRequest {
+  string userId = 1;
+  string mangaId = 2;
+}
+
+message IsInListResponse {
+  optional ListName in = 1;
+  string timestamp = 2;
 }

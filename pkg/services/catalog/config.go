@@ -5,4 +5,5 @@ type Config struct {
 	DbAddr             string
 	ReadingServiceAddr string
 	StaticServiceAddr  string
+	ProfileServiceAddr string
 }
