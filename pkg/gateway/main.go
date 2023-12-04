@@ -3,10 +3,10 @@ package gateway
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	mw "micromango/pkg/gateway/middleware"
 	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
@@ -18,47 +18,10 @@ import (
 func Run(ctx context.Context, c Config) <-chan error {
 	e := echo.New()
 	serv := server{}
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: nil,
-		AllowOriginFunc: func(origin string) (bool, error) {
-			return true, nil
-		},
-		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
-		AllowCredentials: true,
-	}))
-	e.Use(serv.AuthMiddleware)
+	e.Use(mw.Cors())
+	e.Use(mw.Auth(serv.user))
 
-	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
-	serv.user = user.NewUserClient(conn)
-
-	conn, err = grpc.Dial(c.CatalogAddr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		panic(err)
-	}
-	serv.catalog = catalog.NewCatalogClient(conn)
-
-	conn, err = grpc.Dial(c.ReadingAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
-	serv.reading = reading.NewReadingClient(conn)
-
-	conn, err = grpc.Dial(c.StaticAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
-	serv.static = static.NewStaticClient(conn)
-
-	conn, err = grpc.Dial(c.ProfileAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
-	serv.profile = profile.NewProfileClient(conn)
+	serv.connectServices(c)
 
 	applyHandlers(e, serv)
 
@@ -82,6 +45,40 @@ func Run(ctx context.Context, c Config) <-chan error {
 	}()
 
 	return ok
+}
+
+func (s *server) connectServices(c Config) {
+	conn, err := grpc.Dial(c.UserAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	s.user = user.NewUserClient(conn)
+
+	conn, err = grpc.Dial(c.CatalogAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic(err)
+	}
+	s.catalog = catalog.NewCatalogClient(conn)
+
+	conn, err = grpc.Dial(c.ReadingAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	s.reading = reading.NewReadingClient(conn)
+
+	conn, err = grpc.Dial(c.StaticAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	s.static = static.NewStaticClient(conn)
+
+	conn, err = grpc.Dial(c.ProfileAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+	s.profile = profile.NewProfileClient(conn)
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
