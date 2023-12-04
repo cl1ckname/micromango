@@ -4,3 +4,10 @@ rpc:
 client:
 	rm -rf micromango-client; \
 	git clone -b main git@github.com:cl1ckname/micromango-client.git;
+
+up:
+	pm2 start ecosystem.config.js
+restart:
+	pm2 restart ecosystem.config.js
+down:
+	pm2 stop ecosystem.config.js

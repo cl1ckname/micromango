@@ -13,7 +13,7 @@ type userHandler struct {
 
 func RegisterUser(g *echo.Group, u user.UserClient) {
 	h := userHandler{u}
-	userGroup := g.Group("user")
+	userGroup := g.Group("/user")
 
 	userGroup.POST("/register", h.Register)
 	userGroup.POST("/login", h.Login)

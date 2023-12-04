@@ -2,8 +2,9 @@ syntax="proto3";
 option go_package="micromango/pkg/grpc/share";
 
 enum ListName {
-  READING = 0;
-  TOREAD = 1;
-  COMPLETED = 2;
-  DROP =  3;
+  UNKNOWN = 0;
+  READING = 1;
+  TOREAD = 2;
+  COMPLETED = 3;
+  DROP =  4;
 }

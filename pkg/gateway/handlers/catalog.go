@@ -17,10 +17,10 @@ type catalogHandler struct {
 
 func RegisterCatalog(g *echo.Group, c catalog.CatalogClient) {
 	h := catalogHandler{c}
-	catalogGroup := g.Group("catalog")
+	catalogGroup := g.Group("/catalog")
 
-	catalogGroup.GET("/", h.GetMangas)
-	catalogGroup.POST("/", h.AddManga)
+	catalogGroup.GET("", h.GetMangas)
+	catalogGroup.POST("", h.AddManga)
 	catalogGroup.GET("/:mangaId", h.GetManga)
 	catalogGroup.PUT("/:mangaId", h.UpdateManga)
 	catalogGroup.DELETE("/:mangaId", h.DeleteManga)

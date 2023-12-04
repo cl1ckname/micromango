@@ -5,19 +5,20 @@ import (
 	"github.com/labstack/echo/v4"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
+	"micromango/pkg/grpc/share"
 	"net/http"
 	"strconv"
 )
 
 func RegisterProfile(e *echo.Group, p profile.ProfileClient) {
 	handler := profileHandler{e, p}
-	profileGroup := e.Group("profile")
+	profileGroup := e.Group("/profile")
 
-	profileGroup.GET(":userId", handler.GetProfile)
-	profileGroup.PUT(":userId", handler.UpdateProfile)
-	profileGroup.GET(":userId/list", handler.GetList)
-	profileGroup.POST(":userId/list", handler.AddToList)
-	profileGroup.DELETE(":userId/list", handler.RemoveFromList)
+	profileGroup.GET("/:userId", handler.GetProfile)
+	profileGroup.PUT("/:userId", handler.UpdateProfile)
+	profileGroup.GET("/:userId/list", handler.GetList)
+	profileGroup.POST("/:userId/list", handler.AddToList)
+	profileGroup.DELETE("/:userId/list", handler.RemoveFromList)
 }
 
 type profileHandler struct {
@@ -97,7 +98,7 @@ func (s *profileHandler) GetList(ctx echo.Context) error {
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
-	getListReq.List = profile.ListName(list)
+	getListReq.List = share.ListName(list)
 	getListReq.ProfileId = ctx.Param("userId")
 	if _, err := s.profile.GetList(context.TODO(), &getListReq); err != nil {
 		return utils.ErrorToResponse(ctx, err)

@@ -18,10 +18,11 @@ import (
 func Run(ctx context.Context, c Config) <-chan error {
 	e := echo.New()
 	serv := server{}
+	serv.connectServices(c)
+
 	e.Use(mw.Cors())
 	e.Use(mw.Auth(serv.user))
 
-	serv.connectServices(c)
 	applyHandlers(e, serv)
 
 	return listenUntilError(ctx, c.Addr, e)
@@ -70,7 +71,7 @@ func (s *server) connectServices(c Config) {
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
-	apiGroup := e.Group("api")
+	apiGroup := e.Group("/api")
 
 	handlers.RegisterUser(apiGroup, serv.user)
 	handlers.RegisterCatalog(apiGroup, serv.catalog)

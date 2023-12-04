@@ -15,15 +15,15 @@ type readingHandler struct {
 
 func RegisterReading(g *echo.Group, r reading.ReadingClient) {
 	h := readingHandler{r}
-	readingGroup := g.Group("content")
+	readingGroup := g.Group("/content")
 
-	readingGroup.GET("api/content/:mangaId", h.GetMangaContent)
-	readingGroup.POST("api/content", h.AddMangaContent)
-	readingGroup.GET("api/content/:mangaId/chapter/:chapterId", h.GetChapter)
-	readingGroup.PUT("api/content/:mangaId/chapter/:chapterId", h.UpdateChapter)
-	readingGroup.POST("api/content/:mangaId/chapter", h.AddChapter)
-	readingGroup.GET("api/content/:mangaId/chapter/:chapterId/page/:pageId", h.GetPage)
-	readingGroup.POST("api/content/:mangaId/chapter/:chapterId/page", h.AddPage)
+	readingGroup.GET("/:mangaId", h.GetMangaContent)
+	readingGroup.POST("/", h.AddMangaContent)
+	readingGroup.GET("/:mangaId/chapter/:chapterId", h.GetChapter)
+	readingGroup.PUT("/:mangaId/chapter/:chapterId", h.UpdateChapter)
+	readingGroup.POST("/:mangaId/chapter", h.AddChapter)
+	readingGroup.GET("/:mangaId/chapter/:chapterId/page/:pageId", h.GetPage)
+	readingGroup.POST("/:mangaId/chapter/:chapterId/page", h.AddPage)
 
 }
 
