@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -76,7 +75,6 @@ func (s *service) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRespo
 	}
 	accessToken, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
-		fmt.Println("invalid token: ", err.Error())
 		return nil, err
 	}
 	accessTokenExpired, err := token.Claims.GetExpirationTime()
