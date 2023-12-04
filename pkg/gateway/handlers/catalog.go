@@ -1,4 +1,4 @@
-package gateway
+package handlers
 
 import (
 	"context"
@@ -11,7 +11,23 @@ import (
 	"net/http"
 )
 
-func (s *server) GetManga(ctx echo.Context) error {
+type catalogHandler struct {
+	catalog catalog.CatalogClient
+}
+
+func RegisterCatalog(g *echo.Group, c catalog.CatalogClient) {
+	h := catalogHandler{c}
+	catalogGroup := g.Group("catalog")
+
+	catalogGroup.GET("/", h.GetMangas)
+	catalogGroup.POST("/", h.AddManga)
+	catalogGroup.GET("/:mangaId", h.GetManga)
+	catalogGroup.PUT("/:mangaId", h.UpdateManga)
+	catalogGroup.DELETE("/:mangaId", h.DeleteManga)
+
+}
+
+func (s *catalogHandler) GetManga(ctx echo.Context) error {
 	var getMangaReq catalog.MangaRequest
 	if claims, ok := ctx.Get("claims").(*user.UserResponse); ok {
 		getMangaReq.UserId = &claims.UserId
@@ -35,7 +51,7 @@ func (s *server) GetManga(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) GetMangas(ctx echo.Context) error {
+func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.Empty{})
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
@@ -43,7 +59,7 @@ func (s *server) GetMangas(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, mangas.Mangas)
 }
 
-func (s *server) AddManga(ctx echo.Context) error {
+func (s *catalogHandler) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
 	addMangaReq.Title = ctx.FormValue("title")
 	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
@@ -67,7 +83,7 @@ func (s *server) AddManga(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) UpdateManga(ctx echo.Context) error {
+func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 	var updateMangaReq catalog.UpdateMangaRequest
 	if err := ctx.Bind(&updateMangaReq); err != nil {
 		return utils.ErrorToResponse(ctx, err)
@@ -86,7 +102,7 @@ func (s *server) UpdateManga(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-func (s *server) DeleteManga(ctx echo.Context) error {
+func (s *catalogHandler) DeleteManga(ctx echo.Context) error {
 	mangaId := ctx.Param("mangaId")
 	if _, err := s.catalog.DeleteManga(context.TODO(), &catalog.DeleteMangaRequest{MangaId: mangaId}); err != nil {
 		return utils.ErrorToResponse(ctx, err)

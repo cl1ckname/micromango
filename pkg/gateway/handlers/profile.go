@@ -1,4 +1,4 @@
-package gateway
+package handlers
 
 import (
 	"context"
@@ -9,7 +9,23 @@ import (
 	"strconv"
 )
 
-func (s *server) UpdateProfile(ctx echo.Context) error {
+func RegisterProfile(e *echo.Group, p profile.ProfileClient) {
+	handler := profileHandler{e, p}
+	profileGroup := e.Group("profile")
+
+	profileGroup.GET(":userId", handler.GetProfile)
+	profileGroup.PUT(":userId", handler.UpdateProfile)
+	profileGroup.GET(":userId/list", handler.GetList)
+	profileGroup.POST(":userId/list", handler.AddToList)
+	profileGroup.DELETE(":userId/list", handler.RemoveFromList)
+}
+
+type profileHandler struct {
+	e       *echo.Group
+	profile profile.ProfileClient
+}
+
+func (s *profileHandler) UpdateProfile(ctx echo.Context) error {
 	var updateReq profile.UpdateRequest
 	updateReq.UserId = ctx.Param("userId")
 	if username := ctx.FormValue("username"); username != "" {
@@ -38,7 +54,7 @@ func (s *server) UpdateProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) GetProfile(ctx echo.Context) error {
+func (s *profileHandler) GetProfile(ctx echo.Context) error {
 	var getReq profile.GetRequest
 	getReq.UserId = ctx.Param("userId")
 	p, err := s.profile.Get(context.TODO(), &getReq)
@@ -48,7 +64,7 @@ func (s *server) GetProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, p)
 }
 
-func (s *server) AddToList(ctx echo.Context) error {
+func (s *profileHandler) AddToList(ctx echo.Context) error {
 	var addToListReq profile.AddToListRequest
 	addToListReq.ProfileId = ctx.Param("userId")
 	if err := ctx.Bind(&addToListReq); err != nil {
@@ -61,7 +77,7 @@ func (s *server) AddToList(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-func (s *server) RemoveFromList(ctx echo.Context) error {
+func (s *profileHandler) RemoveFromList(ctx echo.Context) error {
 	var removeFromListReq profile.RemoveFromListRequest
 	removeFromListReq.ProfileId = ctx.Param("userId")
 	if err := ctx.Bind(&removeFromListReq); err != nil {
@@ -74,7 +90,7 @@ func (s *server) RemoveFromList(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-func (s *server) GetList(ctx echo.Context) error {
+func (s *profileHandler) GetList(ctx echo.Context) error {
 	var getListReq profile.GetListRequest
 	listStr := ctx.QueryParam("list")
 	list, err := strconv.ParseInt(listStr, 10, 32)

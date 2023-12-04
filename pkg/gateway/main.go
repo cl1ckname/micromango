@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"micromango/pkg/gateway/handlers"
 	mw "micromango/pkg/gateway/middleware"
 	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/profile"
@@ -22,29 +23,34 @@ func Run(ctx context.Context, c Config) <-chan error {
 	e.Use(mw.Auth(serv.user))
 
 	serv.connectServices(c)
-
 	applyHandlers(e, serv)
 
+	return listenUntilError(ctx, c.Addr, e)
+}
+
+func listenUntilError(ctx context.Context, addr string, e *echo.Echo) <-chan error {
 	ok := make(chan error)
-
-	go func() {
-		if err := e.Start(c.Addr); err != nil {
-			log.Println("Server stopped: ", err.Error())
-			ok <- err
-			close(ok)
-		}
-	}()
-	go func() {
-		<-ctx.Done()
-		timeoutCtx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		defer cancel()
-		if err := e.Shutdown(timeoutCtx); err != nil {
-			log.Println("server failed: ", err.Error())
-		}
-		close(ok)
-	}()
-
+	go pipeEchoErrorToChan(addr, e, ok)
+	go waitContextShutdown(ctx, e, ok)
 	return ok
+}
+
+func pipeEchoErrorToChan(addr string, e *echo.Echo, ok chan error) {
+	if err := e.Start(addr); err != nil {
+		log.Println("Server stopped: ", err.Error())
+		ok <- err
+		close(ok)
+	}
+}
+
+func waitContextShutdown(ctx context.Context, e *echo.Echo, ok chan error) {
+	<-ctx.Done()
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+	if err := e.Shutdown(timeoutCtx); err != nil {
+		log.Println("server failed: ", err.Error())
+	}
+	close(ok)
 }
 
 func (s *server) connectServices(c Config) {
@@ -82,30 +88,13 @@ func (s *server) connectServices(c Config) {
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
-	e.POST("api/user/register", serv.Register)
-	e.POST("api/user/login", serv.Login)
+	apiGroup := e.Group("api")
 
-	e.GET("api/content/:mangaId", serv.GetMangaContent)
-	e.POST("api/content", serv.AddMangaContent)
-	e.GET("api/content/:mangaId/chapter/:chapterId", serv.GetChapter)
-	e.PUT("api/content/:mangaId/chapter/:chapterId", serv.UpdateChapter)
-	e.POST("api/content/:mangaId/chapter", serv.AddChapter)
-	e.GET("api/content/:mangaId/chapter/:chapterId/page/:pageId", serv.GetPage)
-	e.POST("api/content/:mangaId/chapter/:chapterId/page", serv.AddPage)
-
-	e.GET("api/catalog", serv.GetMangas)
-	e.POST("api/catalog", serv.AddManga)
-	e.GET("api/catalog/:mangaId", serv.GetManga)
-	e.PUT("api/catalog/:mangaId", serv.UpdateManga)
-	e.DELETE("api/catalog/:mangaId", serv.DeleteManga)
-
-	e.GET("api/profile/:userId", serv.GetProfile)
-	e.PUT("api/profile/:userId", serv.UpdateProfile)
-	e.GET("api/profile/:userId/list", serv.GetList)
-	e.POST("api/profile/:userId/list", serv.AddToList)
-	e.DELETE("api/profile/:userId/list", serv.RemoveFromList)
-
-	e.GET("static/:id", serv.GetStatic)
+	handlers.RegisterUser(apiGroup, serv.user)
+	handlers.RegisterCatalog(apiGroup, serv.catalog)
+	handlers.RegisterProfile(apiGroup, serv.profile)
+	handlers.RegisterReading(apiGroup, serv.reading)
+	e.GET("static/:id", handlers.GetStaticHandler(serv.static))
 }
 
 type server struct {

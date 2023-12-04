@@ -1,4 +1,4 @@
-package gateway
+package handlers
 
 import (
 	"context"
@@ -9,7 +9,25 @@ import (
 	"strconv"
 )
 
-func (s *server) GetMangaContent(ctx echo.Context) error {
+type readingHandler struct {
+	reading reading.ReadingClient
+}
+
+func RegisterReading(g *echo.Group, r reading.ReadingClient) {
+	h := readingHandler{r}
+	readingGroup := g.Group("content")
+
+	readingGroup.GET("api/content/:mangaId", h.GetMangaContent)
+	readingGroup.POST("api/content", h.AddMangaContent)
+	readingGroup.GET("api/content/:mangaId/chapter/:chapterId", h.GetChapter)
+	readingGroup.PUT("api/content/:mangaId/chapter/:chapterId", h.UpdateChapter)
+	readingGroup.POST("api/content/:mangaId/chapter", h.AddChapter)
+	readingGroup.GET("api/content/:mangaId/chapter/:chapterId/page/:pageId", h.GetPage)
+	readingGroup.POST("api/content/:mangaId/chapter/:chapterId/page", h.AddPage)
+
+}
+
+func (s *readingHandler) GetMangaContent(ctx echo.Context) error {
 	var getMangaContentReq reading.MangaContentRequest
 	getMangaContentReq.MangaId = ctx.Param("mangaId")
 	if err := ctx.Bind(&getMangaContentReq); err != nil {
@@ -22,7 +40,7 @@ func (s *server) GetMangaContent(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) AddMangaContent(ctx echo.Context) error {
+func (s *readingHandler) AddMangaContent(ctx echo.Context) error {
 	var addMangaContentRequest reading.AddMangaContentRequest
 	addMangaContentRequest.MangaId = ctx.Param("mangaId")
 	if err := ctx.Bind(&addMangaContentRequest); err != nil {
@@ -35,7 +53,7 @@ func (s *server) AddMangaContent(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) GetChapter(ctx echo.Context) error {
+func (s *readingHandler) GetChapter(ctx echo.Context) error {
 	var getChapterReq reading.ChapterRequest
 	getChapterReq.ChapterId = ctx.Param("chapterId")
 	if err := ctx.Bind(&getChapterReq); err != nil {
@@ -48,7 +66,7 @@ func (s *server) GetChapter(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) AddChapter(ctx echo.Context) error {
+func (s *readingHandler) AddChapter(ctx echo.Context) error {
 	var addChapterContentRequest reading.AddChapterRequest
 	addChapterContentRequest.MangaId = ctx.Param("mangaId")
 	if err := ctx.Bind(&addChapterContentRequest); err != nil {
@@ -61,7 +79,7 @@ func (s *server) AddChapter(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) UpdateChapter(ctx echo.Context) error {
+func (s *readingHandler) UpdateChapter(ctx echo.Context) error {
 	var updateChapterReq reading.UpdateChapterRequest
 	if err := ctx.Bind(&updateChapterReq); err != nil {
 		return utils.ErrorToResponse(ctx, err)
@@ -73,7 +91,7 @@ func (s *server) UpdateChapter(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) GetPage(ctx echo.Context) error {
+func (s *readingHandler) GetPage(ctx echo.Context) error {
 	var addMangaContentRequest reading.PageRequest
 	addMangaContentRequest.PageId = ctx.Param("pageId")
 	if err := ctx.Bind(&addMangaContentRequest); err != nil {
@@ -86,7 +104,7 @@ func (s *server) GetPage(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, resp)
 }
 
-func (s *server) AddPage(ctx echo.Context) error {
+func (s *readingHandler) AddPage(ctx echo.Context) error {
 	var addMangaContentRequest reading.AddPageRequest
 	addMangaContentRequest.ChapterId = ctx.FormValue("chapterId")
 	chapterNumberStr := ctx.FormValue("number")

@@ -1,4 +1,4 @@
-package gateway
+package handlers
 
 import (
 	"context"
@@ -7,7 +7,19 @@ import (
 	"net/http"
 )
 
-func (s *server) Register(ctx echo.Context) error {
+type userHandler struct {
+	user user.UserClient
+}
+
+func RegisterUser(g *echo.Group, u user.UserClient) {
+	h := userHandler{u}
+	userGroup := g.Group("user")
+
+	userGroup.POST("/register", h.Register)
+	userGroup.POST("/login", h.Login)
+}
+
+func (s *userHandler) Register(ctx echo.Context) error {
 	var registerReq user.RegisterRequest
 	if err := ctx.Bind(&registerReq); err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
@@ -19,7 +31,7 @@ func (s *server) Register(ctx echo.Context) error {
 	return ctx.JSON(http.StatusCreated, resp)
 }
 
-func (s *server) Login(ctx echo.Context) error {
+func (s *userHandler) Login(ctx echo.Context) error {
 	var loginReq user.LoginRequest
 	if err := ctx.Bind(&loginReq); err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
