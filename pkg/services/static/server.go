@@ -96,6 +96,7 @@ func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePi
 	if err != nil {
 		return nil, err
 	}
+	img = Resize(img, common.PROFILE_W, common.PROFILE_H)
 	if err := SaveImage(profilePicturePath, img); err != nil {
 		return nil, err
 	}
