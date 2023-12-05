@@ -11,3 +11,5 @@ restart:
 	pm2 restart ecosystem.config.js
 down:
 	pm2 stop ecosystem.config.js
+sql:
+	sqlite3 db/catalog.sqlite3 < sql/genres.sql

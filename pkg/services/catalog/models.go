@@ -13,6 +13,7 @@ type Manga struct {
 	Cover       string    `json:"cover"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"createdAt"`
+	Genres      []Genre   `json:"genres" gorm:"many2many:manga_genres"`
 }
 
 func (m *Manga) BeforeCreate(*gorm.DB) error {
@@ -29,4 +30,9 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Description: m.Description,
 		CreatedAt:   m.CreatedAt.String(),
 	}
+}
+
+type Genre struct {
+	GenreId int    `json:"genreId" gorm:"primaryKey;autoIncrement"`
+	Label   string `json:"label"`
 }

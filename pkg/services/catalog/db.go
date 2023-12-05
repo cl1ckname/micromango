@@ -24,11 +24,14 @@ func Connect(addr string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{
 		Logger: newLogger,
 	})
+	if err != nil {
+		panic(err)
+	}
 	if err := db.AutoMigrate(&Manga{}); err != nil {
 		panic(err)
 	}
-	if err != nil {
-		log.Fatal(err)
+	if err := db.AutoMigrate(&Genre{}); err != nil {
+		panic(err)
 	}
 	return db
 }
