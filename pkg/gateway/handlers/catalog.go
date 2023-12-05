@@ -52,7 +52,10 @@ func (s *catalogHandler) GetManga(ctx echo.Context) error {
 }
 
 func (s *catalogHandler) GetMangas(ctx echo.Context) error {
-	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.Empty{})
+	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.GetMangasRequest{
+		GenresInclude: []uint32{1},
+		GenresExclude: nil,
+	})
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}

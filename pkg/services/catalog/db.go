@@ -15,7 +15,7 @@ func Connect(addr string) *gorm.DB {
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
 			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Warn, // Log level
+			LogLevel:                  logger.Info, // Log level
 			IgnoreRecordNotFoundError: false,       // Ignore ErrRecordNotFound error for logger
 			ParameterizedQueries:      false,       // Don't include params in the SQL log
 			Colorful:                  false,       // Disable color
@@ -48,12 +48,12 @@ func GetManga(db *gorm.DB, mangaId string) (Manga, error) {
 	return m, nil
 }
 
-func GetMangas(db *gorm.DB) ([]Manga, error) {
-	var mangas []Manga
-	if res := db.Find(&mangas); res.Error != nil {
-		return nil, res.Error
-	}
-	return mangas, nil
+func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
+	err = db.
+		Joins("INNER JOIN manga_genres ON manga_genres.manga_manga_id = "+
+			"mangas.manga_id AND manga_genres.genre_genre_id in (?) AND manga_genres.genre_genre_id not in (?)", include, exclude).
+		Find(&m).Error
+	return
 }
 
 func AddManga(db *gorm.DB, m Manga) (Manga, error) {

@@ -104,8 +104,8 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 	return s.GetManga(ctx, &pb.MangaRequest{MangaId: m.MangaId.String()})
 }
 
-func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, error) {
-	ms, err := GetMangas(s.db)
+func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
+	ms, err := GetMangas(s.db, request.GenresInclude, request.GenresExclude)
 	mangas := make([]*share.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
 		mangas[i] = &share.MangaPreviewResponse{
@@ -127,6 +127,10 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 	}
 	mangaToUpdate.Title = utils.DerefOrDefault(req.Title, mangaToUpdate.Title)
 	mangaToUpdate.Description = utils.DerefOrDefault(req.Description, mangaToUpdate.Description)
+	genres := utils.Map(req.Genres, func(i uint32) Genre {
+		return Genre{GenreId: int(i)}
+	})
+	mangaToUpdate.Genres = genres
 	if len(req.Cover) != 0 {
 		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{
 			MangaId: req.MangaId,

@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CatalogClient interface {
 	GetManga(ctx context.Context, in *MangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
-	GetMangas(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MangasResponse, error)
+	GetMangas(ctx context.Context, in *GetMangasRequest, opts ...grpc.CallOption) (*MangasResponse, error)
 	AddManga(ctx context.Context, in *AddMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
 	UpdateManga(ctx context.Context, in *UpdateMangaRequest, opts ...grpc.CallOption) (*MangaResponse, error)
 	DeleteManga(ctx context.Context, in *DeleteMangaRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -56,7 +56,7 @@ func (c *catalogClient) GetManga(ctx context.Context, in *MangaRequest, opts ...
 	return out, nil
 }
 
-func (c *catalogClient) GetMangas(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*MangasResponse, error) {
+func (c *catalogClient) GetMangas(ctx context.Context, in *GetMangasRequest, opts ...grpc.CallOption) (*MangasResponse, error) {
 	out := new(MangasResponse)
 	err := c.cc.Invoke(ctx, Catalog_GetMangas_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -106,7 +106,7 @@ func (c *catalogClient) GetList(ctx context.Context, in *GetListRequest, opts ..
 // for forward compatibility
 type CatalogServer interface {
 	GetManga(context.Context, *MangaRequest) (*MangaResponse, error)
-	GetMangas(context.Context, *Empty) (*MangasResponse, error)
+	GetMangas(context.Context, *GetMangasRequest) (*MangasResponse, error)
 	AddManga(context.Context, *AddMangaRequest) (*MangaResponse, error)
 	UpdateManga(context.Context, *UpdateMangaRequest) (*MangaResponse, error)
 	DeleteManga(context.Context, *DeleteMangaRequest) (*Empty, error)
@@ -121,7 +121,7 @@ type UnimplementedCatalogServer struct {
 func (UnimplementedCatalogServer) GetManga(context.Context, *MangaRequest) (*MangaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetManga not implemented")
 }
-func (UnimplementedCatalogServer) GetMangas(context.Context, *Empty) (*MangasResponse, error) {
+func (UnimplementedCatalogServer) GetMangas(context.Context, *GetMangasRequest) (*MangasResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMangas not implemented")
 }
 func (UnimplementedCatalogServer) AddManga(context.Context, *AddMangaRequest) (*MangaResponse, error) {
@@ -168,7 +168,7 @@ func _Catalog_GetManga_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Catalog_GetMangas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(GetMangasRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func _Catalog_GetMangas_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: Catalog_GetMangas_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CatalogServer).GetMangas(ctx, req.(*Empty))
+		return srv.(CatalogServer).GetMangas(ctx, req.(*GetMangasRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

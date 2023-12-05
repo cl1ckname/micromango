@@ -8,7 +8,7 @@ message Empty {}
 
 service Catalog {
   rpc GetManga(MangaRequest) returns (MangaResponse);
-  rpc GetMangas(Empty) returns (MangasResponse);
+  rpc GetMangas(GetMangasRequest) returns (MangasResponse);
   rpc AddManga(AddMangaRequest) returns (MangaResponse);
   rpc UpdateManga(UpdateMangaRequest) returns (MangaResponse);
   rpc DeleteManga(DeleteMangaRequest) returns (Empty);
@@ -32,12 +32,19 @@ message MangaResponse {
   MangaContentResponse content = 6;
   string createdAt = 5;
   optional ListName list = 7;
+  repeated string genres = 8;
+}
+
+message GetMangasRequest {
+  repeated uint32 genresInclude = 3;
+  repeated uint32 genresExclude = 4;
 }
 
 message AddMangaRequest {
   string title = 1;
   optional bytes cover = 2;
   optional string description = 3;
+  repeated string genres = 4;
 }
 
 message UpdateMangaRequest {
@@ -45,6 +52,7 @@ message UpdateMangaRequest {
   optional string title = 2;
   optional bytes cover = 3;
   optional string description = 4;
+  repeated uint32 genres = 5;
 }
 
 message DeleteMangaRequest {
