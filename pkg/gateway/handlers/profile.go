@@ -100,8 +100,9 @@ func (s *profileHandler) GetList(ctx echo.Context) error {
 	}
 	getListReq.List = share.ListName(list)
 	getListReq.ProfileId = ctx.Param("userId")
-	if _, err := s.profile.GetList(context.TODO(), &getListReq); err != nil {
+	previewList, err := s.profile.GetList(context.TODO(), &getListReq)
+	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
-	return ctx.String(http.StatusOK, "ok")
+	return ctx.JSON(http.StatusOK, previewList.Manga)
 }

@@ -12,6 +12,7 @@ service Catalog {
   rpc AddManga(AddMangaRequest) returns (MangaResponse);
   rpc UpdateManga(UpdateMangaRequest) returns (MangaResponse);
   rpc DeleteManga(DeleteMangaRequest) returns (Empty);
+  rpc GetList(GetListRequest) returns (GetListResponse);
 }
 
 message MangasResponse {
@@ -33,12 +34,6 @@ message MangaResponse {
   optional ListName list = 7;
 }
 
-message MangaPreviewResponse {
-  string mangaId = 1;
-  string title = 2;
-  string cover = 3;
-}
-
 message AddMangaRequest {
   string title = 1;
   optional bytes cover = 2;
@@ -54,4 +49,12 @@ message UpdateMangaRequest {
 
 message DeleteMangaRequest {
   string mangaId = 1;
+}
+
+message GetListRequest {
+  repeated string mangaList = 1;
+}
+
+message GetListResponse {
+  repeated MangaPreviewResponse previewList = 1;
 }

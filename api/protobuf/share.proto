@@ -8,3 +8,9 @@ enum ListName {
   COMPLETED = 3;
   DROP =  4;
 }
+
+message MangaPreviewResponse {
+  string mangaId = 1;
+  string title = 2;
+  string cover = 3;
+}

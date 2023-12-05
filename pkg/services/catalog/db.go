@@ -75,3 +75,8 @@ func DeleteManga(db *gorm.DB, mangaId string) error {
 	toDelete := Manga{MangaId: mangaUuid}
 	return db.Delete(&toDelete).Error
 }
+
+func GetMany(db *gorm.DB, listId []string) (m []Manga, err error) {
+	err = db.Find(&m, listId).Error
+	return
+}

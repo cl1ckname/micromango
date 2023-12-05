@@ -44,7 +44,7 @@ message GetListRequest {
 }
 
 message ListResponse {
-  repeated string mangaId = 1;
+  repeated MangaPreviewResponse manga = 1;
 }
 
 message AddToListRequest {

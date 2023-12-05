@@ -5,34 +5,35 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
+	"micromango/pkg/grpc/catalog"
 	pb "micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/static"
 )
 
 type Config struct {
-	Addr              string
-	DbAddr            string
-	StaticServiceAddr string
+	Addr               string
+	DbAddr             string
+	StaticServiceAddr  string
+	CatalogServiceAddr string
 }
 
 func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 
-	conn, err := grpc.Dial(c.StaticServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
+	conn := utils.GrpcDialOrFatal(c.StaticServiceAddr)
 	staticService := static.NewStaticClient(conn)
 
+	conn = utils.GrpcDialOrFatal(c.CatalogServiceAddr)
+	catalogService := catalog.NewCatalogClient(conn)
+
 	serv := service{
-		db:     database,
-		static: staticService,
+		db:      database,
+		static:  staticService,
+		catalog: catalogService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterProfileServer(baseServer, &serv)
@@ -42,8 +43,9 @@ func Run(ctx context.Context, c Config) <-chan error {
 
 type service struct {
 	pb.UnimplementedProfileServer
-	db     *gorm.DB
-	static static.StaticClient
+	db      *gorm.DB
+	static  static.StaticClient
+	catalog catalog.CatalogClient
 }
 
 func (s *service) Create(_ context.Context, req *pb.CreateRequest) (*pb.Response, error) {
@@ -103,16 +105,22 @@ func (s *service) Get(_ context.Context, req *pb.GetRequest) (*pb.Response, erro
 	return p.ToResponse(), err
 }
 
-func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.ListResponse, error) {
+func (s *service) GetList(ctx context.Context, req *pb.GetListRequest) (*pb.ListResponse, error) {
 	lr, err := GetList(s.db, req)
 	if err != nil {
 		return nil, err
 	}
-	lrsp := make([]string, len(lr))
-	for i := 0; i < len(lr); i++ {
-		lrsp[i] = lr[i].MangaId.String()
+
+	mangaIdList := utils.Map(lr, func(l ListRecord) string {
+		return l.MangaId.String()
+	})
+
+	previewList, err := s.catalog.GetList(ctx, &catalog.GetListRequest{MangaList: mangaIdList})
+	if err != nil {
+		return nil, err
 	}
-	return &pb.ListResponse{MangaId: lrsp}, err
+
+	return &pb.ListResponse{Manga: previewList.PreviewList}, err
 }
 
 func (s *service) AddToList(_ context.Context, req *pb.AddToListRequest) (*pb.Empty, error) {

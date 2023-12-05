@@ -13,6 +13,7 @@ import (
 	pb "micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
+	"micromango/pkg/grpc/share"
 	"micromango/pkg/grpc/static"
 )
 
@@ -106,9 +107,9 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 
 func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, error) {
 	ms, err := GetMangas(s.db)
-	mangas := make([]*pb.MangaPreviewResponse, len(ms))
+	mangas := make([]*share.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
-		mangas[i] = &pb.MangaPreviewResponse{
+		mangas[i] = &share.MangaPreviewResponse{
 			MangaId: m.MangaId.String(),
 			Title:   m.Title,
 			Cover:   m.Cover,
@@ -148,4 +149,21 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 func (s *service) DeleteManga(_ context.Context, req *pb.DeleteMangaRequest) (*pb.Empty, error) {
 	empty := new(pb.Empty)
 	return empty, DeleteManga(s.db, req.MangaId)
+}
+
+func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.GetListResponse, error) {
+	m, err := GetMany(s.db, req.MangaList)
+	if err != nil {
+		return nil, err
+	}
+
+	list := utils.Map(m, func(m Manga) *share.MangaPreviewResponse {
+		return &share.MangaPreviewResponse{
+			MangaId: m.MangaId.String(),
+			Title:   m.Title,
+			Cover:   m.Cover,
+		}
+	})
+
+	return &pb.GetListResponse{PreviewList: list}, nil
 }
