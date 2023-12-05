@@ -18,7 +18,6 @@ func RegisterReading(g *echo.Group, r reading.ReadingClient) {
 	readingGroup := g.Group("/content")
 
 	readingGroup.GET("/:mangaId", h.GetMangaContent)
-	readingGroup.POST("/", h.AddMangaContent)
 	readingGroup.GET("/:mangaId/chapter/:chapterId", h.GetChapter)
 	readingGroup.PUT("/:mangaId/chapter/:chapterId", h.UpdateChapter)
 	readingGroup.POST("/:mangaId/chapter", h.AddChapter)
@@ -34,19 +33,6 @@ func (s *readingHandler) GetMangaContent(ctx echo.Context) error {
 		return utils.ErrorToResponse(ctx, err)
 	}
 	resp, err := s.reading.GetMangaContent(context.TODO(), &getMangaContentReq)
-	if err != nil {
-		return utils.ErrorToResponse(ctx, err)
-	}
-	return ctx.JSON(http.StatusOK, resp)
-}
-
-func (s *readingHandler) AddMangaContent(ctx echo.Context) error {
-	var addMangaContentRequest reading.AddMangaContentRequest
-	addMangaContentRequest.MangaId = ctx.Param("mangaId")
-	if err := ctx.Bind(&addMangaContentRequest); err != nil {
-		return utils.ErrorToResponse(ctx, err)
-	}
-	resp, err := s.reading.AddMangaContent(context.TODO(), &addMangaContentRequest)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
@@ -106,7 +92,7 @@ func (s *readingHandler) GetPage(ctx echo.Context) error {
 
 func (s *readingHandler) AddPage(ctx echo.Context) error {
 	var addMangaContentRequest reading.AddPageRequest
-	addMangaContentRequest.ChapterId = ctx.FormValue("chapterId")
+	addMangaContentRequest.MangaId = ctx.FormValue("mangaId")
 	chapterNumberStr := ctx.FormValue("number")
 	chapterNumber, err := strconv.ParseUint(chapterNumberStr, 10, 32)
 	if err != nil {

@@ -26,9 +26,6 @@ func Connect(addr string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(addr), &gorm.Config{
 		Logger: newLogger,
 	})
-	if err := db.AutoMigrate(&MangaContent{}); err != nil {
-		panic(err)
-	}
 	if err := db.AutoMigrate(&Chapter{}); err != nil {
 		panic(err)
 	}
@@ -41,18 +38,13 @@ func Connect(addr string) *gorm.DB {
 	return db
 }
 
-func getMangaContent(db *gorm.DB, mangaId string) (m MangaContent, err error) {
-	m.MangaId, err = uuid.Parse(mangaId)
+func getMangaContent(db *gorm.DB, mangaId string) (m []Chapter, err error) {
+	mangaUUID, err := uuid.Parse(mangaId)
 	if err != nil {
-		return MangaContent{}, err
+		return nil, err
 	}
-	err = db.Model(&m).Preload("Chapters").First(&m).Error
+	err = db.Find(&m, &Chapter{MangaId: mangaUUID}).Error
 	return
-}
-
-func addMangaContent(db *gorm.DB, mangaContent MangaContent) (m MangaContent, err error) {
-	err = db.Create(&mangaContent).Error
-	return mangaContent, err
 }
 
 func getChapter(db *gorm.DB, chapterId string) (c Chapter, err error) {

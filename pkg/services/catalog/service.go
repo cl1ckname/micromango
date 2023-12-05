@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
@@ -53,12 +54,14 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 	m, err := GetManga(s.db, req.GetMangaId())
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			log.Println("manga", req.MangaId, "not found")
 			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
 		}
 		return nil, err
 	}
 	content, err := s.reading.GetMangaContent(ctx, &reading.MangaContentRequest{MangaId: m.MangaId.String()})
 	if err != nil {
+		log.Println("get manga", req.MangaId, "content error:", err.Error())
 		return nil, err
 	}
 	resp := m.ToResponse()
@@ -98,11 +101,7 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 	if err != nil {
 		return nil, err
 	}
-	newMangaId := &reading.AddMangaContentRequest{MangaId: m.MangaId.String()}
-	if _, err = s.reading.AddMangaContent(ctx, newMangaId); err != nil {
-		return nil, err
-	}
-	return s.GetManga(ctx, &pb.MangaRequest{MangaId: newMangaId.MangaId})
+	return s.GetManga(ctx, &pb.MangaRequest{MangaId: m.MangaId.String()})
 }
 
 func (s *service) GetMangas(context.Context, *pb.Empty) (*pb.MangasResponse, error) {
@@ -152,6 +151,9 @@ func (s *service) DeleteManga(_ context.Context, req *pb.DeleteMangaRequest) (*p
 }
 
 func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.GetListResponse, error) {
+	if len(req.MangaList) == 0 {
+		return &pb.GetListResponse{}, nil
+	}
 	m, err := GetMany(s.db, req.MangaList)
 	if err != nil {
 		return nil, err

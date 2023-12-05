@@ -4,16 +4,11 @@ option go_package="micromango/pkg/grpc/reading";
 
 service Reading {
   rpc GetMangaContent(MangaContentRequest) returns (MangaContentResponse);
-  rpc AddMangaContent(AddMangaContentRequest) returns (MangaContentResponse);
   rpc GetChapter(ChapterRequest) returns (ChapterResponse);
   rpc AddChapter(AddChapterRequest) returns (ChapterResponse);
   rpc UpdateChapter(UpdateChapterRequest) returns (ChapterResponse);
   rpc GetPage(PageRequest) returns (PageResponse);
   rpc AddPage(AddPageRequest) returns (PageResponse);
-}
-
-message AddMangaContentRequest {
-  string mangaId =1;
 }
 
 message MangaContentRequest {
@@ -22,8 +17,6 @@ message MangaContentRequest {
 }
 
 message MangaContentResponse {
-  string mangaId = 1;
-
   message ChapterHead {
     string chapterId = 1;
     float number = 2;

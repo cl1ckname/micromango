@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Reading_GetMangaContent_FullMethodName = "/micromango.Reading/GetMangaContent"
-	Reading_AddMangaContent_FullMethodName = "/micromango.Reading/AddMangaContent"
 	Reading_GetChapter_FullMethodName      = "/micromango.Reading/GetChapter"
 	Reading_AddChapter_FullMethodName      = "/micromango.Reading/AddChapter"
 	Reading_UpdateChapter_FullMethodName   = "/micromango.Reading/UpdateChapter"
@@ -33,7 +32,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReadingClient interface {
 	GetMangaContent(ctx context.Context, in *MangaContentRequest, opts ...grpc.CallOption) (*MangaContentResponse, error)
-	AddMangaContent(ctx context.Context, in *AddMangaContentRequest, opts ...grpc.CallOption) (*MangaContentResponse, error)
 	GetChapter(ctx context.Context, in *ChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
 	AddChapter(ctx context.Context, in *AddChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
 	UpdateChapter(ctx context.Context, in *UpdateChapterRequest, opts ...grpc.CallOption) (*ChapterResponse, error)
@@ -52,15 +50,6 @@ func NewReadingClient(cc grpc.ClientConnInterface) ReadingClient {
 func (c *readingClient) GetMangaContent(ctx context.Context, in *MangaContentRequest, opts ...grpc.CallOption) (*MangaContentResponse, error) {
 	out := new(MangaContentResponse)
 	err := c.cc.Invoke(ctx, Reading_GetMangaContent_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *readingClient) AddMangaContent(ctx context.Context, in *AddMangaContentRequest, opts ...grpc.CallOption) (*MangaContentResponse, error) {
-	out := new(MangaContentResponse)
-	err := c.cc.Invoke(ctx, Reading_AddMangaContent_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +106,6 @@ func (c *readingClient) AddPage(ctx context.Context, in *AddPageRequest, opts ..
 // for forward compatibility
 type ReadingServer interface {
 	GetMangaContent(context.Context, *MangaContentRequest) (*MangaContentResponse, error)
-	AddMangaContent(context.Context, *AddMangaContentRequest) (*MangaContentResponse, error)
 	GetChapter(context.Context, *ChapterRequest) (*ChapterResponse, error)
 	AddChapter(context.Context, *AddChapterRequest) (*ChapterResponse, error)
 	UpdateChapter(context.Context, *UpdateChapterRequest) (*ChapterResponse, error)
@@ -132,9 +120,6 @@ type UnimplementedReadingServer struct {
 
 func (UnimplementedReadingServer) GetMangaContent(context.Context, *MangaContentRequest) (*MangaContentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMangaContent not implemented")
-}
-func (UnimplementedReadingServer) AddMangaContent(context.Context, *AddMangaContentRequest) (*MangaContentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddMangaContent not implemented")
 }
 func (UnimplementedReadingServer) GetChapter(context.Context, *ChapterRequest) (*ChapterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChapter not implemented")
@@ -178,24 +163,6 @@ func _Reading_GetMangaContent_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ReadingServer).GetMangaContent(ctx, req.(*MangaContentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Reading_AddMangaContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddMangaContentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReadingServer).AddMangaContent(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Reading_AddMangaContent_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReadingServer).AddMangaContent(ctx, req.(*AddMangaContentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -300,10 +267,6 @@ var Reading_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMangaContent",
 			Handler:    _Reading_GetMangaContent_Handler,
-		},
-		{
-			MethodName: "AddMangaContent",
-			Handler:    _Reading_AddMangaContent_Handler,
 		},
 		{
 			MethodName: "GetChapter",

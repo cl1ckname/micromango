@@ -43,25 +43,13 @@ func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest
 		}
 		return nil, err
 	}
-	resp := mangaContentToPb(m)
+	resp := chaptersToPb(m)
 	return resp, nil
 }
 
-func (s *service) AddMangaContent(_ context.Context, req *pb.AddMangaContentRequest) (*pb.MangaContentResponse, error) {
-	mangaId, err := uuid.Parse(req.MangaId)
-	if err != nil {
-		return nil, err
-	}
-	mc := MangaContent{
-		MangaId: mangaId,
-	}
-	m, err := addMangaContent(s.db, mc)
-	return mangaContentToPb(m), err
-}
-
-func mangaContentToPb(m MangaContent) *pb.MangaContentResponse {
-	chapters := make([]*pb.MangaContentResponse_ChapterHead, len(m.Chapters))
-	for i, c := range m.Chapters {
+func chaptersToPb(m []Chapter) *pb.MangaContentResponse {
+	chapters := make([]*pb.MangaContentResponse_ChapterHead, len(m))
+	for i, c := range m {
 		chapters[i] = &pb.MangaContentResponse_ChapterHead{
 			ChapterId: c.ChapterId.String(),
 			Number:    c.Number,
@@ -70,7 +58,6 @@ func mangaContentToPb(m MangaContent) *pb.MangaContentResponse {
 		}
 	}
 	return &pb.MangaContentResponse{
-		MangaId:  m.MangaId.String(),
 		Chapters: chapters,
 	}
 }
@@ -148,8 +135,13 @@ func (s *service) AddPage(ctx context.Context, req *pb.AddPageRequest) (*pb.Page
 	if err != nil {
 		return nil, err
 	}
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
 	p, err := addPage(s.db, Page{
 		PageId:    uuid.New(),
+		MangaId:   mangaId,
 		ChapterId: chapterId,
 		Number:    req.Number,
 		Image:     imageUrl,
