@@ -1,6 +1,7 @@
 package catalog
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -49,9 +50,16 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 }
 
 func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
-	err = db.
-		Joins("INNER JOIN manga_genres ON manga_genres.manga_manga_id = "+
-			"mangas.manga_id AND manga_genres.genre_genre_id in (?) AND manga_genres.genre_genre_id not in (?)", include, exclude).
+	conditions := ""
+	fmt.Println(include, exclude)
+	if len(include) != 0 {
+		conditions += " AND manga_genres.genre_genre_id in (?) "
+	}
+	if len(exclude) != 0 {
+		conditions += " AND manga_genres.genre_genre_id not in (?) "
+	}
+	err = db.Distinct("manga_id", "title", "cover").
+		Joins("LEFT JOIN manga_genres ON manga_genres.manga_manga_id = mangas.manga_id"+conditions, include, exclude).
 		Find(&m).Error
 	return
 }

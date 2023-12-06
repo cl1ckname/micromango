@@ -103,6 +103,19 @@ func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 	if title := ctx.FormValue("title"); title != "" {
 		updateMangaReq.Title = utils.Ptr(title)
 	}
+	formFile, err := ctx.FormFile("cover")
+	if err != nil {
+		if err != http.ErrMissingFile {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+	}
+	if formFile != nil {
+		imageBytes, err := utils.ReadFormFile(formFile)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+		updateMangaReq.Cover = imageBytes
+	}
 	res, err := s.catalog.UpdateManga(context.TODO(), &updateMangaReq)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)

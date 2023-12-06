@@ -35,6 +35,9 @@ func ErrorToResponse(ctx echo.Context, err error) error {
 }
 
 func ParseQueryIntArray(s string) []int {
+	if s == "" {
+		return []int{}
+	}
 	parts := strings.Split(s, ",")
 	return Map(parts, func(p string) int {
 		i, _ := strconv.ParseInt(p, 10, 32)

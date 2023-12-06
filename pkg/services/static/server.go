@@ -39,12 +39,12 @@ func (s *server) UploadCover(_ context.Context, req *pb.UploadCoverRequest) (*pb
 	if err := s.saveCoverImage(req.MangaId, filename, img); err != nil {
 		return nil, err
 	}
-	extFileName := s.gatewayAddr + "/static/" + path.Join("mangas", req.MangaId, filename)
+	extFileName := s.gatewayAddr + "/static/" + path.Join("manga", req.MangaId, filename)
 	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
 func (s *server) saveCoverImage(mangaId, filename string, img image.Image) error {
-	mangaDirPath := path.Join(s.staticDir, "mangas", mangaId)
+	mangaDirPath := path.Join(s.staticDir, "manga", mangaId)
 	if err := createFolderIfNotExists(mangaDirPath); err != nil {
 		return err
 	}
@@ -64,12 +64,12 @@ func (s *server) UploadPage(_ context.Context, req *pb.UploadPageRequest) (*pb.U
 		return nil, err
 	}
 
-	extFileName := s.gatewayAddr + "/static/" + path.Join("mangas", req.MangaId, req.ChapterId, filename)
+	extFileName := s.gatewayAddr + "/static/" + path.Join("manga", req.MangaId, req.ChapterId, filename)
 	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
 func (s *server) savePageImage(mangaId, chapterId, filename string, img image.Image) error {
-	mangaDirPath := path.Join(s.staticDir, "mangas", mangaId)
+	mangaDirPath := path.Join(s.staticDir, "manga", mangaId)
 	if err := createFolderIfNotExists(mangaDirPath); err != nil {
 		return err
 	}
@@ -134,6 +134,12 @@ func (s *server) GetImage(_ context.Context, req *pb.GetImageRequest) (*pb.Image
 }
 
 func Run(ctx context.Context, c Config) <-chan error {
+	if err := createFolderIfNotExists(path.Join(c.StaticDir, "manga")); err != nil {
+		panic(err)
+	}
+	if err := createFolderIfNotExists(path.Join(c.StaticDir, "profile")); err != nil {
+		panic(err)
+	}
 	s := server{
 		staticDir:   c.StaticDir,
 		gatewayAddr: c.GatewayAddr,
