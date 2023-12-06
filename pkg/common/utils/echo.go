@@ -7,6 +7,8 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func ReadFormFile(formFile *multipart.FileHeader) ([]byte, error) {
@@ -30,4 +32,12 @@ func ErrorToResponse(ctx echo.Context, err error) error {
 		return ctx.JSON(http.StatusNotFound, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+}
+
+func ParseQueryIntArray(s string) []int {
+	parts := strings.Split(s, ",")
+	return Map(parts, func(p string) int {
+		i, _ := strconv.ParseInt(p, 10, 32)
+		return int(i)
+	})
 }

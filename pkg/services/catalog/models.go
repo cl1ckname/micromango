@@ -3,6 +3,7 @@ package catalog
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
 	"time"
 )
@@ -29,6 +30,7 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Cover:       m.Cover,
 		Description: m.Description,
 		CreatedAt:   m.CreatedAt.String(),
+		Genres:      utils.Map(m.Genres, func(g Genre) uint32 { return uint32(g.GenreId) }),
 	}
 }
 

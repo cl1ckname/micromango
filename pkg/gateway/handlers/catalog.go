@@ -32,7 +32,6 @@ func (s *catalogHandler) GetManga(ctx echo.Context) error {
 	if claims, ok := ctx.Get("claims").(*user.UserResponse); ok {
 		getMangaReq.UserId = &claims.UserId
 	}
-
 	getMangaReq.MangaId = ctx.Param("mangaId")
 	resp, err := s.catalog.GetManga(context.TODO(), &getMangaReq)
 	if err != nil {
@@ -52,9 +51,11 @@ func (s *catalogHandler) GetManga(ctx echo.Context) error {
 }
 
 func (s *catalogHandler) GetMangas(ctx echo.Context) error {
+	include := utils.ParseQueryIntArray(ctx.QueryParam("genre"))
+	exclude := utils.ParseQueryIntArray(ctx.QueryParam("exclude_genre"))
 	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.GetMangasRequest{
-		GenresInclude: []uint32{1},
-		GenresExclude: nil,
+		GenresInclude: utils.Map(include, func(i int) uint32 { return uint32(i) }),
+		GenresExclude: utils.Map(exclude, func(i int) uint32 { return uint32(i) }),
 	})
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
@@ -65,6 +66,8 @@ func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 func (s *catalogHandler) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
 	addMangaReq.Title = ctx.FormValue("title")
+	intGenres := utils.ParseQueryIntArray(ctx.FormValue("genres"))
+	addMangaReq.Genres = utils.Map(intGenres, func(i int) uint32 { return uint32(i) })
 	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
 	formFile, err := ctx.FormFile("cover")
 	if err != nil {
@@ -95,6 +98,8 @@ func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 	if description := ctx.FormValue("description"); description != "" {
 		updateMangaReq.Description = utils.Ptr(description)
 	}
+	intGenres := utils.ParseQueryIntArray(ctx.FormValue("genres"))
+	updateMangaReq.Genres = utils.Map(intGenres, func(i int) uint32 { return uint32(i) })
 	if title := ctx.FormValue("title"); title != "" {
 		updateMangaReq.Title = utils.Ptr(title)
 	}

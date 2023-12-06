@@ -32,7 +32,7 @@ message MangaResponse {
   MangaContentResponse content = 6;
   string createdAt = 5;
   optional ListName list = 7;
-  repeated string genres = 8;
+  repeated uint32 genres = 8;
 }
 
 message GetMangasRequest {
@@ -44,7 +44,7 @@ message AddMangaRequest {
   string title = 1;
   optional bytes cover = 2;
   optional string description = 3;
-  repeated string genres = 4;
+  repeated uint32 genres = 4;
 }
 
 message UpdateMangaRequest {

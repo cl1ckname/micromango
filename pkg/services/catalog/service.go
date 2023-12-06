@@ -97,6 +97,7 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 		Title:       req.Title,
 		Cover:       coverAddr,
 		Description: utils.DerefOrDefault(req.Description, ""),
+		Genres:      utils.Map(req.Genres, func(i uint32) Genre { return Genre{GenreId: int(i)} }),
 	})
 	if err != nil {
 		return nil, err
