@@ -50,26 +50,29 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 }
 
 func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
-	conditions := ""
 	fmt.Println(include, exclude)
-	var joinArgs []interface{}
-	if len(include) != 0 {
-		conditions += " AND manga_genres.genre_genre_id in (?) "
-		joinArgs = append(joinArgs, include)
+	var args []interface{}
+	sql := `SELECT * FROM mangas m `
+	if l := len(include); l != 0 {
+		sql += `where exists(
+		select * from manga_genres mg
+		where m.manga_id = mg.manga_manga_id and
+				mg.genre_genre_id in (?)
+		group by manga_manga_id
+		having count(mg.genre_genre_id) = ?)`
+		args = append(args, include, l)
 	}
 	if len(exclude) != 0 {
-		conditions += " AND manga_genres.genre_genre_id not in (?) "
-		joinArgs = append(joinArgs, exclude)
-	}
-	query := db.Distinct("manga_id", "title", "cover").
-		Joins("LEFT JOIN manga_genres ON manga_genres.manga_manga_id = mangas.manga_id"+conditions, joinArgs...).
-		Group("manga_id")
-
-	if l := len(include); l != 0 {
-		query = query.Having("count(manga_genres.genre_genre_id) = ?", l)
+		sql += `
+		intersect
+		select * from mangas m where exists (
+		select manga_manga_id, sum(case when genre_genre_id in (?) then 1 else 0 end) as exclude from manga_genres
+		where manga_manga_id == m.manga_id
+		group by manga_manga_id having exclude == 0)`
+		args = append(args, exclude)
 	}
 
-	err = query.Find(&m).Error
+	err = db.Raw(sql, args...).Scan(&m).Error
 	return
 }
 
