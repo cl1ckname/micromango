@@ -52,15 +52,24 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
 	conditions := ""
 	fmt.Println(include, exclude)
+	var joinArgs []interface{}
 	if len(include) != 0 {
 		conditions += " AND manga_genres.genre_genre_id in (?) "
+		joinArgs = append(joinArgs, include)
 	}
 	if len(exclude) != 0 {
 		conditions += " AND manga_genres.genre_genre_id not in (?) "
+		joinArgs = append(joinArgs, exclude)
 	}
-	err = db.Distinct("manga_id", "title", "cover").
-		Joins("LEFT JOIN manga_genres ON manga_genres.manga_manga_id = mangas.manga_id"+conditions, include, exclude).
-		Find(&m).Error
+	query := db.Distinct("manga_id", "title", "cover").
+		Joins("LEFT JOIN manga_genres ON manga_genres.manga_manga_id = mangas.manga_id"+conditions, joinArgs...).
+		Group("manga_id")
+
+	if l := len(include); l != 0 {
+		query = query.Having("count(manga_genres.genre_genre_id) = ?", l)
+	}
+
+	err = query.Find(&m).Error
 	return
 }
 
