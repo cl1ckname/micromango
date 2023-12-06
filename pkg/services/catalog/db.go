@@ -1,7 +1,6 @@
 package catalog
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -58,16 +57,25 @@ func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err 
 }
 
 func AddManga(db *gorm.DB, m Manga) (Manga, error) {
+	genres := m.Genres
+	m.Genres = []Genre{}
 	if res := db.Create(&m); res.Error != nil {
 		return Manga{}, res.Error
+	}
+	if err := db.Model(&m).Association("Genres").Append(genres); err != nil {
+		return Manga{}, err
 	}
 	return GetManga(db, m.MangaId.String())
 }
 
 func SaveManga(db *gorm.DB, m Manga) (Manga, error) {
-	fmt.Println("eqeqweqwe====================", m)
+	genres := m.Genres
+	m.Genres = []Genre{}
 	if res := db.Save(&m); res.Error != nil {
 		return Manga{}, res.Error
+	}
+	if err := db.Model(&m).Association("Genres").Replace(genres); err != nil {
+		return Manga{}, err
 	}
 	return GetManga(db, m.MangaId.String())
 }

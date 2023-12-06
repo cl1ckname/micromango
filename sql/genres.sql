@@ -1,4 +1,4 @@
-INSERT INTO "genres" VALUES(21,'Action');
+INSERT INTO "genres" VALUES(0,'Action');
 INSERT INTO "genres" VALUES(1,'Adventure');
 INSERT INTO "genres" VALUES(2,'Comedy');
 INSERT INTO "genres" VALUES(3,'Mystery');
