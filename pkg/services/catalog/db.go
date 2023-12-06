@@ -1,7 +1,6 @@
 package catalog
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -50,7 +49,6 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 }
 
 func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
-	fmt.Println(include, exclude)
 	var args []interface{}
 	sql := `SELECT * FROM mangas m `
 	if l := len(include); l != 0 {
