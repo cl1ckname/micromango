@@ -54,7 +54,7 @@ func GetMangas(db *gorm.DB, include []uint32, exclude []uint32, starts *string) 
 	var args []interface{}
 	var conditions []string
 	if starts != nil {
-		conditions = append(conditions, fmt.Sprintf(`title like "%s%%"`, *starts))
+		conditions = append(conditions, fmt.Sprintf(`lower(title) like "%s%%"`, *starts))
 	}
 	sql := `SELECT * FROM mangas m `
 	if l := len(include); l != 0 {
