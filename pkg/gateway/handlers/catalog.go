@@ -51,12 +51,13 @@ func (s *catalogHandler) GetManga(ctx echo.Context) error {
 }
 
 func (s *catalogHandler) GetMangas(ctx echo.Context) error {
-	include := utils.ParseQueryIntArray(ctx.QueryParam("genre"))
-	exclude := utils.ParseQueryIntArray(ctx.QueryParam("exclude_genre"))
-	mangas, err := s.catalog.GetMangas(context.TODO(), &catalog.GetMangasRequest{
-		GenresInclude: utils.Map(include, func(i int) uint32 { return uint32(i) }),
-		GenresExclude: utils.Map(exclude, func(i int) uint32 { return uint32(i) }),
-	})
+	var req catalog.GetMangasRequest
+	req.GenresInclude = utils.ParseQueryIntArray[uint32](ctx.QueryParam("genre"))
+	req.GenresExclude = utils.ParseQueryIntArray[uint32](ctx.QueryParam("exclude_genre"))
+	if starts := ctx.QueryParam("starts"); starts != "" {
+		req.Starts = utils.Ptr(starts)
+	}
+	mangas, err := s.catalog.GetMangas(context.TODO(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
@@ -66,8 +67,7 @@ func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 func (s *catalogHandler) AddManga(ctx echo.Context) error {
 	var addMangaReq catalog.AddMangaRequest
 	addMangaReq.Title = ctx.FormValue("title")
-	intGenres := utils.ParseQueryIntArray(ctx.FormValue("genres"))
-	addMangaReq.Genres = utils.Map(intGenres, func(i int) uint32 { return uint32(i) })
+	addMangaReq.Genres = utils.ParseQueryIntArray[uint32](ctx.FormValue("genres"))
 	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
 	formFile, err := ctx.FormFile("cover")
 	if err != nil {
@@ -98,8 +98,7 @@ func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 	if description := ctx.FormValue("description"); description != "" {
 		updateMangaReq.Description = utils.Ptr(description)
 	}
-	intGenres := utils.ParseQueryIntArray(ctx.FormValue("genres"))
-	updateMangaReq.Genres = utils.Map(intGenres, func(i int) uint32 { return uint32(i) })
+	updateMangaReq.Genres = utils.ParseQueryIntArray[uint32](ctx.FormValue("genres"))
 	if title := ctx.FormValue("title"); title != "" {
 		updateMangaReq.Title = utils.Ptr(title)
 	}

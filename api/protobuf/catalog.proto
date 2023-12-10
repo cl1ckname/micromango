@@ -36,6 +36,7 @@ message MangaResponse {
 }
 
 message GetMangasRequest {
+  optional string starts = 1;
   repeated uint32 genresInclude = 3;
   repeated uint32 genresExclude = 4;
 }

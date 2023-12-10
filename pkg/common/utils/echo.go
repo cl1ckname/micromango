@@ -34,13 +34,13 @@ func ErrorToResponse(ctx echo.Context, err error) error {
 	return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 }
 
-func ParseQueryIntArray(s string) []int {
+func ParseQueryIntArray[T int | uint32](s string) []T {
 	if s == "" {
-		return []int{}
+		return []T{}
 	}
 	parts := strings.Split(s, ",")
-	return Map(parts, func(p string) int {
+	return Map(parts, func(p string) T {
 		i, _ := strconv.ParseInt(p, 10, 32)
-		return int(i)
+		return T(i)
 	})
 }

@@ -1,12 +1,14 @@
 package catalog
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -48,8 +50,12 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 	return m, nil
 }
 
-func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err error) {
+func GetMangas(db *gorm.DB, include []uint32, exclude []uint32, starts *string) (m []Manga, err error) {
 	var args []interface{}
+	var conditions []string
+	if starts != nil {
+		conditions = append(conditions, fmt.Sprintf(`title like "%s%%"`, *starts))
+	}
 	sql := `SELECT * FROM mangas m `
 	if l := len(include); l != 0 {
 		sql += `where exists(
@@ -58,7 +64,7 @@ func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err 
 				mg.genre_genre_id in (?)
 		group by manga_manga_id
 		having count(mg.genre_genre_id) = ?)`
-		args = append(args, include, l)
+		args = append(args, include, l, strings.Join(conditions, " and "))
 	}
 	if len(exclude) != 0 {
 		sql += `
@@ -69,8 +75,14 @@ func GetMangas(db *gorm.DB, include []uint32, exclude []uint32) (m []Manga, err 
 		group by manga_manga_id having exclude == 0)`
 		args = append(args, exclude)
 	}
+	if len(conditions) != 0 {
+		andConds := strings.Join(conditions, " and ")
+		sqlCond := fmt.Sprintf("select * from (%s) where %s", sql, andConds)
+		err = db.Raw(sqlCond, args...).Scan(&m).Error
+	} else {
+		err = db.Raw(sql, args...).Scan(&m).Error
+	}
 
-	err = db.Raw(sql, args...).Scan(&m).Error
 	return
 }
 

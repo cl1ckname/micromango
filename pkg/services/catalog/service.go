@@ -106,7 +106,7 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 }
 
 func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
-	ms, err := GetMangas(s.db, request.GenresInclude, request.GenresExclude)
+	ms, err := GetMangas(s.db, request.GenresInclude, request.GenresExclude, request.Starts)
 	mangas := make([]*share.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
 		mangas[i] = &share.MangaPreviewResponse{
