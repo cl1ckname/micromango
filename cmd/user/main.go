@@ -4,13 +4,16 @@ import (
 	"context"
 	"github.com/joho/godotenv"
 	"log"
+	"math/rand"
 	"micromango/pkg/services/user"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
+	rand.New(rand.NewSource(time.Now().Unix()))
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file")

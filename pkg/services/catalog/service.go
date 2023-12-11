@@ -74,6 +74,12 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 		resp.List = isInResp.In
 	}
 	resp.Content = content
+
+	listStats, err := s.profile.ListStats(ctx, &profile.ListStatsRequests{MangaId: req.MangaId})
+	if err != nil {
+		return nil, err
+	}
+	resp.ListStats = listStats.Stats
 	return resp, nil
 }
 

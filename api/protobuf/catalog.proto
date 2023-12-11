@@ -33,6 +33,7 @@ message MangaResponse {
   string createdAt = 5;
   optional ListName list = 7;
   repeated uint32 genres = 8;
+  map<uint32, uint64> listStats = 9;
 }
 
 message GetMangasRequest {

@@ -12,6 +12,7 @@ service Profile {
   rpc AddToList(AddToListRequest) returns (Empty);
   rpc RemoveFromList(RemoveFromListRequest) returns (Empty);
   rpc IsInList(IsInListRequest) returns (IsInListResponse);
+  rpc ListStats(ListStatsRequests) returns (ListStatsResponse);
 }
 
 message CreateRequest {
@@ -66,4 +67,12 @@ message IsInListRequest {
 message IsInListResponse {
   optional ListName in = 1;
   string timestamp = 2;
+}
+
+message ListStatsRequests {
+  string mangaId = 1;
+}
+
+message ListStatsResponse {
+  map<uint32, uint64> stats = 1;
 }

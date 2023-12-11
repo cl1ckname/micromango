@@ -26,6 +26,7 @@ const (
 	Profile_AddToList_FullMethodName      = "/Profile/AddToList"
 	Profile_RemoveFromList_FullMethodName = "/Profile/RemoveFromList"
 	Profile_IsInList_FullMethodName       = "/Profile/IsInList"
+	Profile_ListStats_FullMethodName      = "/Profile/ListStats"
 )
 
 // ProfileClient is the client API for Profile service.
@@ -39,6 +40,7 @@ type ProfileClient interface {
 	AddToList(ctx context.Context, in *AddToListRequest, opts ...grpc.CallOption) (*Empty, error)
 	RemoveFromList(ctx context.Context, in *RemoveFromListRequest, opts ...grpc.CallOption) (*Empty, error)
 	IsInList(ctx context.Context, in *IsInListRequest, opts ...grpc.CallOption) (*IsInListResponse, error)
+	ListStats(ctx context.Context, in *ListStatsRequests, opts ...grpc.CallOption) (*ListStatsResponse, error)
 }
 
 type profileClient struct {
@@ -112,6 +114,15 @@ func (c *profileClient) IsInList(ctx context.Context, in *IsInListRequest, opts 
 	return out, nil
 }
 
+func (c *profileClient) ListStats(ctx context.Context, in *ListStatsRequests, opts ...grpc.CallOption) (*ListStatsResponse, error) {
+	out := new(ListStatsResponse)
+	err := c.cc.Invoke(ctx, Profile_ListStats_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServer is the server API for Profile service.
 // All implementations must embed UnimplementedProfileServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type ProfileServer interface {
 	AddToList(context.Context, *AddToListRequest) (*Empty, error)
 	RemoveFromList(context.Context, *RemoveFromListRequest) (*Empty, error)
 	IsInList(context.Context, *IsInListRequest) (*IsInListResponse, error)
+	ListStats(context.Context, *ListStatsRequests) (*ListStatsResponse, error)
 	mustEmbedUnimplementedProfileServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedProfileServer) RemoveFromList(context.Context, *RemoveFromLis
 }
 func (UnimplementedProfileServer) IsInList(context.Context, *IsInListRequest) (*IsInListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsInList not implemented")
+}
+func (UnimplementedProfileServer) ListStats(context.Context, *ListStatsRequests) (*ListStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListStats not implemented")
 }
 func (UnimplementedProfileServer) mustEmbedUnimplementedProfileServer() {}
 
@@ -290,6 +305,24 @@ func _Profile_IsInList_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Profile_ListStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStatsRequests)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServer).ListStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Profile_ListStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServer).ListStats(ctx, req.(*ListStatsRequests))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Profile_ServiceDesc is the grpc.ServiceDesc for Profile service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var Profile_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IsInList",
 			Handler:    _Profile_IsInList_Handler,
+		},
+		{
+			MethodName: "ListStats",
+			Handler:    _Profile_ListStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

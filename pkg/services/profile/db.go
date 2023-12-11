@@ -125,3 +125,16 @@ func FindListRecord(db *gorm.DB, req *pb.IsInListRequest) (*pb.IsInListResponse,
 		Timestamp: lr.CreatedAt.String(),
 	}, nil
 }
+
+func ListStats(db *gorm.DB, mangaId uuid.UUID) (map[uint32]uint64, error) {
+	var resSlice []ListStat
+	sql := `SELECT list_name, count(user_id) as amount FROM list_records WHERE manga_id = ? GROUP BY manga_id, list_name`
+	if err := db.Raw(sql, mangaId).Scan(&resSlice).Error; err != nil {
+		return nil, err
+	}
+	res := make(map[uint32]uint64)
+	for _, v := range resSlice {
+		res[v.ListName] = v.Amount
+	}
+	return res, nil
+}

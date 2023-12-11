@@ -141,3 +141,15 @@ func (s *service) RemoveFromList(_ context.Context, req *pb.RemoveFromListReques
 func (s *service) IsInList(_ context.Context, req *pb.IsInListRequest) (*pb.IsInListResponse, error) {
 	return FindListRecord(s.db, req)
 }
+
+func (s *service) ListStats(_ context.Context, req *pb.ListStatsRequests) (*pb.ListStatsResponse, error) {
+	mangaUuid, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	res, err := ListStats(s.db, mangaUuid)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ListStatsResponse{Stats: res}, nil
+}

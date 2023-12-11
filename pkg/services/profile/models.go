@@ -42,3 +42,8 @@ func (lr *ListRecord) BeforeCreate(*gorm.DB) error {
 	lr.CreatedAt = time.Now()
 	return nil
 }
+
+type ListStat struct {
+	ListName uint32 `json:"listName"`
+	Amount   uint64 `json:"amount"`
+}

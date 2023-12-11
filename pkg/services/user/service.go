@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -40,23 +41,24 @@ type service struct {
 }
 
 func (s *service) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.UserResponse, error) {
-	u, err := findByEmail(s.db, req.Email)
+	_, err := findByEmail(s.db, req.Email)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, err
 		}
 	}
+	var u User
 	u.Email = req.Email
 	u.PasswordHash = hashString(req.Password, s.salt)
 	savedU, err := saveUser(s.db, u)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("save register entry error: %v", err)
 	}
 	if _, err := s.profile.Create(ctx, &profile.CreateRequest{
 		UserId:   savedU.UserId.String(),
 		Username: req.Username,
 	}); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("save profile entry error (%s): %v", savedU.UserId.String(), err)
 	}
 	return &pb.UserResponse{
 		UserId:   savedU.UserId.String(),
