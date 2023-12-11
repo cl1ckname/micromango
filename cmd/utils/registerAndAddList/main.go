@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/joho/godotenv"
 	"log"
@@ -61,18 +62,40 @@ func main() {
 
 	log.Println("generating random lists data")
 	for _, u := range users {
+		loginReq := user.LoginRequest{
+			Email:    u.Username,
+			Password: "qwe",
+		}
+		loginBytes, _ := json.Marshal(loginReq)
+		loginReader := bytes.NewReader(loginBytes)
+		loginResp, err := http.Post(addr+"/api/user/login", "application/json", loginReader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var loginData user.LoginResponse
+		if err := json.NewDecoder(loginResp.Body).Decode(&loginData); err != nil {
+			log.Fatal(err)
+		}
+
 		for _, m := range mangas {
+
 			var req profile.AddToListRequest
 			req.MangaId = m.MangaId
 			req.List = share.ListName(1 + rand.Intn(5))
 			reqBytes, _ := json.Marshal(req)
 			reqReader := bytes.NewReader(reqBytes)
-			resp, err := http.Post(addr+"/api/profile/"+u.UserId+"/list", "application/json", reqReader)
+			httpReq, _ := http.NewRequest("POST", addr+"/api/profile/"+u.UserId+"/list", reqReader)
+			httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", loginData.AccessToken))
+			httpReq.Header.Set("Content-Type", "application/json")
+			resp, err := (&http.Client{}).Do(httpReq)
+			//resp, err := http.Post(addr+"/api/profile/"+u.UserId+"/list", "application/json", reqReader)
 			if err != nil {
 				log.Fatal(err)
 			}
 			if resp.StatusCode != 200 && resp.StatusCode != 201 {
-				log.Fatal("invalid status code: ", resp.StatusCode)
+				var respData struct{ Message string }
+				json.NewDecoder(resp.Body).Decode(&respData)
+				log.Fatal("invalid status code: ", resp.StatusCode, respData.Message)
 			}
 		}
 	}

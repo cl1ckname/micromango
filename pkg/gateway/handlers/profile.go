@@ -6,6 +6,7 @@ import (
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/share"
+	"micromango/pkg/grpc/user"
 	"net/http"
 	"strconv"
 )
@@ -66,8 +67,17 @@ func (s *profileHandler) GetProfile(ctx echo.Context) error {
 }
 
 func (s *profileHandler) AddToList(ctx echo.Context) error {
+	auth, ok := ctx.Get("auth").(*user.UserResponse)
+	if !ok {
+		return ctx.JSON(http.StatusUnauthorized, struct{ Message string }{"no credentials provided"})
+	}
+	if auth.UserId != ctx.Param("userId") {
+		return ctx.JSON(http.StatusUnauthorized, struct{ Message string }{"invalid userId"})
+	}
+
 	var addToListReq profile.AddToListRequest
 	addToListReq.ProfileId = ctx.Param("userId")
+
 	if err := ctx.Bind(&addToListReq); err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
