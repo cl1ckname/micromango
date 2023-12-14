@@ -23,6 +23,10 @@ module.exports = {
         {
             name: "profile",
             script: "go run cmd/profile/main.go"
+        },
+        {
+            name: "activity",
+            script: "go run cmd/activity/main.go"
         }
     ]
 }
