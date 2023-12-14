@@ -12,6 +12,7 @@ import (
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/catalog"
 	pb "micromango/pkg/grpc/profile"
+	"micromango/pkg/grpc/share"
 	"micromango/pkg/grpc/static"
 )
 
@@ -124,18 +125,18 @@ func (s *service) GetList(ctx context.Context, req *pb.GetListRequest) (*pb.List
 	return &pb.ListResponse{Manga: previewList.PreviewList}, err
 }
 
-func (s *service) AddToList(_ context.Context, req *pb.AddToListRequest) (*pb.Empty, error) {
-	return &pb.Empty{}, AddToList(s.db, req)
+func (s *service) AddToList(_ context.Context, req *pb.AddToListRequest) (*share.Empty, error) {
+	return &share.Empty{}, AddToList(s.db, req)
 }
 
-func (s *service) RemoveFromList(_ context.Context, req *pb.RemoveFromListRequest) (*pb.Empty, error) {
+func (s *service) RemoveFromList(_ context.Context, req *pb.RemoveFromListRequest) (*share.Empty, error) {
 	if err := RemoveFromList(s.db, req); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, err
 	}
-	return &pb.Empty{}, nil
+	return &share.Empty{}, nil
 }
 
 func (s *service) IsInList(_ context.Context, req *pb.IsInListRequest) (*pb.IsInListResponse, error) {

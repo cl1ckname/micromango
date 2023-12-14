@@ -56,3 +56,31 @@ func (s *service) Dislike(_ context.Context, req *pb.DislikeRequest) (*share.Emp
 	}
 	return &share.Empty{}, nil
 }
+
+func (s *service) LikesNumber(_ context.Context, req *pb.LikesNumberRequest) (*pb.LikesNumberResponse, error) {
+	mangaUuid, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	num, err := LikesNumber(s.db, mangaUuid)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.LikesNumberResponse{Number: num}, nil
+}
+
+func (s *service) HasLike(_ context.Context, req *pb.HasLikeRequest) (*pb.HasLikeResponse, error) {
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	has, err := HasLike(s.db, userId, mangaId)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.HasLikeResponse{Has: has}, nil
+}

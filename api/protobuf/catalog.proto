@@ -34,6 +34,8 @@ message MangaResponse {
   optional ListName list = 7;
   repeated uint32 genres = 8;
   map<uint32, uint64> listStats = 9;
+  uint64 likes = 10;
+  bool liked = 11;
 }
 
 message GetMangasRequest {

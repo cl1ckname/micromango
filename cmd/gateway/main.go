@@ -16,12 +16,13 @@ func main() {
 		log.Println("Error loading .env file")
 	}
 	c := gateway.Config{
-		Addr:        os.Getenv("GATEWAY_ADDR"),
-		UserAddr:    os.Getenv("USER_ADDR"),
-		CatalogAddr: os.Getenv("CATALOG_ADDR"),
-		ReadingAddr: os.Getenv("READING_ADDR"),
-		StaticAddr:  os.Getenv("STATIC_ADDR"),
-		ProfileAddr: os.Getenv("PROFILE_ADDR"),
+		Addr:         os.Getenv("GATEWAY_ADDR"),
+		UserAddr:     os.Getenv("USER_ADDR"),
+		CatalogAddr:  os.Getenv("CATALOG_ADDR"),
+		ReadingAddr:  os.Getenv("READING_ADDR"),
+		StaticAddr:   os.Getenv("STATIC_ADDR"),
+		ProfileAddr:  os.Getenv("PROFILE_ADDR"),
+		ActivityAddr: os.Getenv("ACTIVITY_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
