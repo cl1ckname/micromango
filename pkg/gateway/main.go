@@ -7,6 +7,7 @@ import (
 	"micromango/pkg/common/utils"
 	"micromango/pkg/gateway/handlers"
 	mw "micromango/pkg/gateway/middleware"
+	"micromango/pkg/grpc/activity"
 	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
@@ -68,6 +69,9 @@ func (s *server) connectServices(c Config) {
 
 	conn = utils.GrpcDialOrFatal(c.ProfileAddr)
 	s.profile = profile.NewProfileClient(conn)
+
+	conn = utils.GrpcDialOrFatal(c.ActivityAddr)
+	s.activity = activity.NewActivityClient(conn)
 }
 
 func applyHandlers(e *echo.Echo, serv server) {
@@ -77,14 +81,16 @@ func applyHandlers(e *echo.Echo, serv server) {
 	handlers.RegisterCatalog(apiGroup, serv.catalog)
 	handlers.RegisterProfile(apiGroup, serv.profile)
 	handlers.RegisterReading(apiGroup, serv.reading)
+	handlers.RegisterActivity(apiGroup, serv.activity)
 	e.GET("static/:id", handlers.GetStaticHandler(serv.static))
 }
 
 type server struct {
-	e       *echo.Echo
-	user    user.UserClient
-	reading reading.ReadingClient
-	catalog catalog.CatalogClient
-	static  static.StaticClient
-	profile profile.ProfileClient
+	e        *echo.Echo
+	user     user.UserClient
+	reading  reading.ReadingClient
+	catalog  catalog.CatalogClient
+	static   static.StaticClient
+	profile  profile.ProfileClient
+	activity activity.ActivityClient
 }

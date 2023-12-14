@@ -44,3 +44,9 @@ func ParseQueryIntArray[T int | uint32](s string) []T {
 		return T(i)
 	})
 }
+
+func JsonMessage(ctx echo.Context, status int, message string) error {
+	return ctx.JSON(status, struct {
+		Message string `json:"message"`
+	}{message})
+}
