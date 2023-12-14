@@ -11,6 +11,7 @@ import (
 	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
+	"micromango/pkg/grpc/activity"
 	pb "micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/reading"
@@ -30,11 +31,15 @@ func Run(ctx context.Context, c Config) <-chan error {
 	conn = utils.GrpcDialOrFatal(c.ProfileServiceAddr)
 	profileService := profile.NewProfileClient(conn)
 
+	conn = utils.GrpcDialOrFatal(c.ActivityServiceAddr)
+	activityService := activity.NewActivityClient(conn)
+
 	serv := service{
-		db:      database,
-		reading: readingService,
-		static:  staticService,
-		profile: profileService,
+		db:       database,
+		reading:  readingService,
+		static:   staticService,
+		profile:  profileService,
+		activity: activityService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterCatalogServer(baseServer, &serv)
@@ -44,10 +49,11 @@ func Run(ctx context.Context, c Config) <-chan error {
 
 type service struct {
 	pb.UnimplementedCatalogServer
-	db      *gorm.DB
-	reading reading.ReadingClient
-	static  static.StaticClient
-	profile profile.ProfileClient
+	db       *gorm.DB
+	reading  reading.ReadingClient
+	static   static.StaticClient
+	profile  profile.ProfileClient
+	activity activity.ActivityClient
 }
 
 func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
@@ -74,6 +80,21 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 		resp.List = isInResp.In
 	}
 	resp.Content = content
+
+	likesNumber, err := s.activity.LikesNumber(ctx, &activity.LikesNumberRequest{MangaId: req.MangaId})
+	if err != nil {
+		return nil, err
+	}
+	resp.Likes = likesNumber.Number
+
+	if req.UserId != nil {
+		userId := *req.UserId
+		hasLike, err := s.activity.HasLike(ctx, &activity.HasLikeRequest{MangaId: req.MangaId, UserId: userId})
+		if err != nil {
+			return nil, err
+		}
+		resp.Liked = hasLike.Has
+	}
 
 	listStats, err := s.profile.ListStats(ctx, &profile.ListStatsRequests{MangaId: req.MangaId})
 	if err != nil {
