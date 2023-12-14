@@ -17,11 +17,12 @@ func main() {
 	}
 
 	config := catalog.Config{
-		Addr:               os.Getenv("CATALOG_ADDR"),
-		DbAddr:             os.Getenv("CATALOG_DB_ADDR"),
-		ReadingServiceAddr: os.Getenv("READING_ADDR"),
-		StaticServiceAddr:  os.Getenv("STATIC_ADDR"),
-		ProfileServiceAddr: os.Getenv("PROFILE_ADDR"),
+		Addr:                os.Getenv("CATALOG_ADDR"),
+		DbAddr:              os.Getenv("CATALOG_DB_ADDR"),
+		ReadingServiceAddr:  os.Getenv("READING_ADDR"),
+		StaticServiceAddr:   os.Getenv("STATIC_ADDR"),
+		ProfileServiceAddr:  os.Getenv("PROFILE_ADDR"),
+		ActivityServiceAddr: os.Getenv("ACTIVITY_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
