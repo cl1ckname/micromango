@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	share "micromango/pkg/grpc/share"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -37,8 +38,8 @@ type ProfileClient interface {
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*Response, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*Response, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*ListResponse, error)
-	AddToList(ctx context.Context, in *AddToListRequest, opts ...grpc.CallOption) (*Empty, error)
-	RemoveFromList(ctx context.Context, in *RemoveFromListRequest, opts ...grpc.CallOption) (*Empty, error)
+	AddToList(ctx context.Context, in *AddToListRequest, opts ...grpc.CallOption) (*share.Empty, error)
+	RemoveFromList(ctx context.Context, in *RemoveFromListRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	IsInList(ctx context.Context, in *IsInListRequest, opts ...grpc.CallOption) (*IsInListResponse, error)
 	ListStats(ctx context.Context, in *ListStatsRequests, opts ...grpc.CallOption) (*ListStatsResponse, error)
 }
@@ -87,8 +88,8 @@ func (c *profileClient) GetList(ctx context.Context, in *GetListRequest, opts ..
 	return out, nil
 }
 
-func (c *profileClient) AddToList(ctx context.Context, in *AddToListRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *profileClient) AddToList(ctx context.Context, in *AddToListRequest, opts ...grpc.CallOption) (*share.Empty, error) {
+	out := new(share.Empty)
 	err := c.cc.Invoke(ctx, Profile_AddToList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,8 +97,8 @@ func (c *profileClient) AddToList(ctx context.Context, in *AddToListRequest, opt
 	return out, nil
 }
 
-func (c *profileClient) RemoveFromList(ctx context.Context, in *RemoveFromListRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *profileClient) RemoveFromList(ctx context.Context, in *RemoveFromListRequest, opts ...grpc.CallOption) (*share.Empty, error) {
+	out := new(share.Empty)
 	err := c.cc.Invoke(ctx, Profile_RemoveFromList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -131,8 +132,8 @@ type ProfileServer interface {
 	Update(context.Context, *UpdateRequest) (*Response, error)
 	Get(context.Context, *GetRequest) (*Response, error)
 	GetList(context.Context, *GetListRequest) (*ListResponse, error)
-	AddToList(context.Context, *AddToListRequest) (*Empty, error)
-	RemoveFromList(context.Context, *RemoveFromListRequest) (*Empty, error)
+	AddToList(context.Context, *AddToListRequest) (*share.Empty, error)
+	RemoveFromList(context.Context, *RemoveFromListRequest) (*share.Empty, error)
 	IsInList(context.Context, *IsInListRequest) (*IsInListResponse, error)
 	ListStats(context.Context, *ListStatsRequests) (*ListStatsResponse, error)
 	mustEmbedUnimplementedProfileServer()
@@ -154,10 +155,10 @@ func (UnimplementedProfileServer) Get(context.Context, *GetRequest) (*Response, 
 func (UnimplementedProfileServer) GetList(context.Context, *GetListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedProfileServer) AddToList(context.Context, *AddToListRequest) (*Empty, error) {
+func (UnimplementedProfileServer) AddToList(context.Context, *AddToListRequest) (*share.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddToList not implemented")
 }
-func (UnimplementedProfileServer) RemoveFromList(context.Context, *RemoveFromListRequest) (*Empty, error) {
+func (UnimplementedProfileServer) RemoveFromList(context.Context, *RemoveFromListRequest) (*share.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveFromList not implemented")
 }
 func (UnimplementedProfileServer) IsInList(context.Context, *IsInListRequest) (*IsInListResponse, error) {

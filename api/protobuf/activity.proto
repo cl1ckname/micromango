@@ -1,0 +1,21 @@
+syntax="proto3";
+package micromango;
+option go_package="micromango/pkg/grpc/activity";
+import "share.proto";
+
+
+service Activity {
+  rpc Like(LikeRequest) returns (Empty);
+  rpc Dislike(DislikeRequest) returns (Empty);
+}
+
+message LikeRequest {
+  string mangaId = 1;
+  string userId = 2;
+}
+
+message DislikeRequest {
+  string mangaId = 1;
+  string userId = 2;
+}
+

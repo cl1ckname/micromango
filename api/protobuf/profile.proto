@@ -2,8 +2,6 @@ syntax="proto3";
 option go_package="micromango/pkg/grpc/profile";
 import "share.proto";
 
-message Empty {}
-
 service Profile {
   rpc Create(CreateRequest) returns (Response);
   rpc Update(UpdateRequest) returns (Response);

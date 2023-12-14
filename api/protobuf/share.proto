@@ -14,3 +14,5 @@ message MangaPreviewResponse {
   string title = 2;
   string cover = 3;
 }
+
+message Empty {}
