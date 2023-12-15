@@ -22,7 +22,6 @@ func Run(ctx context.Context, c Config) <-chan error {
 	serv.connectServices(c)
 
 	e.Use(mw.Cors())
-	e.Use(mw.Auth(serv.user))
 
 	applyHandlers(e, serv)
 
@@ -78,6 +77,7 @@ func applyHandlers(e *echo.Echo, serv server) {
 	apiGroup := e.Group("/api")
 
 	handlers.RegisterUser(apiGroup, serv.user)
+	apiGroup.Use(mw.Auth(serv.user))
 	handlers.RegisterCatalog(apiGroup, serv.catalog)
 	handlers.RegisterProfile(apiGroup, serv.profile)
 	handlers.RegisterReading(apiGroup, serv.reading)

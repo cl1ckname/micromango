@@ -20,6 +20,7 @@ func RegisterActivity(g *echo.Group, a activity.ActivityClient) {
 
 	activityGroup.POST("/manga/:mangaId/like", h.Like)
 	activityGroup.DELETE("/manga/:mangaId/like", h.Dislike)
+	activityGroup.POST("/manga/:mangaId/rate", h.Rate)
 }
 
 func (h *activityHandler) Like(ctx echo.Context) error {
@@ -55,4 +56,22 @@ func (h *activityHandler) Dislike(ctx echo.Context) error {
 		return utils.JsonMessage(ctx, http.StatusBadRequest, err.Error())
 	}
 	return utils.JsonMessage(ctx, http.StatusCreated, "Liked")
+}
+
+func (h *activityHandler) Rate(ctx echo.Context) error {
+	var req activity.RateMangaRequest
+	auth, ok := ctx.Get("claims").(*user.UserResponse)
+	if !ok {
+		return utils.JsonMessage(ctx, http.StatusUnauthorized, "Unauthorized")
+	}
+	if err := ctx.Bind(&req); err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	req.MangaId = ctx.Param("mangaId")
+	req.UserId = auth.UserId
+
+	if _, err := h.activity.RateManga(context.TODO(), &req); err != nil {
+		return utils.JsonMessage(ctx, http.StatusBadRequest, err.Error())
+	}
+	return utils.JsonMessage(ctx, http.StatusCreated, "Rated")
 }
