@@ -17,3 +17,8 @@ message MangaPreviewResponse {
 }
 
 message Empty {}
+
+message AvgMangaRateResponse {
+  float rate = 1;
+  uint64 voters = 2;
+}

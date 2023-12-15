@@ -49,7 +49,3 @@ message RateMangaRequest {
 message AvgMangaRateRequest {
   string mangaId = 1;
 }
-
-message AvgMangaRateResponse {
-  float rate = 1;
-}

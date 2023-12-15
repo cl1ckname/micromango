@@ -101,6 +101,15 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 		return nil, err
 	}
 	resp.ListStats = listStats.Stats
+
+	rate, err := s.activity.AvgMangaRate(ctx, &activity.AvgMangaRateRequest{MangaId: req.MangaId})
+	if err != nil {
+		return nil, err
+	}
+	resp.Rate = &share.AvgMangaRateResponse{
+		Rate:   rate.Rate,
+		Voters: rate.Voters,
+	}
 	return resp, nil
 }
 
@@ -132,14 +141,19 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 	return s.GetManga(ctx, &pb.MangaRequest{MangaId: m.MangaId.String()})
 }
 
-func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
+func (s *service) GetMangas(ctx context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
 	ms, err := GetMangas(s.db, request.GenresInclude, request.GenresExclude, request.Starts)
 	mangas := make([]*share.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
+		rate, err := s.activity.AvgMangaRate(ctx, &activity.AvgMangaRateRequest{MangaId: m.MangaId.String()})
+		if err != nil {
+			return nil, err
+		}
 		mangas[i] = &share.MangaPreviewResponse{
 			MangaId: m.MangaId.String(),
 			Title:   m.Title,
 			Cover:   m.Cover,
+			Rate:    rate.Rate,
 		}
 	}
 	return &pb.MangasResponse{Mangas: mangas}, err

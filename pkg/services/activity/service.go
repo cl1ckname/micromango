@@ -98,11 +98,14 @@ func (s *service) RateManga(_ context.Context, req *pb.RateMangaRequest) (*share
 	return &share.Empty{}, err
 }
 
-func (s *service) AvgMangaRate(_ context.Context, req *pb.AvgMangaRateRequest) (*pb.AvgMangaRateResponse, error) {
+func (s *service) AvgMangaRate(_ context.Context, req *pb.AvgMangaRateRequest) (*share.AvgMangaRateResponse, error) {
 	mangaId, err := uuid.Parse(req.MangaId)
 	if err != nil {
 		return nil, err
 	}
 	avgRate, err := AvgRate(s.db, mangaId)
-	return &pb.AvgMangaRateResponse{Rate: avgRate}, err
+	return &share.AvgMangaRateResponse{
+		Rate:   avgRate.Rate,
+		Voters: avgRate.Voters,
+	}, err
 }

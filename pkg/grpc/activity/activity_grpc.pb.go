@@ -37,7 +37,7 @@ type ActivityClient interface {
 	LikesNumber(ctx context.Context, in *LikesNumberRequest, opts ...grpc.CallOption) (*LikesNumberResponse, error)
 	HasLike(ctx context.Context, in *HasLikeRequest, opts ...grpc.CallOption) (*HasLikeResponse, error)
 	RateManga(ctx context.Context, in *RateMangaRequest, opts ...grpc.CallOption) (*share.Empty, error)
-	AvgMangaRate(ctx context.Context, in *AvgMangaRateRequest, opts ...grpc.CallOption) (*AvgMangaRateResponse, error)
+	AvgMangaRate(ctx context.Context, in *AvgMangaRateRequest, opts ...grpc.CallOption) (*share.AvgMangaRateResponse, error)
 }
 
 type activityClient struct {
@@ -93,8 +93,8 @@ func (c *activityClient) RateManga(ctx context.Context, in *RateMangaRequest, op
 	return out, nil
 }
 
-func (c *activityClient) AvgMangaRate(ctx context.Context, in *AvgMangaRateRequest, opts ...grpc.CallOption) (*AvgMangaRateResponse, error) {
-	out := new(AvgMangaRateResponse)
+func (c *activityClient) AvgMangaRate(ctx context.Context, in *AvgMangaRateRequest, opts ...grpc.CallOption) (*share.AvgMangaRateResponse, error) {
+	out := new(share.AvgMangaRateResponse)
 	err := c.cc.Invoke(ctx, Activity_AvgMangaRate_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ type ActivityServer interface {
 	LikesNumber(context.Context, *LikesNumberRequest) (*LikesNumberResponse, error)
 	HasLike(context.Context, *HasLikeRequest) (*HasLikeResponse, error)
 	RateManga(context.Context, *RateMangaRequest) (*share.Empty, error)
-	AvgMangaRate(context.Context, *AvgMangaRateRequest) (*AvgMangaRateResponse, error)
+	AvgMangaRate(context.Context, *AvgMangaRateRequest) (*share.AvgMangaRateResponse, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -134,7 +134,7 @@ func (UnimplementedActivityServer) HasLike(context.Context, *HasLikeRequest) (*H
 func (UnimplementedActivityServer) RateManga(context.Context, *RateMangaRequest) (*share.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RateManga not implemented")
 }
-func (UnimplementedActivityServer) AvgMangaRate(context.Context, *AvgMangaRateRequest) (*AvgMangaRateResponse, error) {
+func (UnimplementedActivityServer) AvgMangaRate(context.Context, *AvgMangaRateRequest) (*share.AvgMangaRateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AvgMangaRate not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}

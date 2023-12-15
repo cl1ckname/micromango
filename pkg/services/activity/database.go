@@ -83,8 +83,9 @@ func SaveRate(db *gorm.DB, userId, mangaId uuid.UUID, rate uint32) error {
 	return db.Save(&rr).Error
 }
 
-func AvgRate(db *gorm.DB, mangaId uuid.UUID) (float32, error) {
-	var avg float32
-	err := db.Raw(`SELECT AVG(rate) FROM rate_record WHERE manga_id = ?`, mangaId).Scan(&avg).Error
-	return avg, err
+func AvgRate(db *gorm.DB, mangaId uuid.UUID) (AvgRateEntry, error) {
+	var res AvgRateEntry
+	sql := `SELECT AVG(rate) as rate, COUNT(*) as voters FROM rate_records WHERE manga_id = ?`
+	err := db.Raw(sql, mangaId).Scan(&res).Error
+	return res, err
 }

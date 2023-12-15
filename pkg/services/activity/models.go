@@ -28,3 +28,8 @@ func (rr *RateRecord) BeforeCreate(*gorm.DB) error {
 	rr.CreatedAt = time.Now()
 	return nil
 }
+
+type AvgRateEntry struct {
+	Rate   float32
+	Voters uint64
+}
