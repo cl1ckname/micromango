@@ -11,6 +11,7 @@ service Activity {
   rpc HasLike(HasLikeRequest) returns (HasLikeResponse);
   rpc RateManga(RateMangaRequest) returns (Empty);
   rpc AvgMangaRate(AvgMangaRateRequest) returns (AvgMangaRateResponse);
+  rpc UserRate(UserRateRequest) returns (UserRateResponse);
 }
 
 message LikeRequest {
@@ -48,4 +49,13 @@ message RateMangaRequest {
 
 message AvgMangaRateRequest {
   string mangaId = 1;
+}
+
+message UserRateRequest {
+  string userId = 1;
+  string mangaId = 2;
+}
+
+message UserRateResponse {
+  optional float rate = 1;
 }

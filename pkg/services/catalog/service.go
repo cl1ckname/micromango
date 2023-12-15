@@ -94,6 +94,12 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 			return nil, err
 		}
 		resp.Liked = hasLike.Has
+
+		userRate, err := s.activity.UserRate(ctx, &activity.UserRateRequest{UserId: userId, MangaId: req.MangaId})
+		if err != nil {
+			return nil, err
+		}
+		resp.UserRate = userRate.Rate
 	}
 
 	listStats, err := s.profile.ListStats(ctx, &profile.ListStatsRequests{MangaId: req.MangaId})

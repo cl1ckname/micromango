@@ -109,3 +109,19 @@ func (s *service) AvgMangaRate(_ context.Context, req *pb.AvgMangaRateRequest) (
 		Voters: avgRate.Voters,
 	}, err
 }
+
+func (s *service) UserRate(_ context.Context, req *pb.UserRateRequest) (*pb.UserRateResponse, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	rate, err := UserRate(s.db, userId, mangaId)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UserRateResponse{Rate: rate}, nil
+}

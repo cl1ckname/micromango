@@ -26,6 +26,7 @@ const (
 	Activity_HasLike_FullMethodName      = "/micromango.Activity/HasLike"
 	Activity_RateManga_FullMethodName    = "/micromango.Activity/RateManga"
 	Activity_AvgMangaRate_FullMethodName = "/micromango.Activity/AvgMangaRate"
+	Activity_UserRate_FullMethodName     = "/micromango.Activity/UserRate"
 )
 
 // ActivityClient is the client API for Activity service.
@@ -38,6 +39,7 @@ type ActivityClient interface {
 	HasLike(ctx context.Context, in *HasLikeRequest, opts ...grpc.CallOption) (*HasLikeResponse, error)
 	RateManga(ctx context.Context, in *RateMangaRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	AvgMangaRate(ctx context.Context, in *AvgMangaRateRequest, opts ...grpc.CallOption) (*share.AvgMangaRateResponse, error)
+	UserRate(ctx context.Context, in *UserRateRequest, opts ...grpc.CallOption) (*UserRateResponse, error)
 }
 
 type activityClient struct {
@@ -102,6 +104,15 @@ func (c *activityClient) AvgMangaRate(ctx context.Context, in *AvgMangaRateReque
 	return out, nil
 }
 
+func (c *activityClient) UserRate(ctx context.Context, in *UserRateRequest, opts ...grpc.CallOption) (*UserRateResponse, error) {
+	out := new(UserRateResponse)
+	err := c.cc.Invoke(ctx, Activity_UserRate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActivityServer is the server API for Activity service.
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
@@ -112,6 +123,7 @@ type ActivityServer interface {
 	HasLike(context.Context, *HasLikeRequest) (*HasLikeResponse, error)
 	RateManga(context.Context, *RateMangaRequest) (*share.Empty, error)
 	AvgMangaRate(context.Context, *AvgMangaRateRequest) (*share.AvgMangaRateResponse, error)
+	UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -136,6 +148,9 @@ func (UnimplementedActivityServer) RateManga(context.Context, *RateMangaRequest)
 }
 func (UnimplementedActivityServer) AvgMangaRate(context.Context, *AvgMangaRateRequest) (*share.AvgMangaRateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AvgMangaRate not implemented")
+}
+func (UnimplementedActivityServer) UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserRate not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -258,6 +273,24 @@ func _Activity_AvgMangaRate_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Activity_UserRate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).UserRate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Activity_UserRate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).UserRate(ctx, req.(*UserRateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Activity_ServiceDesc is the grpc.ServiceDesc for Activity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +321,10 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AvgMangaRate",
 			Handler:    _Activity_AvgMangaRate_Handler,
+		},
+		{
+			MethodName: "UserRate",
+			Handler:    _Activity_UserRate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -125,6 +125,28 @@ func main() {
 					log.Fatal("like invalid status code: ", resp.StatusCode, respData.Message)
 				}
 			}
+
+			if rate := rand.Intn(11); rate != 0 {
+				req := activity.RateMangaRequest{
+					MangaId: m.MangaId,
+					UserId:  u.UserId,
+					Rate:    uint32(rate),
+				}
+				reqBytes, _ := json.Marshal(req)
+				reqReader := bytes.NewReader(reqBytes)
+				httpReq, _ := http.NewRequest("POST", addr+"/api/activity/manga/"+m.MangaId+"/rate", reqReader)
+				httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", loginData.AccessToken))
+				httpReq.Header.Set("Content-Type", "application/json")
+				resp, err := (&http.Client{}).Do(httpReq)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if resp.StatusCode != 200 && resp.StatusCode != 201 {
+					var respData struct{ Message string }
+					json.NewDecoder(resp.Body).Decode(&respData)
+					log.Fatal("rate invalid status code: ", resp.StatusCode, respData.Message)
+				}
+			}
 		}
 	}
 }

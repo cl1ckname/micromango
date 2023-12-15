@@ -37,6 +37,7 @@ message MangaResponse {
   uint64 likes = 10;
   bool liked = 11;
   AvgMangaRateResponse rate = 12;
+  optional float userRate = 13;
 }
 
 message GetMangasRequest {

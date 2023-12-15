@@ -89,3 +89,17 @@ func AvgRate(db *gorm.DB, mangaId uuid.UUID) (AvgRateEntry, error) {
 	err := db.Raw(sql, mangaId).Scan(&res).Error
 	return res, err
 }
+
+func UserRate(db *gorm.DB, userId, mangaId uuid.UUID) (*float32, error) {
+	rr := RateRecord{
+		MangaId: mangaId,
+		UserId:  userId,
+	}
+	var res float32
+	err := db.First(&rr).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	res = float32(rr.Rate)
+	return &res, err
+}
