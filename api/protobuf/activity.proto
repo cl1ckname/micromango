@@ -9,6 +9,8 @@ service Activity {
   rpc Dislike(DislikeRequest) returns (Empty);
   rpc LikesNumber(LikesNumberRequest) returns (LikesNumberResponse);
   rpc HasLike(HasLikeRequest) returns (HasLikeResponse);
+  rpc RateManga(RateMangaRequest) returns (Empty);
+  rpc AvgMangaRate(AvgMangaRateRequest) returns (AvgMangaRateResponse);
 }
 
 message LikeRequest {
@@ -36,4 +38,18 @@ message HasLikeRequest {
 
 message HasLikeResponse {
   bool has = 1;
+}
+
+message RateMangaRequest {
+  string userId = 1;
+  string mangaId = 2;
+  uint32 rate = 3;
+}
+
+message AvgMangaRateRequest {
+  string mangaId = 1;
+}
+
+message AvgMangaRateResponse {
+  float rate = 1;
 }

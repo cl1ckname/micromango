@@ -36,6 +36,7 @@ message MangaResponse {
   map<uint32, uint64> listStats = 9;
   uint64 likes = 10;
   bool liked = 11;
+  float rate = 12;
 }
 
 message GetMangasRequest {
