@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/user"
 	"net/http"
@@ -18,6 +20,7 @@ func Auth(u user.UserClient) echo.MiddlewareFunc {
 			var token string
 			header := c.Request().Header.Get("Authorization")
 			if header != "" {
+				log.Printf("%s - header is not null\n", c.Request().URL.Path)
 				var ok bool
 				token, ok = parseBearer(header)
 				if !ok {
@@ -26,16 +29,22 @@ func Auth(u user.UserClient) echo.MiddlewareFunc {
 			} else {
 				cookie, err := c.Cookie("auth")
 				if err != nil {
-					return utils.ErrorToResponse(c, err)
+					if !errors.Is(err, http.ErrNoCookie) {
+						return utils.ErrorToResponse(c, fmt.Errorf("authentication error: %v", err))
+					}
+				} else {
+					token = cookie.Value
 				}
-				token = cookie.Value
 			}
-			req := &user.AuthRequest{Token: token}
-			claims, err := u.Auth(context.TODO(), req)
-			if err != nil {
-				return c.JSON(http.StatusUnauthorized, struct{ Message string }{err.Error()})
+			if token != "" {
+				req := &user.AuthRequest{Token: token}
+				claims, err := u.Auth(context.TODO(), req)
+				if err != nil {
+					return c.JSON(http.StatusUnauthorized, struct{ Message string }{err.Error()})
+				}
+				c.Set("claims", claims)
+				log.Printf("%s - authorized as %s\n", c.Request().URL.Path, claims.UserId)
 			}
-			c.Set("claims", claims)
 			if err := next(c); err != nil {
 				c.Error(err)
 			}

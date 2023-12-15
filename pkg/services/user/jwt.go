@@ -16,7 +16,7 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 		PasswordHash: passwordHash,
 		Email:        email,
 	}
-	err := s.db.First(&userModel).Error
+	err := s.db.Where(&userModel).First(&userModel).Error
 	if err != nil {
 		return nil, err
 	}

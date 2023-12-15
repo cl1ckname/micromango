@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
@@ -67,12 +68,14 @@ func (s *profileHandler) GetProfile(ctx echo.Context) error {
 }
 
 func (s *profileHandler) AddToList(ctx echo.Context) error {
-	auth, ok := ctx.Get("auth").(*user.UserResponse)
+	auth, ok := ctx.Get("claims").(*user.UserResponse)
 	if !ok {
 		return ctx.JSON(http.StatusUnauthorized, struct{ Message string }{"no credentials provided"})
 	}
 	if auth.UserId != ctx.Param("userId") {
-		return ctx.JSON(http.StatusUnauthorized, struct{ Message string }{"invalid userId"})
+		return ctx.JSON(http.StatusUnauthorized, struct{ Message string }{
+			fmt.Sprintf("signed is as %s, set %s", auth.UserId, ctx.Param("userId")),
+		})
 	}
 
 	var addToListReq profile.AddToListRequest

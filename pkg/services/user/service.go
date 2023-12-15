@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
+	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/grpc/profile"
 	pb "micromango/pkg/grpc/user"
@@ -67,10 +68,12 @@ func (s *service) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Us
 }
 
 func (s *service) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	_, err := findByEmail(s.db, req.Email)
+	u, err := findByEmail(s.db, req.Email)
 	if err != nil {
+		log.Printf("user %s not found\n", req.Email)
 		return nil, err
 	}
+	log.Printf("found user %s with email %s\n", u.UserId, req.Email)
 	token, err := s.login(req.Email, req.Password)
 	if err != nil {
 		return nil, err
