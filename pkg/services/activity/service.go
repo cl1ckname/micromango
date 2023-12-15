@@ -84,3 +84,25 @@ func (s *service) HasLike(_ context.Context, req *pb.HasLikeRequest) (*pb.HasLik
 	}
 	return &pb.HasLikeResponse{Has: has}, nil
 }
+
+func (s *service) RateManga(_ context.Context, req *pb.RateMangaRequest) (*share.Empty, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = SaveRate(s.db, userId, mangaId, req.Rate)
+	return &share.Empty{}, err
+}
+
+func (s *service) AvgMangaRate(_ context.Context, req *pb.AvgMangaRateRequest) (*pb.AvgMangaRateResponse, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	avgRate, err := AvgRate(s.db, mangaId)
+	return &pb.AvgMangaRateResponse{Rate: avgRate}, err
+}

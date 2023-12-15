@@ -30,6 +30,9 @@ func Connect(addr string) *gorm.DB {
 	if err := db.AutoMigrate(&LikeRecord{}); err != nil {
 		panic(err)
 	}
+	if err := db.AutoMigrate(&RateRecord{}); err != nil {
+		panic(err)
+	}
 	return db
 }
 
@@ -69,4 +72,19 @@ func HasLike(db *gorm.DB, userId uuid.UUID, mangaId uuid.UUID) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func SaveRate(db *gorm.DB, userId, mangaId uuid.UUID, rate uint32) error {
+	rr := RateRecord{
+		MangaId: mangaId,
+		UserId:  userId,
+		Rate:    rate,
+	}
+	return db.Save(&rr).Error
+}
+
+func AvgRate(db *gorm.DB, mangaId uuid.UUID) (float32, error) {
+	var avg float32
+	err := db.Raw(`SELECT AVG(rate) FROM rate_record WHERE manga_id = ?`, mangaId).Scan(&avg).Error
+	return avg, err
 }

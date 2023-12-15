@@ -16,3 +16,15 @@ func (lr *LikeRecord) BeforeCreate(*gorm.DB) error {
 	lr.CreatedAt = time.Now()
 	return nil
 }
+
+type RateRecord struct {
+	MangaId   uuid.UUID `gorm:"primaryKey; type:uuid"`
+	UserId    uuid.UUID `gorm:"primaryKey; type:uuid"`
+	Rate      uint32
+	CreatedAt time.Time
+}
+
+func (rr *RateRecord) BeforeCreate(*gorm.DB) error {
+	rr.CreatedAt = time.Now()
+	return nil
+}
