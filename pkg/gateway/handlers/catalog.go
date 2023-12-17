@@ -57,6 +57,9 @@ func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 	if starts := ctx.QueryParam("starts"); starts != "" {
 		req.Starts = utils.Ptr(starts)
 	}
+	if order := ctx.QueryParam("order"); order != "" {
+		req.Order = utils.Ptr(order)
+	}
 	mangas, err := s.catalog.GetMangas(context.TODO(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})

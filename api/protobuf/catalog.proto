@@ -47,7 +47,7 @@ message GetMangasRequest {
   repeated uint32 genresInclude = 3;
   repeated uint32 genresExclude = 4;
   optional string order = 5;
-  bool desc = 6;
+  bool asc = 6;
 }
 
 message AddMangaRequest {

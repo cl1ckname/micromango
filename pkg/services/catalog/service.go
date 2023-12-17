@@ -143,7 +143,7 @@ func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*p
 		Include: request.GenresInclude,
 		Exclude: request.GenresExclude,
 		Starts:  request.Starts,
-		Desc:    request.Desc,
+		Asc:     request.Asc,
 	}
 	if request.Order != nil {
 		opts.Order = utils.Ptr(Order(*request.Order))

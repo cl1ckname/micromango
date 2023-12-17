@@ -55,7 +55,7 @@ type GetMangaOpts struct {
 	Exclude []uint32
 	Starts  *string
 	Order   *Order
-	Desc    bool
+	Asc     bool
 }
 
 func GetMangas(db *gorm.DB, opts GetMangaOpts) (m []Manga, err error) {
@@ -83,25 +83,23 @@ func GetMangas(db *gorm.DB, opts GetMangaOpts) (m []Manga, err error) {
 		group by manga_manga_id having exclude == 0)`
 		args = append(args, opts.Exclude)
 	}
+	subquery := gorm.Expr(sql, args...)
 
 	var order = "rate "
 	if opts.Order != nil {
 		order = string(*opts.Order) + " "
 	}
-	if opts.Desc {
+	if opts.Asc {
+		order += "asc"
+	} else {
 		order += "desc"
 	}
 
-	if len(conditions) != 0 {
-		andConds := strings.Join(conditions, " and ")
-		sqlCond := fmt.Sprintf("select * from (%s) where %s", sql, andConds)
-		query := db.Raw(sqlCond, args...)
-		query.Order(order)
-
-		err = query.Scan(&m).Error
-	} else {
-		err = db.Raw(sql, args...).Scan(&m).Error
-	}
+	andConds := strings.Join(conditions, " and ")
+	//sqlCond := gorm.Expr("select * from (?) order by ?", subquery, order)
+	query := db.Table("(?)", subquery).Where(andConds).Order(order)
+	//query := db.Raw("?", sqlCond)
+	err = query.Scan(&m).Error
 
 	return
 }
