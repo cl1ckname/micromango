@@ -207,6 +207,7 @@ func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.GetLis
 			MangaId: m.MangaId.String(),
 			Title:   m.Title,
 			Cover:   m.Cover,
+			Rate:    m.Rate,
 		}
 	})
 

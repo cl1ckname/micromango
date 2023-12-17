@@ -2,7 +2,6 @@ package profile
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -116,7 +115,6 @@ func (s *service) GetList(ctx context.Context, req *pb.GetListRequest) (*pb.List
 	mangaIdList := utils.Map(lr, func(l ListRecord) string {
 		return l.MangaId.String()
 	})
-	fmt.Println("got list", lr)
 	previewList, err := s.catalog.GetList(ctx, &catalog.GetListRequest{MangaList: mangaIdList})
 	if err != nil {
 		return nil, err
