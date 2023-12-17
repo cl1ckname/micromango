@@ -34,7 +34,7 @@ type service struct {
 	catalog catalog.CatalogClient
 }
 
-func (s *service) Like(_ context.Context, req *pb.LikeRequest) (*share.Empty, error) {
+func (s *service) Like(ctx context.Context, req *pb.LikeRequest) (*share.Empty, error) {
 	userId, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, err
@@ -44,6 +44,16 @@ func (s *service) Like(_ context.Context, req *pb.LikeRequest) (*share.Empty, er
 		return nil, err
 	}
 	if _, err := SaveLike(s.db, mangaId, userId); err != nil {
+		return nil, err
+	}
+	likes, err := LikesCount(s.db, mangaId)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := s.catalog.SetLikes(ctx, &catalog.SetLikesRequest{
+		MangaId: req.MangaId,
+		Likes:   likes,
+	}); err != nil {
 		return nil, err
 	}
 	return &share.Empty{}, nil
@@ -62,18 +72,6 @@ func (s *service) Dislike(_ context.Context, req *pb.DislikeRequest) (*share.Emp
 		return nil, err
 	}
 	return &share.Empty{}, nil
-}
-
-func (s *service) LikesNumber(_ context.Context, req *pb.LikesNumberRequest) (*pb.LikesNumberResponse, error) {
-	mangaUuid, err := uuid.Parse(req.MangaId)
-	if err != nil {
-		return nil, err
-	}
-	num, err := LikesNumber(s.db, mangaUuid)
-	if err != nil {
-		return nil, err
-	}
-	return &pb.LikesNumberResponse{Number: num}, nil
 }
 
 func (s *service) HasLike(_ context.Context, req *pb.HasLikeRequest) (*pb.HasLikeResponse, error) {

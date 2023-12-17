@@ -17,6 +17,7 @@ type Manga struct {
 	Genres      []Genre   `json:"genres" gorm:"many2many:manga_genres"`
 	Rate        float32   `json:"rate"`
 	Rates       uint64    `json:"rates"`
+	Likes       uint64    `json:"likes"`
 }
 
 func (m *Manga) BeforeCreate(*gorm.DB) error {
@@ -35,6 +36,7 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Genres:      utils.Map(m.Genres, func(g Genre) uint32 { return uint32(g.GenreId) }),
 		Rate:        m.Rate,
 		Rates:       m.Rates,
+		Likes:       m.Likes,
 	}
 }
 

@@ -14,6 +14,7 @@ service Catalog {
   rpc DeleteManga(DeleteMangaRequest) returns (Empty);
   rpc GetList(GetListRequest) returns (GetListResponse);
   rpc SetAvgRate(SetAvgRateRateRequest) returns (Empty);
+  rpc SetLikes(SetLikesRequest) returns (Empty);
 }
 
 message MangasResponse {
@@ -81,4 +82,9 @@ message SetAvgRateRateRequest {
   string mangaId = 1;
   float rate = 2;
   uint64 rates = 3;
+}
+
+message SetLikesRequest {
+  string mangaId = 1;
+  uint64 likes = 2;
 }

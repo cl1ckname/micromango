@@ -26,6 +26,7 @@ const (
 	Catalog_DeleteManga_FullMethodName = "/micromango.Catalog/DeleteManga"
 	Catalog_GetList_FullMethodName     = "/micromango.Catalog/GetList"
 	Catalog_SetAvgRate_FullMethodName  = "/micromango.Catalog/SetAvgRate"
+	Catalog_SetLikes_FullMethodName    = "/micromango.Catalog/SetLikes"
 )
 
 // CatalogClient is the client API for Catalog service.
@@ -39,6 +40,7 @@ type CatalogClient interface {
 	DeleteManga(ctx context.Context, in *DeleteMangaRequest, opts ...grpc.CallOption) (*Empty, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	SetAvgRate(ctx context.Context, in *SetAvgRateRateRequest, opts ...grpc.CallOption) (*Empty, error)
+	SetLikes(ctx context.Context, in *SetLikesRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type catalogClient struct {
@@ -112,6 +114,15 @@ func (c *catalogClient) SetAvgRate(ctx context.Context, in *SetAvgRateRateReques
 	return out, nil
 }
 
+func (c *catalogClient) SetLikes(ctx context.Context, in *SetLikesRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Catalog_SetLikes_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogServer is the server API for Catalog service.
 // All implementations must embed UnimplementedCatalogServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type CatalogServer interface {
 	DeleteManga(context.Context, *DeleteMangaRequest) (*Empty, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	SetAvgRate(context.Context, *SetAvgRateRateRequest) (*Empty, error)
+	SetLikes(context.Context, *SetLikesRequest) (*Empty, error)
 	mustEmbedUnimplementedCatalogServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedCatalogServer) GetList(context.Context, *GetListRequest) (*Ge
 }
 func (UnimplementedCatalogServer) SetAvgRate(context.Context, *SetAvgRateRateRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetAvgRate not implemented")
+}
+func (UnimplementedCatalogServer) SetLikes(context.Context, *SetLikesRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLikes not implemented")
 }
 func (UnimplementedCatalogServer) mustEmbedUnimplementedCatalogServer() {}
 
@@ -290,6 +305,24 @@ func _Catalog_SetAvgRate_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Catalog_SetLikes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetLikesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServer).SetLikes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Catalog_SetLikes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServer).SetLikes(ctx, req.(*SetLikesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Catalog_ServiceDesc is the grpc.ServiceDesc for Catalog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetAvgRate",
 			Handler:    _Catalog_SetAvgRate_Handler,
+		},
+		{
+			MethodName: "SetLikes",
+			Handler:    _Catalog_SetLikes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

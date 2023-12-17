@@ -53,7 +53,7 @@ func RemoveLike(db *gorm.DB, mangaId, userId uuid.UUID) error {
 	return db.Delete(&lr).Error
 }
 
-func LikesNumber(db *gorm.DB, mangaId uuid.UUID) (uint64, error) {
+func LikesCount(db *gorm.DB, mangaId uuid.UUID) (uint64, error) {
 	var res uint64
 	err := db.Raw(`SELECT count(*) FROM like_records WHERE manga_id = ?`, mangaId).Scan(&res).Error
 	return res, err

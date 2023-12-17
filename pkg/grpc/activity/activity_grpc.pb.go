@@ -20,12 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Activity_Like_FullMethodName        = "/micromango.Activity/Like"
-	Activity_Dislike_FullMethodName     = "/micromango.Activity/Dislike"
-	Activity_LikesNumber_FullMethodName = "/micromango.Activity/LikesNumber"
-	Activity_HasLike_FullMethodName     = "/micromango.Activity/HasLike"
-	Activity_RateManga_FullMethodName   = "/micromango.Activity/RateManga"
-	Activity_UserRate_FullMethodName    = "/micromango.Activity/UserRate"
+	Activity_Like_FullMethodName      = "/micromango.Activity/Like"
+	Activity_Dislike_FullMethodName   = "/micromango.Activity/Dislike"
+	Activity_HasLike_FullMethodName   = "/micromango.Activity/HasLike"
+	Activity_RateManga_FullMethodName = "/micromango.Activity/RateManga"
+	Activity_UserRate_FullMethodName  = "/micromango.Activity/UserRate"
 )
 
 // ActivityClient is the client API for Activity service.
@@ -34,7 +33,6 @@ const (
 type ActivityClient interface {
 	Like(ctx context.Context, in *LikeRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	Dislike(ctx context.Context, in *DislikeRequest, opts ...grpc.CallOption) (*share.Empty, error)
-	LikesNumber(ctx context.Context, in *LikesNumberRequest, opts ...grpc.CallOption) (*LikesNumberResponse, error)
 	HasLike(ctx context.Context, in *HasLikeRequest, opts ...grpc.CallOption) (*HasLikeResponse, error)
 	RateManga(ctx context.Context, in *RateMangaRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	UserRate(ctx context.Context, in *UserRateRequest, opts ...grpc.CallOption) (*UserRateResponse, error)
@@ -60,15 +58,6 @@ func (c *activityClient) Like(ctx context.Context, in *LikeRequest, opts ...grpc
 func (c *activityClient) Dislike(ctx context.Context, in *DislikeRequest, opts ...grpc.CallOption) (*share.Empty, error) {
 	out := new(share.Empty)
 	err := c.cc.Invoke(ctx, Activity_Dislike_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *activityClient) LikesNumber(ctx context.Context, in *LikesNumberRequest, opts ...grpc.CallOption) (*LikesNumberResponse, error) {
-	out := new(LikesNumberResponse)
-	err := c.cc.Invoke(ctx, Activity_LikesNumber_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +97,6 @@ func (c *activityClient) UserRate(ctx context.Context, in *UserRateRequest, opts
 type ActivityServer interface {
 	Like(context.Context, *LikeRequest) (*share.Empty, error)
 	Dislike(context.Context, *DislikeRequest) (*share.Empty, error)
-	LikesNumber(context.Context, *LikesNumberRequest) (*LikesNumberResponse, error)
 	HasLike(context.Context, *HasLikeRequest) (*HasLikeResponse, error)
 	RateManga(context.Context, *RateMangaRequest) (*share.Empty, error)
 	UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error)
@@ -124,9 +112,6 @@ func (UnimplementedActivityServer) Like(context.Context, *LikeRequest) (*share.E
 }
 func (UnimplementedActivityServer) Dislike(context.Context, *DislikeRequest) (*share.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Dislike not implemented")
-}
-func (UnimplementedActivityServer) LikesNumber(context.Context, *LikesNumberRequest) (*LikesNumberResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LikesNumber not implemented")
 }
 func (UnimplementedActivityServer) HasLike(context.Context, *HasLikeRequest) (*HasLikeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasLike not implemented")
@@ -182,24 +167,6 @@ func _Activity_Dislike_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ActivityServer).Dislike(ctx, req.(*DislikeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Activity_LikesNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LikesNumberRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ActivityServer).LikesNumber(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Activity_LikesNumber_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActivityServer).LikesNumber(ctx, req.(*LikesNumberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -272,10 +239,6 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Dislike",
 			Handler:    _Activity_Dislike_Handler,
-		},
-		{
-			MethodName: "LikesNumber",
-			Handler:    _Activity_LikesNumber_Handler,
 		},
 		{
 			MethodName: "HasLike",

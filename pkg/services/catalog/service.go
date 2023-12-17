@@ -80,12 +80,6 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 	}
 	resp.Content = content
 
-	likesNumber, err := s.activity.LikesNumber(ctx, &activity.LikesNumberRequest{MangaId: req.MangaId})
-	if err != nil {
-		return nil, err
-	}
-	resp.Likes = likesNumber.Number
-
 	if req.UserId != nil {
 		userId := *req.UserId
 		hasLike, err := s.activity.HasLike(ctx, &activity.HasLikeRequest{MangaId: req.MangaId, UserId: userId})
@@ -225,6 +219,17 @@ func (s *service) SetAvgRate(_ context.Context, req *pb.SetAvgRateRateRequest) (
 		return nil, err
 	}
 	if err := RateManga(s.db, mangaId, req.Rate, req.Rates); err != nil {
+		return nil, err
+	}
+	return &pb.Empty{}, err
+}
+
+func (s *service) SetLikes(_ context.Context, req *pb.SetLikesRequest) (*pb.Empty, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	if err := LikeManga(s.db, mangaId, req.Likes); err != nil {
 		return nil, err
 	}
 	return &pb.Empty{}, err

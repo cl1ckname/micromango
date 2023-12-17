@@ -146,3 +146,8 @@ func RateManga(db *gorm.DB, mangaId uuid.UUID, rate float32, rates uint64) error
 	m := Manga{MangaId: mangaId, Rate: rate, Rates: rates}
 	return db.Updates(&m).Error
 }
+
+func LikeManga(db *gorm.DB, mangaId uuid.UUID, likes uint64) error {
+	m := Manga{MangaId: mangaId, Likes: likes}
+	return db.Updates(&m).Error
+}

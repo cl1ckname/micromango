@@ -7,7 +7,6 @@ import "share.proto";
 service Activity {
   rpc Like(LikeRequest) returns (Empty);
   rpc Dislike(DislikeRequest) returns (Empty);
-  rpc LikesNumber(LikesNumberRequest) returns (LikesNumberResponse);
   rpc HasLike(HasLikeRequest) returns (HasLikeResponse);
   rpc RateManga(RateMangaRequest) returns (Empty);
   rpc UserRate(UserRateRequest) returns (UserRateResponse);
@@ -21,14 +20,6 @@ message LikeRequest {
 message DislikeRequest {
   string mangaId = 1;
   string userId = 2;
-}
-
-message LikesNumberRequest {
-  string mangaId = 1;
-}
-
-message LikesNumberResponse {
-  uint64 number = 1;
 }
 
 message HasLikeRequest {
