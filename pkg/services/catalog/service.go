@@ -60,7 +60,6 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 	m, err := GetManga(s.db, req.GetMangaId())
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Println("manga", req.MangaId, "not found")
 			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
 		}
 		return nil, err
@@ -108,14 +107,6 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 	}
 	resp.ListStats = listStats.Stats
 
-	rate, err := s.activity.AvgMangaRate(ctx, &activity.AvgMangaRateRequest{MangaId: req.MangaId})
-	if err != nil {
-		return nil, err
-	}
-	resp.Rate = &share.AvgMangaRateResponse{
-		Rate:   rate.Rate,
-		Voters: rate.Voters,
-	}
 	return resp, nil
 }
 
@@ -147,19 +138,25 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 	return s.GetManga(ctx, &pb.MangaRequest{MangaId: m.MangaId.String()})
 }
 
-func (s *service) GetMangas(ctx context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
-	ms, err := GetMangas(s.db, request.GenresInclude, request.GenresExclude, request.Starts)
+func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*pb.MangasResponse, error) {
+	opts := GetMangaOpts{
+		Include: request.GenresInclude,
+		Exclude: request.GenresExclude,
+		Starts:  request.Starts,
+		Desc:    request.Desc,
+	}
+	if request.Order != nil {
+		opts.Order = utils.Ptr(Order(*request.Order))
+	}
+
+	ms, err := GetMangas(s.db, opts)
 	mangas := make([]*share.MangaPreviewResponse, len(ms))
 	for i, m := range ms {
-		rate, err := s.activity.AvgMangaRate(ctx, &activity.AvgMangaRateRequest{MangaId: m.MangaId.String()})
-		if err != nil {
-			return nil, err
-		}
 		mangas[i] = &share.MangaPreviewResponse{
 			MangaId: m.MangaId.String(),
 			Title:   m.Title,
 			Cover:   m.Cover,
-			Rate:    rate.Rate,
+			Rate:    m.Rate,
 		}
 	}
 	return &pb.MangasResponse{Mangas: mangas}, err
@@ -220,4 +217,15 @@ func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.GetLis
 	})
 
 	return &pb.GetListResponse{PreviewList: list}, nil
+}
+
+func (s *service) SetAvgRate(_ context.Context, req *pb.SetAvgRateRateRequest) (*pb.Empty, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	if err := RateManga(s.db, mangaId, req.Rate, req.Rates); err != nil {
+		return nil, err
+	}
+	return &pb.Empty{}, err
 }

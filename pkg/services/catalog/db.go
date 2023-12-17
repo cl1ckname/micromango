@@ -50,35 +50,55 @@ func GetManga(db *gorm.DB, mangaId string) (m Manga, err error) {
 	return m, nil
 }
 
-func GetMangas(db *gorm.DB, include []uint32, exclude []uint32, starts *string) (m []Manga, err error) {
+type GetMangaOpts struct {
+	Include []uint32
+	Exclude []uint32
+	Starts  *string
+	Order   *Order
+	Desc    bool
+}
+
+func GetMangas(db *gorm.DB, opts GetMangaOpts) (m []Manga, err error) {
 	var args []interface{}
 	var conditions []string
-	if starts != nil {
-		conditions = append(conditions, fmt.Sprintf(`lower(title) like "%s%%"`, *starts))
+	if opts.Starts != nil {
+		conditions = append(conditions, fmt.Sprintf(`lower(title) like "%s%%"`, *opts.Starts))
 	}
 	sql := `SELECT * FROM mangas m `
-	if l := len(include); l != 0 {
+	if l := len(opts.Include); l != 0 {
 		sql += `where exists(
 		select * from manga_genres mg
 		where m.manga_id = mg.manga_manga_id and
 				mg.genre_genre_id in (?)
 		group by manga_manga_id
 		having count(mg.genre_genre_id) = ?)`
-		args = append(args, include, l, strings.Join(conditions, " and "))
+		args = append(args, opts.Include, l, strings.Join(conditions, " and "))
 	}
-	if len(exclude) != 0 {
+	if len(opts.Exclude) != 0 {
 		sql += `
 		intersect
 		select * from mangas m where exists (
 		select manga_manga_id, sum(case when genre_genre_id in (?) then 1 else 0 end) as exclude from manga_genres
 		where manga_manga_id == m.manga_id
 		group by manga_manga_id having exclude == 0)`
-		args = append(args, exclude)
+		args = append(args, opts.Exclude)
 	}
+
+	var order = "rate "
+	if opts.Order != nil {
+		order = string(*opts.Order) + " "
+	}
+	if opts.Desc {
+		order += "desc"
+	}
+
 	if len(conditions) != 0 {
 		andConds := strings.Join(conditions, " and ")
 		sqlCond := fmt.Sprintf("select * from (%s) where %s", sql, andConds)
-		err = db.Raw(sqlCond, args...).Scan(&m).Error
+		query := db.Raw(sqlCond, args...)
+		query.Order(order)
+
+		err = query.Scan(&m).Error
 	} else {
 		err = db.Raw(sql, args...).Scan(&m).Error
 	}
@@ -122,4 +142,9 @@ func DeleteManga(db *gorm.DB, mangaId string) error {
 func GetMany(db *gorm.DB, listId []string) (m []Manga, err error) {
 	err = db.Find(&m, listId).Error
 	return
+}
+
+func RateManga(db *gorm.DB, mangaId uuid.UUID, rate float32, rates uint64) error {
+	m := Manga{MangaId: mangaId, Rate: rate, Rates: rates}
+	return db.Save(&m).Error
 }

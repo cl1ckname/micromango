@@ -13,6 +13,7 @@ service Catalog {
   rpc UpdateManga(UpdateMangaRequest) returns (MangaResponse);
   rpc DeleteManga(DeleteMangaRequest) returns (Empty);
   rpc GetList(GetListRequest) returns (GetListResponse);
+  rpc SetAvgRate(SetAvgRateRateRequest) returns (Empty);
 }
 
 message MangasResponse {
@@ -36,14 +37,17 @@ message MangaResponse {
   map<uint32, uint64> listStats = 9;
   uint64 likes = 10;
   bool liked = 11;
-  AvgMangaRateResponse rate = 12;
-  optional float userRate = 13;
+  float rate = 12;
+  uint32 rates = 13;
+  optional float userRate = 14;
 }
 
 message GetMangasRequest {
   optional string starts = 1;
   repeated uint32 genresInclude = 3;
   repeated uint32 genresExclude = 4;
+  optional string order = 5;
+  bool desc = 6;
 }
 
 message AddMangaRequest {
@@ -71,4 +75,10 @@ message GetListRequest {
 
 message GetListResponse {
   repeated MangaPreviewResponse previewList = 1;
+}
+
+message SetAvgRateRateRequest {
+  string mangaId = 1;
+  float rate = 2;
+  uint64 rates = 3;
 }

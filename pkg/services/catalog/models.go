@@ -15,6 +15,8 @@ type Manga struct {
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"createdAt"`
 	Genres      []Genre   `json:"genres" gorm:"many2many:manga_genres"`
+	Rate        float32   `json:"rate"`
+	Rates       uint64    `json:"rates"`
 }
 
 func (m *Manga) BeforeCreate(*gorm.DB) error {

@@ -6,15 +6,21 @@ import (
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 	"micromango/pkg/common"
+	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/activity"
+	"micromango/pkg/grpc/catalog"
 	"micromango/pkg/grpc/share"
 )
 
 func Run(ctx context.Context, c Config) <-chan error {
 	database := Connect(c.DbAddr)
 
+	conn := utils.GrpcDialOrFatal(c.CatalogAddr)
+	catalogService := catalog.NewCatalogClient(conn)
+
 	serv := service{
-		db: database,
+		db:      database,
+		catalog: catalogService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterActivityServer(baseServer, &serv)
@@ -25,6 +31,7 @@ func Run(ctx context.Context, c Config) <-chan error {
 type service struct {
 	db *gorm.DB
 	pb.UnimplementedActivityServer
+	catalog catalog.CatalogClient
 }
 
 func (s *service) Like(_ context.Context, req *pb.LikeRequest) (*share.Empty, error) {
@@ -85,7 +92,7 @@ func (s *service) HasLike(_ context.Context, req *pb.HasLikeRequest) (*pb.HasLik
 	return &pb.HasLikeResponse{Has: has}, nil
 }
 
-func (s *service) RateManga(_ context.Context, req *pb.RateMangaRequest) (*share.Empty, error) {
+func (s *service) RateManga(ctx context.Context, req *pb.RateMangaRequest) (*share.Empty, error) {
 	mangaId, err := uuid.Parse(req.MangaId)
 	if err != nil {
 		return nil, err
@@ -95,19 +102,22 @@ func (s *service) RateManga(_ context.Context, req *pb.RateMangaRequest) (*share
 		return nil, err
 	}
 	err = SaveRate(s.db, userId, mangaId, req.Rate)
-	return &share.Empty{}, err
-}
-
-func (s *service) AvgMangaRate(_ context.Context, req *pb.AvgMangaRateRequest) (*share.AvgMangaRateResponse, error) {
-	mangaId, err := uuid.Parse(req.MangaId)
 	if err != nil {
 		return nil, err
 	}
-	avgRate, err := AvgRate(s.db, mangaId)
-	return &share.AvgMangaRateResponse{
-		Rate:   avgRate.Rate,
-		Voters: avgRate.Voters,
-	}, err
+	avg, err := AvgRate(s.db, mangaId)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := s.catalog.SetAvgRate(ctx, &catalog.SetAvgRateRateRequest{
+		MangaId: req.MangaId,
+		Rate:    avg.Rate,
+		Rates:   avg.Voters,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &share.Empty{}, err
 }
 
 func (s *service) UserRate(_ context.Context, req *pb.UserRateRequest) (*pb.UserRateResponse, error) {
