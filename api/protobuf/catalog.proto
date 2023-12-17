@@ -38,7 +38,7 @@ message MangaResponse {
   uint64 likes = 10;
   bool liked = 11;
   float rate = 12;
-  uint32 rates = 13;
+  uint64 rates = 13;
   optional float userRate = 14;
 }
 

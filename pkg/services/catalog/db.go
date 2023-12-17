@@ -146,5 +146,5 @@ func GetMany(db *gorm.DB, listId []string) (m []Manga, err error) {
 
 func RateManga(db *gorm.DB, mangaId uuid.UUID, rate float32, rates uint64) error {
 	m := Manga{MangaId: mangaId, Rate: rate, Rates: rates}
-	return db.Save(&m).Error
+	return db.Updates(&m).Error
 }

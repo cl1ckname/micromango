@@ -17,8 +17,9 @@ func main() {
 	}
 
 	config := activity.Config{
-		Addr:   os.Getenv("ACTIVITY_ADDR"),
-		DbAddr: os.Getenv("ACTIVITY_DB_ADDR"),
+		Addr:        os.Getenv("ACTIVITY_ADDR"),
+		DbAddr:      os.Getenv("ACTIVITY_DB_ADDR"),
+		CatalogAddr: os.Getenv("CATALOG_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

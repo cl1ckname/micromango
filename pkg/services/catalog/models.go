@@ -33,6 +33,8 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Description: m.Description,
 		CreatedAt:   m.CreatedAt.String(),
 		Genres:      utils.Map(m.Genres, func(g Genre) uint32 { return uint32(g.GenreId) }),
+		Rate:        m.Rate,
+		Rates:       m.Rates,
 	}
 }
 
