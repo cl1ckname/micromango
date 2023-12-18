@@ -87,7 +87,11 @@ func GetMangas(db *gorm.DB, opts GetMangaOpts) (m []Manga, err error) {
 
 	var order = "rate "
 	if opts.Order != nil {
-		order = string(*opts.Order) + " "
+		if *opts.Order == "title" {
+			order = "lower(title) "
+		} else {
+			order = string(*opts.Order) + " "
+		}
 	}
 	if opts.Asc {
 		order += "asc"
