@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
+	"micromango/pkg/grpc/activity"
 	"micromango/pkg/grpc/catalog"
 	pb "micromango/pkg/grpc/profile"
 	"micromango/pkg/grpc/share"
@@ -16,10 +17,11 @@ import (
 )
 
 type Config struct {
-	Addr               string
-	DbAddr             string
-	StaticServiceAddr  string
-	CatalogServiceAddr string
+	Addr                string
+	DbAddr              string
+	StaticServiceAddr   string
+	CatalogServiceAddr  string
+	ActivityServiceAddr string
 }
 
 func Run(ctx context.Context, c Config) <-chan error {
@@ -31,10 +33,14 @@ func Run(ctx context.Context, c Config) <-chan error {
 	conn = utils.GrpcDialOrFatal(c.CatalogServiceAddr)
 	catalogService := catalog.NewCatalogClient(conn)
 
+	conn = utils.GrpcDialOrFatal(c.ActivityServiceAddr)
+	activityService := activity.NewActivityClient(conn)
+
 	serv := service{
-		db:      database,
-		static:  staticService,
-		catalog: catalogService,
+		db:       database,
+		static:   staticService,
+		catalog:  catalogService,
+		activity: activityService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterProfileServer(baseServer, &serv)
@@ -44,9 +50,10 @@ func Run(ctx context.Context, c Config) <-chan error {
 
 type service struct {
 	pb.UnimplementedProfileServer
-	db      *gorm.DB
-	static  static.StaticClient
-	catalog catalog.CatalogClient
+	db       *gorm.DB
+	static   static.StaticClient
+	catalog  catalog.CatalogClient
+	activity activity.ActivityClient
 }
 
 func (s *service) Create(_ context.Context, req *pb.CreateRequest) (*pb.Response, error) {
@@ -107,20 +114,49 @@ func (s *service) Get(_ context.Context, req *pb.GetRequest) (*pb.Response, erro
 }
 
 func (s *service) GetList(ctx context.Context, req *pb.GetListRequest) (*pb.ListResponse, error) {
-	lr, err := GetList(s.db, req)
+	userId, err := uuid.Parse(req.ProfileId)
 	if err != nil {
 		return nil, err
 	}
 
-	mangaIdList := utils.Map(lr, func(l ListRecord) string {
-		return l.MangaId.String()
-	})
-	previewList, err := s.catalog.GetList(ctx, &catalog.GetListRequest{MangaList: mangaIdList})
-	if err != nil {
-		return nil, err
+	resp := pb.ListResponse{
+		Lists: make(map[uint32]*pb.ListResponse_ListMapField),
+	}
+	for i := share.ListName(0); i < 5; i++ {
+		mangaList, err := GetList(s.db, userId, i)
+		if err != nil {
+			return nil, err
+		}
+		mangaIdList := utils.Map(mangaList, func(l ListRecord) string {
+			return l.MangaId.String()
+		})
+		previewList, err := s.catalog.GetList(ctx, &catalog.GetListRequest{MangaList: mangaIdList})
+		if err != nil {
+			return nil, err
+		}
+		rates, err := s.activity.UserRateList(ctx, &activity.UserRateListRequest{
+			UserId:  req.ProfileId,
+			MangaId: mangaIdList,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		field := &pb.ListResponse_ListMapField{
+			Value: utils.Map(previewList.PreviewList, func(c *share.MangaPreviewResponse) *pb.ListResponse_ListEntry {
+				rate := rates.Rates[c.MangaId]
+				return &pb.ListResponse_ListEntry{
+					MangaId: c.MangaId,
+					Title:   c.Title,
+					Rate:    utils.Ptr(rate),
+				}
+			}),
+		}
+
+		resp.Lists[uint32(i)] = field
 	}
 
-	return &pb.ListResponse{Manga: previewList.PreviewList}, err
+	return &resp, err
 }
 
 func (s *service) AddToList(_ context.Context, req *pb.AddToListRequest) (*share.Empty, error) {

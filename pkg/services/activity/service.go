@@ -133,3 +133,19 @@ func (s *service) UserRate(_ context.Context, req *pb.UserRateRequest) (*pb.User
 	}
 	return &pb.UserRateResponse{Rate: rate}, nil
 }
+
+func (s *service) UserRateList(_ context.Context, req *pb.UserRateListRequest) (*pb.UserRateListResponse, error) {
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	rates, err := RateList(s.db, userId, req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	resp := pb.UserRateListResponse{Rates: make(map[string]uint32, len(rates))}
+	for _, m := range rates {
+		resp.Rates[m.MangaId.String()] = m.Rate
+	}
+	return &resp, nil
+}

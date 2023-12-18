@@ -39,11 +39,18 @@ message GetRequest {
 
 message GetListRequest {
   string profileId = 1;
-  ListName list = 2;
 }
 
 message ListResponse {
-  repeated MangaPreviewResponse manga = 1;
+  message ListEntry {
+    string mangaId = 1;
+    string title = 2;
+    optional uint32 rate = 3;
+  }
+  message ListMapField {
+    repeated ListEntry value = 1;
+  }
+  map<uint32, ListMapField> lists = 1;
 }
 
 message AddToListRequest {

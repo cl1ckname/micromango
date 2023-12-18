@@ -20,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Activity_Like_FullMethodName      = "/micromango.Activity/Like"
-	Activity_Dislike_FullMethodName   = "/micromango.Activity/Dislike"
-	Activity_HasLike_FullMethodName   = "/micromango.Activity/HasLike"
-	Activity_RateManga_FullMethodName = "/micromango.Activity/RateManga"
-	Activity_UserRate_FullMethodName  = "/micromango.Activity/UserRate"
+	Activity_Like_FullMethodName         = "/micromango.Activity/Like"
+	Activity_Dislike_FullMethodName      = "/micromango.Activity/Dislike"
+	Activity_HasLike_FullMethodName      = "/micromango.Activity/HasLike"
+	Activity_RateManga_FullMethodName    = "/micromango.Activity/RateManga"
+	Activity_UserRate_FullMethodName     = "/micromango.Activity/UserRate"
+	Activity_UserRateList_FullMethodName = "/micromango.Activity/UserRateList"
 )
 
 // ActivityClient is the client API for Activity service.
@@ -36,6 +37,7 @@ type ActivityClient interface {
 	HasLike(ctx context.Context, in *HasLikeRequest, opts ...grpc.CallOption) (*HasLikeResponse, error)
 	RateManga(ctx context.Context, in *RateMangaRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	UserRate(ctx context.Context, in *UserRateRequest, opts ...grpc.CallOption) (*UserRateResponse, error)
+	UserRateList(ctx context.Context, in *UserRateListRequest, opts ...grpc.CallOption) (*UserRateListResponse, error)
 }
 
 type activityClient struct {
@@ -91,6 +93,15 @@ func (c *activityClient) UserRate(ctx context.Context, in *UserRateRequest, opts
 	return out, nil
 }
 
+func (c *activityClient) UserRateList(ctx context.Context, in *UserRateListRequest, opts ...grpc.CallOption) (*UserRateListResponse, error) {
+	out := new(UserRateListResponse)
+	err := c.cc.Invoke(ctx, Activity_UserRateList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActivityServer is the server API for Activity service.
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
@@ -100,6 +111,7 @@ type ActivityServer interface {
 	HasLike(context.Context, *HasLikeRequest) (*HasLikeResponse, error)
 	RateManga(context.Context, *RateMangaRequest) (*share.Empty, error)
 	UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error)
+	UserRateList(context.Context, *UserRateListRequest) (*UserRateListResponse, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -121,6 +133,9 @@ func (UnimplementedActivityServer) RateManga(context.Context, *RateMangaRequest)
 }
 func (UnimplementedActivityServer) UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserRate not implemented")
+}
+func (UnimplementedActivityServer) UserRateList(context.Context, *UserRateListRequest) (*UserRateListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserRateList not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -225,6 +240,24 @@ func _Activity_UserRate_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Activity_UserRateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRateListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).UserRateList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Activity_UserRateList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).UserRateList(ctx, req.(*UserRateListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Activity_ServiceDesc is the grpc.ServiceDesc for Activity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -251,6 +284,10 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserRate",
 			Handler:    _Activity_UserRate_Handler,
+		},
+		{
+			MethodName: "UserRateList",
+			Handler:    _Activity_UserRateList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

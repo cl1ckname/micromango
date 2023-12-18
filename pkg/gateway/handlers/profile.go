@@ -6,10 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
-	"micromango/pkg/grpc/share"
 	"micromango/pkg/grpc/user"
 	"net/http"
-	"strconv"
 )
 
 func RegisterProfile(e *echo.Group, p profile.ProfileClient) {
@@ -106,16 +104,14 @@ func (s *profileHandler) RemoveFromList(ctx echo.Context) error {
 
 func (s *profileHandler) GetList(ctx echo.Context) error {
 	var getListReq profile.GetListRequest
-	listStr := ctx.QueryParam("list")
-	list, err := strconv.ParseInt(listStr, 10, 32)
-	if err != nil {
-		return utils.ErrorToResponse(ctx, err)
-	}
-	getListReq.List = share.ListName(list)
 	getListReq.ProfileId = ctx.Param("userId")
 	previewList, err := s.profile.GetList(context.TODO(), &getListReq)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
-	return ctx.JSON(http.StatusOK, previewList.Manga)
+	resp := make(map[uint32][]*profile.ListResponse_ListEntry)
+	for k, v := range previewList.Lists {
+		resp[k] = v.Value
+	}
+	return ctx.JSON(http.StatusOK, resp)
 }

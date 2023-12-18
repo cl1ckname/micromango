@@ -10,6 +10,7 @@ service Activity {
   rpc HasLike(HasLikeRequest) returns (HasLikeResponse);
   rpc RateManga(RateMangaRequest) returns (Empty);
   rpc UserRate(UserRateRequest) returns (UserRateResponse);
+  rpc UserRateList(UserRateListRequest) returns (UserRateListResponse);
 }
 
 message LikeRequest {
@@ -44,4 +45,13 @@ message UserRateRequest {
 
 message UserRateResponse {
   optional float rate = 1;
+}
+
+message UserRateListRequest {
+  string userId = 1;
+  repeated string mangaId = 2;
+}
+
+message UserRateListResponse {
+  map<string, uint32> rates = 1;
 }

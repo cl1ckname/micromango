@@ -8,6 +8,7 @@ import (
 	"log"
 	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/profile"
+	"micromango/pkg/grpc/share"
 	"os"
 	"time"
 )
@@ -54,18 +55,13 @@ func FindOne(db *gorm.DB, userId uuid.UUID) (p Profile, err error) {
 	return
 }
 
-func GetList(db *gorm.DB, req *pb.GetListRequest) ([]ListRecord, error) {
-	userUuid, err := uuid.Parse(req.ProfileId)
-	if err != nil {
-		return nil, err
-	}
-
+func GetList(db *gorm.DB, userId uuid.UUID, list share.ListName) ([]ListRecord, error) {
 	var lr []ListRecord
 	cond := ListRecord{
-		UserId:   userUuid,
-		ListName: req.List,
+		UserId:   userId,
+		ListName: list,
 	}
-	err = db.Find(&lr, cond).Error
+	err := db.Find(&lr, cond).Error
 	return lr, err
 }
 

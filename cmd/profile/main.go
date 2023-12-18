@@ -20,10 +20,11 @@ func main() {
 	}
 
 	config := profile.Config{
-		Addr:               os.Getenv("PROFILE_ADDR"),
-		DbAddr:             os.Getenv("PROFILE_DB_ADDR"),
-		StaticServiceAddr:  os.Getenv("STATIC_ADDR"),
-		CatalogServiceAddr: os.Getenv("CATALOG_ADDR"),
+		Addr:                os.Getenv("PROFILE_ADDR"),
+		DbAddr:              os.Getenv("PROFILE_DB_ADDR"),
+		StaticServiceAddr:   os.Getenv("STATIC_ADDR"),
+		CatalogServiceAddr:  os.Getenv("CATALOG_ADDR"),
+		ActivityServiceAddr: os.Getenv("ACTIVITY_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

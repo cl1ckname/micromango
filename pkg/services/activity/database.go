@@ -103,3 +103,11 @@ func UserRate(db *gorm.DB, userId, mangaId uuid.UUID) (*float32, error) {
 	res = float32(rr.Rate)
 	return &res, err
 }
+
+func RateList(db *gorm.DB, userId uuid.UUID, mangaIds []string) ([]RateRecord, error) {
+	var resp []RateRecord
+	err := db.Table("rate_records").
+		Where("user_id = ? and manga_id in (?)", userId, mangaIds).
+		Scan(&resp).Error
+	return resp, err
+}
