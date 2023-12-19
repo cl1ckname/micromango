@@ -100,7 +100,7 @@ func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePi
 	if err := SaveImage(profilePicturePath, img); err != nil {
 		return nil, err
 	}
-	extPath := path.Join("profile", req.UserId, "profile.jpg")
+	extPath := s.gatewayAddr + "/" + path.Join("static", "profile", req.UserId, "profile.jpg")
 	return &pb.UploadImageResponse{ImageId: extPath}, nil
 }
 
