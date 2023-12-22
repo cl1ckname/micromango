@@ -23,6 +23,7 @@ const (
 	Static_UploadThumbnail_FullMethodName      = "/micromango.Static/UploadThumbnail"
 	Static_UploadPage_FullMethodName           = "/micromango.Static/UploadPage"
 	Static_UploadProfilePicture_FullMethodName = "/micromango.Static/UploadProfilePicture"
+	Static_UploadProfileCover_FullMethodName   = "/micromango.Static/UploadProfileCover"
 )
 
 // StaticClient is the client API for Static service.
@@ -33,6 +34,7 @@ type StaticClient interface {
 	UploadThumbnail(ctx context.Context, in *UploadThumbnailRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 	UploadPage(ctx context.Context, in *UploadPageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 	UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
+	UploadProfileCover(ctx context.Context, in *UploadProfileCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 }
 
 type staticClient struct {
@@ -79,6 +81,15 @@ func (c *staticClient) UploadProfilePicture(ctx context.Context, in *UploadProfi
 	return out, nil
 }
 
+func (c *staticClient) UploadProfileCover(ctx context.Context, in *UploadProfileCoverRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
+	out := new(UploadImageResponse)
+	err := c.cc.Invoke(ctx, Static_UploadProfileCover_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StaticServer is the server API for Static service.
 // All implementations must embed UnimplementedStaticServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type StaticServer interface {
 	UploadThumbnail(context.Context, *UploadThumbnailRequest) (*UploadImageResponse, error)
 	UploadPage(context.Context, *UploadPageRequest) (*UploadImageResponse, error)
 	UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*UploadImageResponse, error)
+	UploadProfileCover(context.Context, *UploadProfileCoverRequest) (*UploadImageResponse, error)
 	mustEmbedUnimplementedStaticServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedStaticServer) UploadPage(context.Context, *UploadPageRequest)
 }
 func (UnimplementedStaticServer) UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*UploadImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadProfilePicture not implemented")
+}
+func (UnimplementedStaticServer) UploadProfileCover(context.Context, *UploadProfileCoverRequest) (*UploadImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadProfileCover not implemented")
 }
 func (UnimplementedStaticServer) mustEmbedUnimplementedStaticServer() {}
 
@@ -191,6 +206,24 @@ func _Static_UploadProfilePicture_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Static_UploadProfileCover_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadProfileCoverRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaticServer).UploadProfileCover(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Static_UploadProfileCover_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaticServer).UploadProfileCover(ctx, req.(*UploadProfileCoverRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Static_ServiceDesc is the grpc.ServiceDesc for Static service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var Static_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadProfilePicture",
 			Handler:    _Static_UploadProfilePicture_Handler,
+		},
+		{
+			MethodName: "UploadProfileCover",
+			Handler:    _Static_UploadProfileCover_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

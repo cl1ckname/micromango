@@ -48,6 +48,20 @@ func (s *profileHandler) UpdateProfile(ctx echo.Context) error {
 		}
 		updateReq.Picture = picture
 	}
+	formFile, err = ctx.FormFile("cover")
+	if err != nil {
+		if err != http.ErrMissingFile {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+	}
+	if formFile != nil {
+		cover, err := utils.ReadFormFile(formFile)
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
+		}
+		updateReq.Cover = cover
+	}
+
 	resp, err := s.profile.Update(context.TODO(), &updateReq)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)

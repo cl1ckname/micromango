@@ -32,7 +32,7 @@ func (s *server) UploadThumbnail(_ context.Context, req *pb.UploadThumbnailReque
 	if err != nil {
 		return nil, err
 	}
-	img = Resize(img, common.COVER_W, common.COVER_H)
+	img = Resize(img, common.THUMBNAIL_W, common.THUMBNAIL_H)
 
 	filename := uuid.NewString() + ".jpg"
 
@@ -101,6 +101,29 @@ func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePi
 		return nil, err
 	}
 	extPath := s.gatewayAddr + "/" + path.Join("static", "profile", req.UserId, "profile.jpg")
+	return &pb.UploadImageResponse{ImageId: extPath}, nil
+}
+
+func (s *server) UploadProfileCover(_ context.Context, req *pb.UploadProfileCoverRequest) (*pb.UploadImageResponse, error) {
+	coverPicturePath := path.Join(s.staticDir, "profile")
+	if err := createFolderIfNotExists(coverPicturePath); err != nil {
+		return nil, err
+	}
+	coverPicturePath = path.Join(coverPicturePath, req.UserId)
+	if err := createFolderIfNotExists(coverPicturePath); err != nil {
+		return nil, err
+	}
+	coverPicturePath = path.Join(coverPicturePath, "cover.jpg")
+
+	img, err := ToImage(req.Cover)
+	if err != nil {
+		return nil, err
+	}
+	img = Resize(img, common.COVER_W, common.COVER_H)
+	if err := SaveImage(coverPicturePath, img); err != nil {
+		return nil, err
+	}
+	extPath := s.gatewayAddr + "/" + path.Join("static", "profile", req.UserId, "cover.jpg")
 	return &pb.UploadImageResponse{ImageId: extPath}, nil
 }
 

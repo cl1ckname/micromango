@@ -22,8 +22,9 @@ message Response {
   string userId = 1;
   string username = 2;
   string picture = 3;
-  string bio = 4;
-  string createdAt = 5;
+  string cover = 4;
+  string bio = 5;
+  string createdAt = 6;
 }
 
 message UpdateRequest {

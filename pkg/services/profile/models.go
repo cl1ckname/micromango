@@ -12,6 +12,7 @@ type Profile struct {
 	UserId    uuid.UUID `json:"userId" gorm:"primaryKey;type:uuid"`
 	Username  string    `json:"username"`
 	Picture   string    `json:"picture"`
+	Cover     string    `json:"cover"`
 	Bio       string    `json:"bio"`
 	CreatedAt time.Time `json:"createdAt"`
 }
@@ -26,6 +27,7 @@ func (m *Profile) ToResponse() *pb.Response {
 		UserId:    m.UserId.String(),
 		Username:  m.Username,
 		Picture:   m.Picture,
+		Cover:     m.Cover,
 		Bio:       m.Bio,
 		CreatedAt: m.CreatedAt.String(),
 	}

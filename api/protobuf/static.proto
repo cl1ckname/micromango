@@ -8,6 +8,7 @@ service Static {
   rpc UploadThumbnail(UploadThumbnailRequest) returns (UploadImageResponse);
   rpc UploadPage(UploadPageRequest) returns (UploadImageResponse);
   rpc UploadProfilePicture(UploadProfilePictureRequest) returns (UploadImageResponse);
+  rpc UploadProfileCover(UploadProfileCoverRequest) returns (UploadImageResponse);
 }
 
 message GetImageRequest {
@@ -36,4 +37,9 @@ message UploadImageResponse {
 message UploadProfilePictureRequest {
   string userId = 1;
   File picture = 2;
+}
+
+message UploadProfileCoverRequest {
+  string userId = 1;
+  File cover = 2;
 }

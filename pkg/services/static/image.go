@@ -24,7 +24,7 @@ func ToImage(image *share.File) (image.Image, error) {
 	case "jpg", "jpeg":
 		return jpeg.Decode(bytes.NewReader(image.File))
 	default:
-		return nil, fmt.Errorf("unable to convert %#v to jpeg", image.Filename)
+		return nil, fmt.Errorf("unable to convert %#v to jpeg: invalid mime %s", image.Filename, ext)
 	}
 }
 
@@ -57,8 +57,8 @@ func SaveImage(path string, img image.Image) error {
 func getMime(filename string) (string, error) {
 	filename = strings.ToLower(filename)
 	nameParts := strings.Split(filename, ".")
-	if len(filename) != 2 {
-		return "", fmt.Errorf("invalid filename: %s", filename)
+	if len(nameParts) != 2 {
+		return "", fmt.Errorf("invalid filename: %s (len is %d)", filename, len(nameParts))
 	}
-	return nameParts[0], nil
+	return nameParts[1], nil
 }

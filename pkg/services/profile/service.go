@@ -97,6 +97,16 @@ func (s *service) Update(ctx context.Context, req *pb.UpdateRequest) (*pb.Respon
 		}
 		userToUpdate.Picture = uploadRes.ImageId
 	}
+	if req.Cover != nil {
+		uploadRes, err := s.static.UploadProfileCover(ctx, &static.UploadProfileCoverRequest{
+			UserId: req.UserId,
+			Cover:  req.Cover,
+		})
+		if err != nil {
+			return nil, err
+		}
+		userToUpdate.Cover = uploadRes.ImageId
+	}
 	updatedProfile, err := SaveProfile(s.db, userToUpdate)
 	if err != nil {
 		return nil, err
