@@ -107,11 +107,10 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
 	mangaId := uuid.New()
 	var coverAddr string
-	if len(req.Cover) != 0 {
-		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{
-			MangaId: mangaId.String(),
-			Image:   req.Cover,
-			Type:    0, // FIXME
+	if req.Thumbnail != nil {
+		uploadResp, err := s.static.UploadThumbnail(ctx, &static.UploadThumbnailRequest{
+			MangaId:   mangaId.String(),
+			Thumbnail: req.Thumbnail,
 		})
 		if err != nil {
 			return nil, err
@@ -170,11 +169,10 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 		return Genre{GenreId: int(i)}
 	})
 	mangaToUpdate.Genres = genres
-	if len(req.Cover) != 0 {
-		uploadResp, err := s.static.UploadCover(ctx, &static.UploadCoverRequest{
-			MangaId: req.MangaId,
-			Image:   req.Cover,
-			Type:    0, // FIXME
+	if req.Thumbnail != nil {
+		uploadResp, err := s.static.UploadThumbnail(ctx, &static.UploadThumbnailRequest{
+			MangaId:   req.MangaId,
+			Thumbnail: req.Thumbnail,
 		})
 		if err != nil {
 			return nil, err

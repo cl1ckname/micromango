@@ -87,10 +87,10 @@ func (s *service) Update(ctx context.Context, req *pb.UpdateRequest) (*pb.Respon
 
 	userToUpdate.Username = utils.DerefOrDefault(req.Username, userToUpdate.Username)
 	userToUpdate.Bio = utils.DerefOrDefault(req.Bio, userToUpdate.Bio)
-	if len(req.Picture) != 0 {
+	if req.Picture != nil {
 		uploadRes, err := s.static.UploadProfilePicture(ctx, &static.UploadProfilePictureRequest{
-			UserId: req.UserId,
-			Image:  req.Picture,
+			UserId:  req.UserId,
+			Picture: req.Picture,
 		})
 		if err != nil {
 			return nil, err

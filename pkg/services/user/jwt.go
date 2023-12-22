@@ -29,7 +29,7 @@ func (s *service) login(email string, password string) (*jwt.Token, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, common.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    userModel.UserId.String(),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
 		UserId:   userModel.UserId.String(),

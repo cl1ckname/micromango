@@ -1,6 +1,7 @@
 syntax="proto3";
 package micromango;
 option go_package="micromango/pkg/grpc/reading";
+import "share.proto";
 
 service Reading {
   rpc GetMangaContent(MangaContentRequest) returns (MangaContentResponse);
@@ -60,7 +61,7 @@ message AddPageRequest {
   string mangaId = 1;
   string chapterId = 2;
   uint32 number = 3;
-  bytes image = 4;
+  File image = 4;
 }
 
 message PageRequest {

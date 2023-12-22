@@ -7,21 +7,25 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	pb "micromango/pkg/grpc/static"
+	"micromango/pkg/grpc/share"
 	"os"
+	"strings"
 )
 
-// ToImage converts a PNG image to JPEG format
-func ToImage(imageBytes []byte, from pb.ImageType) (image.Image, error) {
-	switch from {
-	case pb.ImageType_PNG:
-		// Decode the PNG image bytes
-		return png.Decode(bytes.NewReader(imageBytes))
-	case pb.ImageType_JPG:
-		return jpeg.Decode(bytes.NewReader(imageBytes))
+// ToImage converts an image to JPEG format
+func ToImage(image *share.File) (image.Image, error) {
+	ext, err := getMime(image.Filename)
+	if err != nil {
+		return nil, err
 	}
-
-	return nil, fmt.Errorf("unable to convert %#v to jpeg", from)
+	switch ext {
+	case "png":
+		return png.Decode(bytes.NewReader(image.File))
+	case "jpg", "jpeg":
+		return jpeg.Decode(bytes.NewReader(image.File))
+	default:
+		return nil, fmt.Errorf("unable to convert %#v to jpeg", image.Filename)
+	}
 }
 
 func Resize(src image.Image, w, h int) image.Image {
@@ -48,4 +52,13 @@ func SaveImage(path string, img image.Image) error {
 		return err
 	}
 	return nil
+}
+
+func getMime(filename string) (string, error) {
+	filename = strings.ToLower(filename)
+	nameParts := strings.Split(filename, ".")
+	if len(filename) != 2 {
+		return "", fmt.Errorf("invalid filename: %s", filename)
+	}
+	return nameParts[0], nil
 }

@@ -22,3 +22,8 @@ message AvgMangaRateResponse {
   float rate = 1;
   uint64 voters = 2;
 }
+
+message File {
+  bytes file = 1;
+  string filename = 2;
+}

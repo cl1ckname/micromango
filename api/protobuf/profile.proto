@@ -29,8 +29,9 @@ message Response {
 message UpdateRequest {
   string userId = 1;
   optional string username = 2;
-  optional bytes picture = 3;
-  optional string bio = 4;
+  optional File picture = 3;
+  optional File cover = 4;
+  optional string bio = 5;
 }
 
 message GetRequest {

@@ -27,8 +27,8 @@ type server struct {
 	pb.UnimplementedStaticServer
 }
 
-func (s *server) UploadCover(_ context.Context, req *pb.UploadCoverRequest) (*pb.UploadImageResponse, error) {
-	img, err := ToImage(req.Image, req.Type)
+func (s *server) UploadThumbnail(_ context.Context, req *pb.UploadThumbnailRequest) (*pb.UploadImageResponse, error) {
+	img, err := ToImage(req.Thumbnail)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *server) saveCoverImage(mangaId, filename string, img image.Image) error
 }
 
 func (s *server) UploadPage(_ context.Context, req *pb.UploadPageRequest) (*pb.UploadImageResponse, error) {
-	img, err := ToImage(req.Image, req.Type)
+	img, err := ToImage(req.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePi
 	}
 	profilePicturePath = path.Join(profilePicturePath, "profile.jpg")
 
-	img, err := ToImage(req.Image, req.Type)
+	img, err := ToImage(req.Picture)
 	if err != nil {
 		return nil, err
 	}

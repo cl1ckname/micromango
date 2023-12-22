@@ -1,17 +1,13 @@
 syntax = "proto3";
 package micromango;
 option go_package = "micromango/pkg/grpc/static";
+import "share.proto";
 
 service Static {
   rpc GetImage(GetImageRequest) returns (ImageResponse);
-  rpc UploadCover(UploadCoverRequest) returns (UploadImageResponse);
+  rpc UploadThumbnail(UploadThumbnailRequest) returns (UploadImageResponse);
   rpc UploadPage(UploadPageRequest) returns (UploadImageResponse);
   rpc UploadProfilePicture(UploadProfilePictureRequest) returns (UploadImageResponse);
-}
-
-enum ImageType {
-  JPG = 0;
-  PNG = 1;
 }
 
 message GetImageRequest {
@@ -22,22 +18,15 @@ message ImageResponse {
   bytes image = 1;
 }
 
-message UploadCoverRequest {
+message UploadThumbnailRequest {
   string mangaId = 1;
-  bytes image = 2;
-  ImageType type = 3;
+  File thumbnail = 2;
 }
 
 message UploadPageRequest {
   string mangaId = 1;
   string chapterId = 2;
-  bytes image = 3;
-  ImageType type = 4;
-}
-
-message UploadImageRequest {
-  bytes image = 1;
-  ImageType type = 2;
+  File page = 3;
 }
 
 message UploadImageResponse {
@@ -46,6 +35,5 @@ message UploadImageResponse {
 
 message UploadProfilePictureRequest {
   string userId = 1;
-  bytes image = 2;
-  ImageType type = 4;
+  File picture = 2;
 }
