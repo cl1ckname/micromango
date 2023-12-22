@@ -82,11 +82,11 @@ func (s *catalogHandler) AddManga(ctx echo.Context) error {
 		}
 	}
 	if formFile != nil {
-		imageBytes, err := utils.ReadFormFile(formFile)
+		thumbnail, err := utils.ReadFormFile(formFile)
 		if err != nil {
 			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 		}
-		addMangaReq.Cover = imageBytes
+		addMangaReq.Thumbnail = thumbnail
 	}
 	resp, err := s.catalog.AddManga(context.TODO(), &addMangaReq)
 	if err != nil {
@@ -115,11 +115,11 @@ func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 		}
 	}
 	if formFile != nil {
-		imageBytes, err := utils.ReadFormFile(formFile)
+		cover, err := utils.ReadFormFile(formFile)
 		if err != nil {
 			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 		}
-		updateMangaReq.Cover = imageBytes
+		updateMangaReq.Cover = cover
 	}
 	res, err := s.catalog.UpdateManga(context.TODO(), &updateMangaReq)
 	if err != nil {

@@ -103,11 +103,11 @@ func (s *readingHandler) AddPage(ctx echo.Context) error {
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
-	fileBytes, err := utils.ReadFormFile(file)
+	image, err := utils.ReadFormFile(file)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
-	addMangaContentRequest.Image = fileBytes
+	addMangaContentRequest.Image = image
 	addMangaContentRequest.ChapterId = ctx.Param("chapterId")
 
 	resp, err := s.reading.AddPage(context.TODO(), &addMangaContentRequest)

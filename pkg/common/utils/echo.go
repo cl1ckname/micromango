@@ -5,13 +5,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
+	"micromango/pkg/grpc/share"
 	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-func ReadFormFile(formFile *multipart.FileHeader) ([]byte, error) {
+func ReadFormFile(formFile *multipart.FileHeader) (*share.File, error) {
 	file, err := formFile.Open()
 	if err != nil {
 		return nil, err
@@ -20,7 +21,10 @@ func ReadFormFile(formFile *multipart.FileHeader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return imageBytes, nil
+	return &share.File{
+		File:     imageBytes,
+		Filename: formFile.Filename,
+	}, nil
 }
 
 func ErrorToResponse(ctx echo.Context, err error) error {

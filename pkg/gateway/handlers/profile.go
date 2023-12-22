@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/profile"
-	"micromango/pkg/grpc/share"
 	"micromango/pkg/grpc/user"
 	"net/http"
 )
@@ -43,14 +42,11 @@ func (s *profileHandler) UpdateProfile(ctx echo.Context) error {
 		}
 	}
 	if formFile != nil {
-		imageBytes, err := utils.ReadFormFile(formFile)
+		picture, err := utils.ReadFormFile(formFile)
 		if err != nil {
 			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 		}
-		updateReq.Picture = &share.File{
-			File:     imageBytes,
-			Filename: formFile.Filename,
-		}
+		updateReq.Picture = picture
 	}
 	resp, err := s.profile.Update(context.TODO(), &updateReq)
 	if err != nil {
