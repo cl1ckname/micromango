@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"golang.org/x/image/draw"
+	"golang.org/x/image/tiff"
+	"golang.org/x/image/webp"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -23,6 +25,10 @@ func ToImage(image *share.File) (image.Image, error) {
 		return png.Decode(bytes.NewReader(image.File))
 	case "jpg", "jpeg":
 		return jpeg.Decode(bytes.NewReader(image.File))
+	case "webp":
+		return webp.Decode(bytes.NewReader(image.File))
+	case "tiff":
+		return tiff.Decode(bytes.NewReader(image.File))
 	default:
 		return nil, fmt.Errorf("unable to convert %#v to jpeg: invalid mime %s", image.Filename, ext)
 	}
