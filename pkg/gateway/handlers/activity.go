@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/activity"
@@ -27,7 +26,6 @@ func RegisterActivity(g *echo.Group, a activity.ActivityClient) {
 func (h *activityHandler) Like(ctx echo.Context) error {
 	auth, ok := ctx.Get("claims").(*user.UserResponse)
 	if !ok {
-		fmt.Println("auth", auth, ok)
 		return utils.JsonMessage(ctx, http.StatusUnauthorized, "Unauthorized")
 	}
 	mangaId := ctx.Param("mangaId")

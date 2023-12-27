@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/activity"
@@ -64,35 +63,18 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 		}
 		return nil, err
 	}
-	content, err := s.reading.GetMangaContent(ctx, &reading.MangaContentRequest{MangaId: m.MangaId.String()})
-	if err != nil {
-		log.Println("get manga", req.MangaId, "content error:", err.Error())
-		return nil, err
-	}
 	resp := m.ToResponse()
 
-	if req.UserId != nil {
-		isInResp, err := s.profile.IsInList(ctx, &profile.IsInListRequest{UserId: *req.UserId, MangaId: req.MangaId})
-		if err != nil {
-			return nil, err
-		}
-		resp.List = isInResp.In
+	content, err := s.reading.GetMangaContent(ctx, &reading.MangaContentRequest{MangaId: m.MangaId.String()})
+	if err != nil {
+		return nil, err
 	}
 	resp.Content = content
 
 	if req.UserId != nil {
-		userId := *req.UserId
-		hasLike, err := s.activity.HasLike(ctx, &activity.HasLikeRequest{MangaId: req.MangaId, UserId: userId})
-		if err != nil {
+		if err := s.attachUserMangaFields(ctx, *req.UserId, req.MangaId, resp); err != nil {
 			return nil, err
 		}
-		resp.Liked = hasLike.Has
-
-		userRate, err := s.activity.UserRate(ctx, &activity.UserRateRequest{UserId: userId, MangaId: req.MangaId})
-		if err != nil {
-			return nil, err
-		}
-		resp.UserRate = userRate.Rate
 	}
 
 	listStats, err := s.profile.ListStats(ctx, &profile.ListStatsRequests{MangaId: req.MangaId})
@@ -102,6 +84,27 @@ func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.Manga
 	resp.ListStats = listStats.Stats
 
 	return resp, nil
+}
+
+func (s *service) attachUserMangaFields(ctx context.Context, userId, mangaId string, resp *pb.MangaResponse) error {
+	isInResp, err := s.profile.IsInList(ctx, &profile.IsInListRequest{UserId: userId, MangaId: mangaId})
+	if err != nil {
+		return err
+	}
+	resp.List = isInResp.In
+
+	hasLike, err := s.activity.HasLike(ctx, &activity.HasLikeRequest{MangaId: mangaId, UserId: userId})
+	if err != nil {
+		return err
+	}
+	resp.Liked = hasLike.Has
+
+	userRate, err := s.activity.UserRate(ctx, &activity.UserRateRequest{UserId: userId, MangaId: mangaId})
+	if err != nil {
+		return err
+	}
+	resp.UserRate = userRate.Rate
+	return nil
 }
 
 func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.MangaResponse, error) {
@@ -143,15 +146,15 @@ func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*p
 	}
 
 	ms, err := GetMangas(s.db, opts)
-	mangas := make([]*share.MangaPreviewResponse, len(ms))
-	for i, m := range ms {
-		mangas[i] = &share.MangaPreviewResponse{
+	mangas := utils.Map(ms, func(m Manga) *share.MangaPreviewResponse {
+		return &share.MangaPreviewResponse{
 			MangaId: m.MangaId.String(),
 			Title:   m.Title,
 			Cover:   m.Cover,
 			Rate:    m.Rate,
 		}
-	}
+	})
+
 	return &pb.MangasResponse{Mangas: mangas}, err
 }
 
