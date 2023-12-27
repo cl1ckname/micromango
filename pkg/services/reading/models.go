@@ -8,10 +8,10 @@ import (
 
 type Chapter struct {
 	ChapterId uuid.UUID `json:"chapterId" gorm:"primaryKey;type:uuid"`
-	MangaId   uuid.UUID `json:"mangaId" gorm:"uniqueIndex;type:uuid"`
+	MangaId   uuid.UUID `json:"mangaId" gorm:"primaryKey;type:uuid"`
 	Title     string    `json:"title"`
 	Number    float32   `json:"number"`
-	Pages     []Page    `json:"pages"`
+	Pages     []Page    `json:"pages" gorm:"foreignKey:chapter_id,manga_id"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
