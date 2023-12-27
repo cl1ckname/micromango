@@ -26,6 +26,7 @@ const (
 	Activity_RateManga_FullMethodName    = "/micromango.Activity/RateManga"
 	Activity_UserRate_FullMethodName     = "/micromango.Activity/UserRate"
 	Activity_UserRateList_FullMethodName = "/micromango.Activity/UserRateList"
+	Activity_ReadChapter_FullMethodName  = "/micromango.Activity/ReadChapter"
 )
 
 // ActivityClient is the client API for Activity service.
@@ -38,6 +39,7 @@ type ActivityClient interface {
 	RateManga(ctx context.Context, in *RateMangaRequest, opts ...grpc.CallOption) (*share.Empty, error)
 	UserRate(ctx context.Context, in *UserRateRequest, opts ...grpc.CallOption) (*UserRateResponse, error)
 	UserRateList(ctx context.Context, in *UserRateListRequest, opts ...grpc.CallOption) (*UserRateListResponse, error)
+	ReadChapter(ctx context.Context, in *ReadChapterRequest, opts ...grpc.CallOption) (*share.Empty, error)
 }
 
 type activityClient struct {
@@ -102,6 +104,15 @@ func (c *activityClient) UserRateList(ctx context.Context, in *UserRateListReque
 	return out, nil
 }
 
+func (c *activityClient) ReadChapter(ctx context.Context, in *ReadChapterRequest, opts ...grpc.CallOption) (*share.Empty, error) {
+	out := new(share.Empty)
+	err := c.cc.Invoke(ctx, Activity_ReadChapter_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActivityServer is the server API for Activity service.
 // All implementations must embed UnimplementedActivityServer
 // for forward compatibility
@@ -112,6 +123,7 @@ type ActivityServer interface {
 	RateManga(context.Context, *RateMangaRequest) (*share.Empty, error)
 	UserRate(context.Context, *UserRateRequest) (*UserRateResponse, error)
 	UserRateList(context.Context, *UserRateListRequest) (*UserRateListResponse, error)
+	ReadChapter(context.Context, *ReadChapterRequest) (*share.Empty, error)
 	mustEmbedUnimplementedActivityServer()
 }
 
@@ -136,6 +148,9 @@ func (UnimplementedActivityServer) UserRate(context.Context, *UserRateRequest) (
 }
 func (UnimplementedActivityServer) UserRateList(context.Context, *UserRateListRequest) (*UserRateListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserRateList not implemented")
+}
+func (UnimplementedActivityServer) ReadChapter(context.Context, *ReadChapterRequest) (*share.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadChapter not implemented")
 }
 func (UnimplementedActivityServer) mustEmbedUnimplementedActivityServer() {}
 
@@ -258,6 +273,24 @@ func _Activity_UserRateList_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Activity_ReadChapter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadChapterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActivityServer).ReadChapter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Activity_ReadChapter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActivityServer).ReadChapter(ctx, req.(*ReadChapterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Activity_ServiceDesc is the grpc.ServiceDesc for Activity service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +321,10 @@ var Activity_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserRateList",
 			Handler:    _Activity_UserRateList_Handler,
+		},
+		{
+			MethodName: "ReadChapter",
+			Handler:    _Activity_ReadChapter_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

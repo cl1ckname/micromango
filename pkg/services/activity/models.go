@@ -33,3 +33,14 @@ type AvgRateEntry struct {
 	Rate   float32
 	Voters uint64
 }
+
+type ReadRecord struct {
+	ChapterId uuid.UUID `gorm:"primaryKey; type:uuid"`
+	UserId    uuid.UUID `gorm:"primaryKey; type:uuid"`
+	CreatedAt time.Time
+}
+
+func (rr *ReadRecord) BeforeCreate(*gorm.DB) error {
+	rr.CreatedAt = time.Now()
+	return nil
+}

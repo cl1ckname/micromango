@@ -11,6 +11,7 @@ service Activity {
   rpc RateManga(RateMangaRequest) returns (Empty);
   rpc UserRate(UserRateRequest) returns (UserRateResponse);
   rpc UserRateList(UserRateListRequest) returns (UserRateListResponse);
+  rpc ReadChapter(ReadChapterRequest) returns (Empty);
 }
 
 message LikeRequest {
@@ -54,4 +55,9 @@ message UserRateListRequest {
 
 message UserRateListResponse {
   map<string, uint32> rates = 1;
+}
+
+message ReadChapterRequest {
+  string userId = 1;
+  string chapterId = 2;
 }

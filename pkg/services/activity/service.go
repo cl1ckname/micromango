@@ -149,3 +149,19 @@ func (s *service) UserRateList(_ context.Context, req *pb.UserRateListRequest) (
 	}
 	return &resp, nil
 }
+
+func (s *service) ReadChapter(_ context.Context, req *pb.ReadChapterRequest) (*share.Empty, error) {
+	chapterId, err := uuid.Parse(req.ChapterId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := ReadChapter(s.db, userId, chapterId); err != nil {
+		return nil, err
+	}
+	return &share.Empty{}, nil
+}

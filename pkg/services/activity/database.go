@@ -33,6 +33,9 @@ func Connect(addr string) *gorm.DB {
 	if err := db.AutoMigrate(&RateRecord{}); err != nil {
 		panic(err)
 	}
+	if err := db.AutoMigrate(&ReadRecord{}); err != nil {
+		panic(err)
+	}
 	return db
 }
 
@@ -110,4 +113,12 @@ func RateList(db *gorm.DB, userId uuid.UUID, mangaIds []string) ([]RateRecord, e
 		Where("user_id = ? and manga_id in (?)", userId, mangaIds).
 		Scan(&resp).Error
 	return resp, err
+}
+
+func ReadChapter(db *gorm.DB, userId, chapterId uuid.UUID) error {
+	rr := ReadRecord{
+		ChapterId: chapterId,
+		UserId:    userId,
+	}
+	return db.Save(&rr).Error
 }
