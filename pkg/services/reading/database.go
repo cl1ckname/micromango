@@ -38,12 +38,15 @@ func Connect(addr string) *gorm.DB {
 	return db
 }
 
-func getMangaContent(db *gorm.DB, mangaId string) (m []Chapter, err error) {
+func getMangaContent(db *gorm.DB, mangaId string) (m []ChapterHead, err error) {
 	mangaUUID, err := uuid.Parse(mangaId)
 	if err != nil {
 		return nil, err
 	}
-	err = db.Find(&m, &Chapter{MangaId: mangaUUID}).Error
+	sql := `SELECT c.chapter_id, c.number, title, count(p.chapter_id) as pages, created_at  
+    FROM chapters c LEFT JOIN pages p on c.chapter_id = p.chapter_id and c.manga_id = p.manga_id
+    WHERE c.manga_id = ? GROUP BY c.chapter_id`
+	err = db.Raw(sql, mangaUUID).Scan(&m).Error
 	return
 }
 

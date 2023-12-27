@@ -21,7 +21,7 @@ func RegisterActivity(g *echo.Group, a activity.ActivityClient) {
 	activityGroup.POST("/manga/:mangaId/like", h.Like)
 	activityGroup.DELETE("/manga/:mangaId/like", h.Dislike)
 	activityGroup.POST("/manga/:mangaId/rate", h.Rate)
-	activityGroup.POST("/chapter/:chapterId/read", h.Read)
+	activityGroup.POST("/chapter/:chapterId", h.Read)
 }
 
 func (h *activityHandler) Like(ctx echo.Context) error {

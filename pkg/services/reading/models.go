@@ -37,3 +37,11 @@ func (page *Page) BeforeCreate(*gorm.DB) error {
 	}
 	return nil
 }
+
+type ChapterHead struct {
+	ChapterId string    `json:"chapterId"`
+	Number    float32   `json:"number"`
+	Title     string    `json:"title"`
+	Pages     uint32    `json:"uint32"`
+	CreatedAt time.Time `json:"createdAt"`
+}

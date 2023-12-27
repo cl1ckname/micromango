@@ -1,6 +1,6 @@
-syntax="proto3";
+syntax = "proto3";
 package micromango;
-option go_package="micromango/pkg/grpc/reading";
+option go_package = "micromango/pkg/grpc/reading";
 import "share.proto";
 
 service Reading {
@@ -22,8 +22,10 @@ message MangaContentResponse {
     string chapterId = 1;
     float number = 2;
     string title = 4;
-    string createdAt = 5;
+    uint32 pages = 5;
+    string createdAt = 6;
   }
+  string mangaId = 1;
   repeated ChapterHead chapters = 2;
 }
 

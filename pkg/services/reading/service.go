@@ -44,16 +44,18 @@ func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest
 		return nil, err
 	}
 	resp := chaptersToPb(m)
+	resp.MangaId = req.MangaId
 	return resp, nil
 }
 
-func chaptersToPb(m []Chapter) *pb.MangaContentResponse {
+func chaptersToPb(m []ChapterHead) *pb.MangaContentResponse {
 	chapters := make([]*pb.MangaContentResponse_ChapterHead, len(m))
 	for i, c := range m {
 		chapters[i] = &pb.MangaContentResponse_ChapterHead{
-			ChapterId: c.ChapterId.String(),
+			ChapterId: c.ChapterId,
 			Number:    c.Number,
 			Title:     c.Title,
+			Pages:     c.Pages,
 			CreatedAt: c.CreatedAt.String(),
 		}
 	}
