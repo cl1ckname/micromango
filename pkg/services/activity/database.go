@@ -115,10 +115,20 @@ func RateList(db *gorm.DB, userId uuid.UUID, mangaIds []string) ([]RateRecord, e
 	return resp, err
 }
 
-func ReadChapter(db *gorm.DB, userId, chapterId uuid.UUID) error {
+func ReadChapter(db *gorm.DB, userId, mangaId, chapterId uuid.UUID) error {
 	rr := ReadRecord{
+		MangaId:   mangaId,
 		ChapterId: chapterId,
 		UserId:    userId,
 	}
 	return db.Save(&rr).Error
+}
+
+func ReadChapters(db *gorm.DB, userId, mangaId uuid.UUID) (r []uuid.UUID, err error) {
+	rr := RateRecord{
+		MangaId: mangaId,
+		UserId:  userId,
+	}
+	err = db.Find(&r, &rr).Error
+	return
 }

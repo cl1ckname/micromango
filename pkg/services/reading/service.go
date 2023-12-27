@@ -10,14 +10,16 @@ import (
 	"gorm.io/gorm"
 	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
+	"micromango/pkg/grpc/activity"
 	pb "micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/static"
 )
 
 type service struct {
 	pb.UnimplementedReadingServer
-	db     *gorm.DB
-	static static.StaticClient
+	db       *gorm.DB
+	static   static.StaticClient
+	activity activity.ActivityClient
 }
 
 func Run(ctx context.Context, c Config) <-chan error {
@@ -25,9 +27,13 @@ func Run(ctx context.Context, c Config) <-chan error {
 	conn := utils.GrpcDialOrFatal(c.StaticServiceAddr)
 	staticService := static.NewStaticClient(conn)
 
+	conn = utils.GrpcDialOrFatal(c.ActivityServiceAddr)
+	activityService := activity.NewActivityClient(conn)
+
 	serv := service{
-		db:     database,
-		static: staticService,
+		db:       database,
+		static:   staticService,
+		activity: activityService,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterReadingServer(baseServer, &serv)
@@ -35,7 +41,7 @@ func Run(ctx context.Context, c Config) <-chan error {
 	return common.StartGrpcService(ctx, c.Addr, baseServer)
 }
 
-func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest) (*pb.MangaContentResponse, error) {
+func (s *service) GetMangaContent(ctx context.Context, req *pb.MangaContentRequest) (*pb.MangaContentResponse, error) {
 	m, err := getMangaContent(s.db, req.MangaId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -43,25 +49,35 @@ func (s *service) GetMangaContent(_ context.Context, req *pb.MangaContentRequest
 		}
 		return nil, err
 	}
-	resp := chaptersToPb(m)
-	resp.MangaId = req.MangaId
-	return resp, nil
-}
 
-func chaptersToPb(m []ChapterHead) *pb.MangaContentResponse {
-	chapters := make([]*pb.MangaContentResponse_ChapterHead, len(m))
-	for i, c := range m {
-		chapters[i] = &pb.MangaContentResponse_ChapterHead{
+	readSet := make(map[string]struct{})
+	if req.UserId != nil {
+		resp, err := s.activity.ReadChapters(ctx, &activity.ReadChaptersRequest{
+			UserId:  *req.UserId,
+			MangaId: req.MangaId,
+		})
+		if err != nil {
+			return nil, err
+		}
+		for _, uid := range resp.ChapterIds {
+			readSet[uid] = struct{}{}
+		}
+	}
+
+	var resp pb.MangaContentResponse
+	resp.Chapters = utils.Map(m, func(c ChapterHead) *pb.MangaContentResponse_ChapterHead {
+		_, read := readSet[c.ChapterId]
+		return &pb.MangaContentResponse_ChapterHead{
 			ChapterId: c.ChapterId,
 			Number:    c.Number,
 			Title:     c.Title,
 			Pages:     c.Pages,
+			Read:      read,
 			CreatedAt: c.CreatedAt.String(),
 		}
-	}
-	return &pb.MangaContentResponse{
-		Chapters: chapters,
-	}
+	})
+	resp.MangaId = req.MangaId
+	return &resp, nil
 }
 
 func (s *service) GetChapter(_ context.Context, req *pb.ChapterRequest) (*pb.ChapterResponse, error) {

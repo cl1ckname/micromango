@@ -16,9 +16,10 @@ func main() {
 		log.Println("Error loading .env file")
 	}
 	c := reading.Config{
-		Addr:              os.Getenv("READING_ADDR"),
-		DbAddr:            os.Getenv("READING_DB_ADDR"),
-		StaticServiceAddr: os.Getenv("STATIC_ADDR"),
+		Addr:                os.Getenv("READING_ADDR"),
+		DbAddr:              os.Getenv("READING_DB_ADDR"),
+		StaticServiceAddr:   os.Getenv("STATIC_ADDR"),
+		ActivityServiceAddr: os.Getenv("ACTIVITY_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

@@ -13,8 +13,8 @@ service Reading {
 }
 
 message MangaContentRequest {
-  // @gotags: body:manga
   string mangaId = 1;
+  optional string userId = 2;
 }
 
 message MangaContentResponse {
@@ -23,7 +23,8 @@ message MangaContentResponse {
     float number = 2;
     string title = 4;
     uint32 pages = 5;
-    string createdAt = 6;
+    bool read = 6;
+    string createdAt = 7;
   }
   string mangaId = 1;
   repeated ChapterHead chapters = 2;

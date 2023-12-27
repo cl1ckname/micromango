@@ -35,9 +35,10 @@ type AvgRateEntry struct {
 }
 
 type ReadRecord struct {
-	ChapterId uuid.UUID `gorm:"primaryKey; type:uuid"`
-	UserId    uuid.UUID `gorm:"primaryKey; type:uuid"`
-	CreatedAt time.Time
+	MangaId   uuid.UUID `gorm:"primaryKey; type:uuid" json:"mangaId"`
+	ChapterId uuid.UUID `gorm:"primaryKey; type:uuid" json:"chapterId"`
+	UserId    uuid.UUID `gorm:"primaryKey; type:uuid" json:"userId"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func (rr *ReadRecord) BeforeCreate(*gorm.DB) error {

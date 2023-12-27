@@ -151,6 +151,10 @@ func (s *service) UserRateList(_ context.Context, req *pb.UserRateListRequest) (
 }
 
 func (s *service) ReadChapter(_ context.Context, req *pb.ReadChapterRequest) (*share.Empty, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
 	chapterId, err := uuid.Parse(req.ChapterId)
 	if err != nil {
 		return nil, err
@@ -160,8 +164,27 @@ func (s *service) ReadChapter(_ context.Context, req *pb.ReadChapterRequest) (*s
 		return nil, err
 	}
 
-	if err := ReadChapter(s.db, userId, chapterId); err != nil {
+	if err := ReadChapter(s.db, userId, mangaId, chapterId); err != nil {
 		return nil, err
 	}
 	return &share.Empty{}, nil
+}
+
+func (s *service) ReadChapters(_ context.Context, req *pb.ReadChaptersRequest) (*pb.ReadChaptersResponse, error) {
+	mangaId, err := uuid.Parse(req.MangaId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	uids, err := ReadChapters(s.db, userId, mangaId)
+	if err != nil {
+		return nil, err
+	}
+	suids := utils.Map(uids, func(u uuid.UUID) string {
+		return u.String()
+	})
+	return &pb.ReadChaptersResponse{ChapterIds: suids}, nil
 }
