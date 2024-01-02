@@ -13,16 +13,25 @@ type Manga struct {
 	Title       string    `json:"title"`
 	Cover       string    `json:"cover"`
 	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
 	Genres      []Genre   `json:"genres" gorm:"many2many:manga_genres"`
 	Rate        float32   `json:"rate"`
 	Rates       uint64    `json:"rates"`
 	Likes       uint64    `json:"likes"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	CreatedBy   uuid.UUID `json:"createdBy"`
+	UpdatedBy   uuid.UUID `json:"updatedBy"`
 }
 
 func (m *Manga) BeforeCreate(*gorm.DB) error {
 	m.MangaId = uuid.New()
 	m.CreatedAt = time.Now()
+	m.UpdatedAt = time.Now()
+	return nil
+}
+
+func (m *Manga) BeforeSave(*gorm.DB) error {
+	m.UpdatedAt = time.Now()
 	return nil
 }
 

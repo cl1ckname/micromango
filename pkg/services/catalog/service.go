@@ -121,12 +121,19 @@ func (s *service) AddManga(ctx context.Context, req *pb.AddMangaRequest) (*pb.Ma
 		coverAddr = uploadResp.ImageId
 	}
 
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
 	m, err := AddManga(s.db, Manga{
 		MangaId:     mangaId,
 		Title:       req.Title,
 		Cover:       coverAddr,
 		Description: utils.DerefOrDefault(req.Description, ""),
 		Genres:      utils.Map(req.Genres, func(i uint32) Genre { return Genre{GenreId: int(i)} }),
+		CreatedBy:   userId,
+		UpdatedBy:   userId,
 	})
 	if err != nil {
 		return nil, err
@@ -166,6 +173,11 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 		}
 		return nil, err
 	}
+	userId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	mangaToUpdate.UpdatedBy = userId
 	mangaToUpdate.Title = utils.DerefOrDefault(req.Title, mangaToUpdate.Title)
 	mangaToUpdate.Description = utils.DerefOrDefault(req.Description, mangaToUpdate.Description)
 	genres := utils.Map(req.Genres, func(i uint32) Genre {

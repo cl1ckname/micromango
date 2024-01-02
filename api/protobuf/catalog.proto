@@ -53,18 +53,20 @@ message GetMangasRequest {
 
 message AddMangaRequest {
   string title = 1;
-  optional File thumbnail = 2;
-  optional string description = 3;
-  repeated uint32 genres = 4;
+  string userId = 2;
+  optional File thumbnail = 3;
+  optional string description = 4;
+  repeated uint32 genres = 5;
 }
 
 message UpdateMangaRequest {
   string mangaId = 1;
-  optional string title = 2;
-  optional File thumbnail = 3;
-  optional File cover = 4;
-  optional string description = 5;
-  repeated uint32 genres = 6;
+  string userId = 2;
+  optional string title = 3;
+  optional File thumbnail = 4;
+  optional File cover = 5;
+  optional string description = 6;
+  repeated uint32 genres = 7;
 }
 
 message DeleteMangaRequest {

@@ -71,7 +71,12 @@ func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 }
 
 func (s *catalogHandler) AddManga(ctx echo.Context) error {
+	auth, ok := ctx.Get("claims").(*user.UserResponse)
+	if !ok {
+		return utils.JsonMessage(ctx, http.StatusUnauthorized, "unauthorized")
+	}
 	var addMangaReq catalog.AddMangaRequest
+	addMangaReq.UserId = auth.UserId
 	addMangaReq.Title = ctx.FormValue("title")
 	addMangaReq.Genres = utils.ParseQueryIntArray[uint32](ctx.FormValue("genres"))
 	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
@@ -96,7 +101,12 @@ func (s *catalogHandler) AddManga(ctx echo.Context) error {
 }
 
 func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
+	auth, ok := ctx.Get("claims").(*user.UserResponse)
+	if !ok {
+		return utils.JsonMessage(ctx, http.StatusUnauthorized, "unauthorized")
+	}
 	var updateMangaReq catalog.UpdateMangaRequest
+	updateMangaReq.UserId = auth.UserId
 	if err := ctx.Bind(&updateMangaReq); err != nil {
 		return utils.ErrorToResponse(ctx, err)
 	}
