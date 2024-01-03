@@ -28,6 +28,20 @@ services:
     env_file:
       - .env
     network_mode: "host"
+  profile:
+    build:
+      context: .
+      dockerfile: docker/profile/Dockerfile
+    env_file:
+      - .env
+    network_mode: "host"
+  activity:
+    build:
+      context: .
+      dockerfile: docker/activity/Dockerfile
+    env_file:
+      - .env
+    network_mode: "host"
   gateway:
     build:
       context: .
@@ -36,6 +50,7 @@ services:
       - .env
     network_mode: "host"
     depends_on:
+      - activity
       - user
       - reading
       - catalog
@@ -44,6 +59,6 @@ services:
     build:
       context: micromango-client/
       dockerfile: Dockerfile
-    env_file:
-      - .env
+    environment:
+      - NEXT_PUBLIC_SERVER_ADDR=http://127.0.0.1:8080
     network_mode: "host"

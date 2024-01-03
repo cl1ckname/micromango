@@ -1,0 +1,117 @@
+# First, add the API
+apiVersion: apps/v1
+# This will be the deployment setup
+kind: Deployment
+metadata:
+  # Name your Deployment here
+  name: micromango-dep
+  labels:
+    # label your deployment
+    app: micromango-app
+spec:
+  # The number of pods/replicas to run
+  replicas: 1
+  selector:
+    matchLabels:
+      # selector to match the pod
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        # label your pod
+        app: micromango-app
+    spec:
+      containers:
+        - name: user-app
+          image: micromango-user:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50001
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: catalog-app
+          image: micromango-catalog:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50002
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        # Add the container name for Kubernetes
+        - name: static-app
+          # Add the local image name
+          image: micromango-static:latest
+          # never pull the image policy
+          imagePullPolicy: Never
+          ports:
+            # port for running the container
+            - containerPort: 50004
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: reading-app
+          image: micromango-reading:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50003
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: profile-app
+          image: micromango-profile:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50005
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: activity-app
+          image: micromango-activity:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50006
+---
+# First, add the Service API
+apiVersion: v1
+# This will be the Service setup
+kind: Service
+metadata:
+  # Your service name
+  name: micromango-src
+spec:
+  selector:
+    # selector that matches the pod
+    app: example-test-app
+  # type of service
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      # port for exposing the service
+      port: 5000
+      # port for exposing the pod
+      targetPort: 3000
+      # port for exposing the node
+      nodePort: 31110
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: micromango-settings
+data:
+  USER_ADDR: ":50001"
+  USER_DB_ADDR: "db/user.sqlite"
+  USER_SALT: "qwerty"
+  USER_JWT_SECRET: "to_generate_later"
+  CATALOG_ADDR: ":50002"
+  CATALOG_DB_ADDR: "db/catalog.sqlite"
+  READING_ADDR: ":50003"
+  READING_DB_ADDR: "db/reading.sqlite"
+  STATIC_ADDR: ":50004"
+  GATEWAY_ADDR: ":8080"
+  SERVER_ADDR: "http://127.0.0.1:8080"
+  PROFILE_ADDR: ":50005"
+  PROFILE_DB_ADDR: "db/profile.sqlite"
+  ACTIVITY_ADDR: ":50006"
+  ACTIVITY_DB_ADDR: "db/activity.sqlite"
