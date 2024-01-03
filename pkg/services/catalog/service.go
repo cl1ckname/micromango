@@ -248,3 +248,14 @@ func (s *service) SetLikes(_ context.Context, req *pb.SetLikesRequest) (*pb.Empt
 	}
 	return &pb.Empty{}, err
 }
+
+func (s *service) LastUpdates(_ context.Context, req *pb.LastUpdatesRequest) (*pb.LastUpdatesResponse, error) {
+	m, err := LastUpdates(s.db, req.Page, req.Number)
+	if err != nil {
+		return nil, err
+	}
+	responseList := utils.Map(m, func(i Manga) *share.MangaPreviewResponse {
+		return i.ToPreview()
+	})
+	return &pb.LastUpdatesResponse{Manga: responseList}, nil
+}

@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"micromango/pkg/common/utils"
 	pb "micromango/pkg/grpc/catalog"
+	"micromango/pkg/grpc/share"
 	"time"
 )
 
@@ -46,6 +47,15 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 		Rate:        m.Rate,
 		Rates:       m.Rates,
 		Likes:       m.Likes,
+	}
+}
+
+func (m *Manga) ToPreview() *share.MangaPreviewResponse {
+	return &share.MangaPreviewResponse{
+		MangaId: m.MangaId.String(),
+		Title:   m.Title,
+		Cover:   m.Cover,
+		Rate:    m.Rate,
 	}
 }
 

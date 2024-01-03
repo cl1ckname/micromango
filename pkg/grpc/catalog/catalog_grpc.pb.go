@@ -27,6 +27,7 @@ const (
 	Catalog_GetList_FullMethodName     = "/micromango.Catalog/GetList"
 	Catalog_SetAvgRate_FullMethodName  = "/micromango.Catalog/SetAvgRate"
 	Catalog_SetLikes_FullMethodName    = "/micromango.Catalog/SetLikes"
+	Catalog_LastUpdates_FullMethodName = "/micromango.Catalog/LastUpdates"
 )
 
 // CatalogClient is the client API for Catalog service.
@@ -41,6 +42,7 @@ type CatalogClient interface {
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	SetAvgRate(ctx context.Context, in *SetAvgRateRateRequest, opts ...grpc.CallOption) (*Empty, error)
 	SetLikes(ctx context.Context, in *SetLikesRequest, opts ...grpc.CallOption) (*Empty, error)
+	LastUpdates(ctx context.Context, in *LastUpdatesRequest, opts ...grpc.CallOption) (*LastUpdatesResponse, error)
 }
 
 type catalogClient struct {
@@ -123,6 +125,15 @@ func (c *catalogClient) SetLikes(ctx context.Context, in *SetLikesRequest, opts 
 	return out, nil
 }
 
+func (c *catalogClient) LastUpdates(ctx context.Context, in *LastUpdatesRequest, opts ...grpc.CallOption) (*LastUpdatesResponse, error) {
+	out := new(LastUpdatesResponse)
+	err := c.cc.Invoke(ctx, Catalog_LastUpdates_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogServer is the server API for Catalog service.
 // All implementations must embed UnimplementedCatalogServer
 // for forward compatibility
@@ -135,6 +146,7 @@ type CatalogServer interface {
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	SetAvgRate(context.Context, *SetAvgRateRateRequest) (*Empty, error)
 	SetLikes(context.Context, *SetLikesRequest) (*Empty, error)
+	LastUpdates(context.Context, *LastUpdatesRequest) (*LastUpdatesResponse, error)
 	mustEmbedUnimplementedCatalogServer()
 }
 
@@ -165,6 +177,9 @@ func (UnimplementedCatalogServer) SetAvgRate(context.Context, *SetAvgRateRateReq
 }
 func (UnimplementedCatalogServer) SetLikes(context.Context, *SetLikesRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetLikes not implemented")
+}
+func (UnimplementedCatalogServer) LastUpdates(context.Context, *LastUpdatesRequest) (*LastUpdatesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LastUpdates not implemented")
 }
 func (UnimplementedCatalogServer) mustEmbedUnimplementedCatalogServer() {}
 
@@ -323,6 +338,24 @@ func _Catalog_SetLikes_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Catalog_LastUpdates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LastUpdatesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogServer).LastUpdates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Catalog_LastUpdates_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogServer).LastUpdates(ctx, req.(*LastUpdatesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Catalog_ServiceDesc is the grpc.ServiceDesc for Catalog service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,6 +394,10 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetLikes",
 			Handler:    _Catalog_SetLikes_Handler,
+		},
+		{
+			MethodName: "LastUpdates",
+			Handler:    _Catalog_LastUpdates_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

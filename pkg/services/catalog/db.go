@@ -155,3 +155,8 @@ func LikeManga(db *gorm.DB, mangaId uuid.UUID, likes uint64) error {
 	m := Manga{MangaId: mangaId, Likes: likes}
 	return db.Updates(&m).Error
 }
+
+func LastUpdates(db *gorm.DB, page, pp uint32) (m []Manga, err error) {
+	err = db.Find(&m).Order("updated_by").Offset(int(page * pp)).Limit(int(pp)).Error
+	return
+}

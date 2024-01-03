@@ -15,6 +15,7 @@ service Catalog {
   rpc GetList(GetListRequest) returns (GetListResponse);
   rpc SetAvgRate(SetAvgRateRateRequest) returns (Empty);
   rpc SetLikes(SetLikesRequest) returns (Empty);
+  rpc LastUpdates(LastUpdatesRequest) returns (LastUpdatesResponse);
 }
 
 message MangasResponse {
@@ -90,4 +91,13 @@ message SetAvgRateRateRequest {
 message SetLikesRequest {
   string mangaId = 1;
   uint64 likes = 2;
+}
+
+message LastUpdatesRequest {
+  uint32 page = 1;
+  uint32 number = 2;
+}
+
+message LastUpdatesResponse {
+  repeated MangaPreviewResponse manga = 1;
 }
