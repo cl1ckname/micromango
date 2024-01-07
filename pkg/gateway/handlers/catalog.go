@@ -25,6 +25,9 @@ func RegisterCatalog(g *echo.Group, c catalog.CatalogClient) {
 	catalogGroup.PUT("/:mangaId", h.UpdateManga)
 	catalogGroup.DELETE("/:mangaId", h.DeleteManga)
 
+	feedGroup := g.Group("/feed")
+
+	feedGroup.GET("/updates", h.GetUpdated)
 }
 
 func (s *catalogHandler) GetManga(ctx echo.Context) error {
@@ -68,6 +71,17 @@ func (s *catalogHandler) GetMangas(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 	}
 	return ctx.JSON(http.StatusOK, mangas.Mangas)
+}
+
+func (s *catalogHandler) GetUpdated(ctx echo.Context) error {
+	mangas, err := s.catalog.LastUpdates(context.TODO(), &catalog.LastUpdatesRequest{
+		Page:   1,
+		Number: 10,
+	})
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, mangas.Manga)
 }
 
 func (s *catalogHandler) AddManga(ctx echo.Context) error {

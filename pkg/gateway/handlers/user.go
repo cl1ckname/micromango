@@ -60,5 +60,5 @@ func (s *userHandler) Login(ctx echo.Context) error {
 	publicCookie.Path = "/"
 	ctx.SetCookie(publicCookie)
 
-	return ctx.JSON(http.StatusOK, resp)
+	return ctx.JSON(http.StatusCreated, resp)
 }
