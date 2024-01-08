@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -58,7 +59,7 @@ type service struct {
 func (s *service) GetManga(ctx context.Context, req *pb.MangaRequest) (*pb.MangaResponse, error) {
 	m, err := GetManga(s.db, req.GetMangaId())
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
 		}
 		return nil, err
@@ -153,14 +154,7 @@ func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*p
 	}
 
 	ms, err := GetMangas(s.db, opts)
-	mangas := utils.Map(ms, func(m Manga) *share.MangaPreviewResponse {
-		return &share.MangaPreviewResponse{
-			MangaId: m.MangaId.String(),
-			Title:   m.Title,
-			Cover:   m.Cover,
-			Rate:    m.Rate,
-		}
-	})
+	mangas := utils.Map(ms, func(m Manga) *share.MangaPreviewResponse { return m.ToPreview() })
 
 	return &pb.MangasResponse{Mangas: mangas}, err
 }
@@ -168,7 +162,7 @@ func (s *service) GetMangas(_ context.Context, request *pb.GetMangasRequest) (*p
 func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (*pb.MangaResponse, error) {
 	mangaToUpdate, err := GetManga(s.db, req.MangaId)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, fmt.Sprintf("manga %s not found", req.MangaId))
 		}
 		return nil, err
@@ -192,7 +186,7 @@ func (s *service) UpdateManga(ctx context.Context, req *pb.UpdateMangaRequest) (
 		if err != nil {
 			return nil, err
 		}
-		mangaToUpdate.Cover = uploadResp.ImageId
+		mangaToUpdate.Thumbnail = uploadResp.ImageId
 	}
 	updatedManga, err := SaveManga(s.db, mangaToUpdate)
 	if err != nil {
@@ -215,14 +209,7 @@ func (s *service) GetList(_ context.Context, req *pb.GetListRequest) (*pb.GetLis
 		return nil, err
 	}
 
-	list := utils.Map(m, func(m Manga) *share.MangaPreviewResponse {
-		return &share.MangaPreviewResponse{
-			MangaId: m.MangaId.String(),
-			Title:   m.Title,
-			Cover:   m.Cover,
-			Rate:    m.Rate,
-		}
-	})
+	list := utils.Map(m, func(m Manga) *share.MangaPreviewResponse { return m.ToPreview() })
 
 	return &pb.GetListResponse{PreviewList: list}, nil
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -96,7 +97,7 @@ func (s *catalogHandler) AddManga(ctx echo.Context) error {
 	addMangaReq.Description = utils.Ptr(ctx.FormValue("description"))
 	formFile, err := ctx.FormFile("cover")
 	if err != nil {
-		if err != http.ErrMissingFile {
+		if !errors.Is(err, http.ErrMissingFile) {
 			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
 		}
 	}
@@ -132,19 +133,19 @@ func (s *catalogHandler) UpdateManga(ctx echo.Context) error {
 	if title := ctx.FormValue("title"); title != "" {
 		updateMangaReq.Title = utils.Ptr(title)
 	}
-	formFile, err := ctx.FormFile("cover")
+
+	thumbnail, err := utils.FormFile(ctx, "thumbnail")
 	if err != nil {
-		if err != http.ErrMissingFile {
-			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
-		}
+		return utils.ErrorToResponse(ctx, err)
 	}
-	if formFile != nil {
-		cover, err := utils.ReadFormFile(formFile)
-		if err != nil {
-			return ctx.JSON(http.StatusBadRequest, struct{ Message string }{err.Error()})
-		}
-		updateMangaReq.Cover = cover
+	updateMangaReq.Thumbnail = thumbnail
+
+	cover, err := utils.FormFile(ctx, "cover")
+	if err != nil {
+		return utils.ErrorToResponse(ctx, err)
 	}
+	updateMangaReq.Cover = cover
+
 	res, err := s.catalog.UpdateManga(context.TODO(), &updateMangaReq)
 	if err != nil {
 		return utils.ErrorToResponse(ctx, err)

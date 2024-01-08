@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -53,4 +54,15 @@ func JsonMessage(ctx echo.Context, status int, message string) error {
 	return ctx.JSON(status, struct {
 		Message string `json:"message"`
 	}{message})
+}
+
+func FormFile(ctx echo.Context, field string) (*share.File, error) {
+	formFile, err := ctx.FormFile(field)
+	if err != nil {
+		if !errors.Is(err, http.ErrMissingFile) {
+			return nil, err
+		}
+		return nil, nil
+	}
+	return ReadFormFile(formFile)
 }

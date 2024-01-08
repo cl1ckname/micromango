@@ -12,7 +12,7 @@ enum ListName {
 message MangaPreviewResponse {
   string mangaId = 1;
   string title = 2;
-  string cover = 3;
+  string thumbnail = 3;
   float rate = 4;
 }
 

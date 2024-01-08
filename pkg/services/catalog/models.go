@@ -12,6 +12,7 @@ import (
 type Manga struct {
 	MangaId     uuid.UUID `json:"mangaId" gorm:"primaryKey;type:uuid"`
 	Title       string    `json:"title"`
+	Thumbnail   string    `json:"thumbnail"`
 	Cover       string    `json:"cover"`
 	Description string    `json:"description"`
 	Genres      []Genre   `json:"genres" gorm:"many2many:manga_genres"`
@@ -37,13 +38,15 @@ func (m *Manga) BeforeSave(*gorm.DB) error {
 }
 
 func (m *Manga) ToResponse() *pb.MangaResponse {
+	genres := utils.Map(m.Genres, func(g Genre) uint32 { return uint32(g.GenreId) })
 	return &pb.MangaResponse{
 		MangaId:     m.MangaId.String(),
 		Title:       m.Title,
+		Thumbnail:   m.Thumbnail,
 		Cover:       m.Cover,
 		Description: m.Description,
 		CreatedAt:   m.CreatedAt.String(),
-		Genres:      utils.Map(m.Genres, func(g Genre) uint32 { return uint32(g.GenreId) }),
+		Genres:      genres,
 		Rate:        m.Rate,
 		Rates:       m.Rates,
 		Likes:       m.Likes,
@@ -52,10 +55,10 @@ func (m *Manga) ToResponse() *pb.MangaResponse {
 
 func (m *Manga) ToPreview() *share.MangaPreviewResponse {
 	return &share.MangaPreviewResponse{
-		MangaId: m.MangaId.String(),
-		Title:   m.Title,
-		Cover:   m.Cover,
-		Rate:    m.Rate,
+		MangaId:   m.MangaId.String(),
+		Title:     m.Title,
+		Thumbnail: m.Thumbnail,
+		Rate:      m.Rate,
 	}
 }
 

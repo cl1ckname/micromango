@@ -36,14 +36,14 @@ func (s *server) UploadThumbnail(_ context.Context, req *pb.UploadThumbnailReque
 
 	filename := uuid.NewString() + ".jpg"
 
-	if err := s.saveCoverImage(req.MangaId, filename, img); err != nil {
+	if err := s.saveThumbnailImage(req.MangaId, filename, img); err != nil {
 		return nil, err
 	}
 	extFileName := s.gatewayAddr + "/static/" + path.Join("manga", req.MangaId, filename)
 	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
-func (s *server) saveCoverImage(mangaId, filename string, img image.Image) error {
+func (s *server) saveThumbnailImage(mangaId, filename string, img image.Image) error {
 	mangaDirPath := path.Join(s.staticDir, "manga", mangaId)
 	if err := createFolderIfNotExists(mangaDirPath); err != nil {
 		return err
