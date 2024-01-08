@@ -9,5 +9,10 @@ COPY cmd ./cmd
 COPY pkg ./pkg
 COPY static ./static
 
-RUN go build -o service cmd/static/main.go
-CMD ./service
+RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=1 GOOS=linux go build -o /service -a -ldflags '-linkmode external -extldflags "-static"' cmd/static/main.go
+
+
+FROM scratch
+COPY static /static
+COPY --from=builder /service /service
+CMD ["/service"]

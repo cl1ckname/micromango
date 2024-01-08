@@ -1,6 +1,7 @@
 package activity
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -25,7 +26,7 @@ func Connect(addr string) *gorm.DB {
 		Logger: newLogger,
 	})
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to open %s: %v", addr, err))
 	}
 	if err := db.AutoMigrate(&LikeRecord{}); err != nil {
 		panic(err)

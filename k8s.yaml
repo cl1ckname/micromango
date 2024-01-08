@@ -71,6 +71,26 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 50006
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: gateway-app
+          image: micromango-gateway:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+        - name: client-app
+          image: micromango-client
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+
 ---
 # First, add the Service API
 apiVersion: v1
@@ -82,17 +102,24 @@ metadata:
 spec:
   selector:
     # selector that matches the pod
-    app: example-test-app
+    app: micromango-app
   # type of service
   type: LoadBalancer
   ports:
     - protocol: TCP
       # port for exposing the service
-      port: 5000
+      port: 8080
       # port for exposing the pod
-      targetPort: 3000
+      targetPort: 8080
       # port for exposing the node
       nodePort: 31110
+      name: api
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 31111
+      name: client
+
 
 ---
 apiVersion: v1
@@ -101,17 +128,18 @@ metadata:
   name: micromango-settings
 data:
   USER_ADDR: ":50001"
-  USER_DB_ADDR: "db/user.sqlite"
+  USER_DB_ADDR: "user.sqlite"
   USER_SALT: "qwerty"
   USER_JWT_SECRET: "to_generate_later"
   CATALOG_ADDR: ":50002"
-  CATALOG_DB_ADDR: "db/catalog.sqlite"
+  CATALOG_DB_ADDR: "catalog.sqlite"
   READING_ADDR: ":50003"
-  READING_DB_ADDR: "db/reading.sqlite"
+  READING_DB_ADDR: "reading.sqlite"
   STATIC_ADDR: ":50004"
   GATEWAY_ADDR: ":8080"
-  SERVER_ADDR: "http://127.0.0.1:8080"
+  SERVER_ADDR: "http://10.102.218.234:8080"
   PROFILE_ADDR: ":50005"
-  PROFILE_DB_ADDR: "db/profile.sqlite"
+  PROFILE_DB_ADDR: "profile.sqlite"
   ACTIVITY_ADDR: ":50006"
-  ACTIVITY_DB_ADDR: "db/activity.sqlite"
+  ACTIVITY_DB_ADDR: "activity.sqlite"
+  NEXT_PUBLIC_SERVER_ADDR: "http://10.102.218.234:8080"
