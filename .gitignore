@@ -2,7 +2,7 @@
 .env
 *.sqlite
 vendor
-static/
-/static
+/static/manga
+/static/profile
 micromango-client
 db

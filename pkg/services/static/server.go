@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc"
 	"image"
 	"io"
-	"log"
 	"micromango/pkg/common"
 	pb "micromango/pkg/grpc/static"
 	"os"
@@ -144,7 +143,6 @@ func createFolderIfNotExists(folderPath string) error {
 func (s *server) GetImage(_ context.Context, req *pb.GetImageRequest) (*pb.ImageResponse, error) {
 	id := req.ImageId
 	filepath := path.Join(s.staticDir, id)
-	log.Println(filepath)
 	f, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
