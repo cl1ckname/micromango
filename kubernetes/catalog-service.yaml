@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-catalog-dep
+  labels:
+    app: micromango-app
+    service: catalog
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: catalog
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: catalog
+    spec:
+      containers:
+        - name: catalog-app
+          image: micromango-catalog:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50002
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+  labels:
+    app: micromango-app
+    service: catalog
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: catalog
+  ports:
+    - protocol: TCP
+      port: 50002

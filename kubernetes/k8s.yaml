@@ -29,31 +29,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: micromango-catalog-dep
-  labels:
-    app: micromango-app
-spec:
-  selector:
-    matchLabels:
-      app: micromango-app
-  template:
-    metadata:
-      labels:
-        app: micromango-app
-    spec:
-      containers:
-        - name: catalog-app
-          image: micromango-catalog:latest
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 50002
-          envFrom:
-            - configMapRef:
-                name: micromango-settings
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: micromango-static-dep
   labels:
     app: micromango-app
@@ -219,13 +194,13 @@ spec:
       # port for exposing the service
       port: 8080
       # port for exposing the pod
-      targetPort: 8080
+      targetPort: gateway-app
       # port for exposing the node
       nodePort: 31110
       name: api
     - protocol: TCP
       port: 3000
-      targetPort: 3000
+      targetPort: client-app
       nodePort: 31111
       name: client
 ---
