@@ -1,24 +1,19 @@
-# First, add the API
 apiVersion: apps/v1
-# This will be the deployment setup
 kind: Deployment
 metadata:
-  # Name your Deployment here
-  name: micromango-dep
+  name: micromango-user-dep
   labels:
-    # label your deployment
     app: micromango-app
 spec:
-  # The number of pods/replicas to run
   replicas: 1
   selector:
     matchLabels:
-      # selector to match the pod
       app: micromango-app
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
-        # label your pod
         app: micromango-app
     spec:
       containers:
@@ -30,6 +25,23 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-catalog-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: catalog-app
           image: micromango-catalog:latest
           imagePullPolicy: Never
@@ -38,18 +50,48 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
-        # Add the container name for Kubernetes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-static-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: static-app
-          # Add the local image name
           image: micromango-static:latest
-          # never pull the image policy
           imagePullPolicy: Never
           ports:
-            # port for running the container
             - containerPort: 50004
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-reading-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: reading-app
           image: micromango-reading:latest
           imagePullPolicy: Never
@@ -58,6 +100,23 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-profile-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: profile-app
           image: micromango-profile:latest
           imagePullPolicy: Never
@@ -66,6 +125,23 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-activity-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: activity-app
           image: micromango-activity:latest
           imagePullPolicy: Never
@@ -74,6 +150,23 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-gateway-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: gateway-app
           image: micromango-gateway:latest
           imagePullPolicy: Never
@@ -82,6 +175,23 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-client-dep
+  labels:
+    app: micromango-app
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+    spec:
+      containers:
         - name: client-app
           image: micromango-client
           imagePullPolicy: Never
@@ -90,7 +200,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: micromango-settings
-
 ---
 # First, add the Service API
 apiVersion: v1
@@ -119,8 +228,6 @@ spec:
       targetPort: 3000
       nodePort: 31111
       name: client
-
-
 ---
 apiVersion: v1
 kind: ConfigMap
