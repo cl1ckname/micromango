@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-profile-dep
+  labels:
+    app: micromango-app
+    service: profile
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: profile
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: profile
+    spec:
+      containers:
+        - name: profile-app
+          image: micromango-profile:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50005
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: profile-service
+  labels:
+    app: micromango-app
+    service: profile
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: profile
+  ports:
+    - protocol: TCP
+      port: 50005

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-reading-dep
+  labels:
+    app: micromango-app
+    service: reading
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: reading
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: reading
+    spec:
+      containers:
+        - name: reading-app
+          image: micromango-reading:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50003
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reading-service
+  labels:
+    app: micromango-app
+    service: reading
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: reading
+  ports:
+    - protocol: TCP
+      port: 50003

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-activity-dep
+  labels:
+    app: micromango-app
+    service: activity
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: activity
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: activity
+    spec:
+      containers:
+        - name: activity-app
+          image: micromango-activity:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50006
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activity-service
+  labels:
+    app: micromango-app
+    service: activity
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: activity
+  ports:
+    - protocol: TCP
+      port: 50006

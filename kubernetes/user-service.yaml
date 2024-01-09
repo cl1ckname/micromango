@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-user-dep
+  labels:
+    app: micromango-app
+    service: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: user-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: user-service
+    spec:
+      containers:
+        - name: user-app
+          image: micromango-user:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50001
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app: micromango-app
+    service: user
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: user
+  ports:
+    - protocol: TCP
+      port: 50001

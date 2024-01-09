@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micromango-static-dep
+  labels:
+    app: micromango-app
+    service: static
+spec:
+  selector:
+    matchLabels:
+      app: micromango-app
+      service: static
+  template:
+    metadata:
+      labels:
+        app: micromango-app
+        service: static
+    spec:
+      containers:
+        - name: static-app
+          image: micromango-static:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 50004
+          envFrom:
+            - configMapRef:
+                name: micromango-settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: static-service
+  labels:
+    app: micromango-app
+    service: static
+spec:
+  type: ClusterIP
+  selector:
+    app: micromango-app
+    service: static
+  ports:
+    - protocol: TCP
+      port: 50004
