@@ -17,9 +17,8 @@ func main() {
 	}
 
 	config := static.Config{
-		ServerAddr:  os.Getenv("STATIC_ADDR"),
-		GatewayAddr: os.Getenv("SERVER_ADDR"),
-		StaticDir:   "static",
+		ServerAddr: os.Getenv("STATIC_ADDR"),
+		StaticDir:  "static",
 	}
 	log.Println(os.Getenv("SERVER_ADDR"))
 	ctx, cancel := context.WithCancel(context.Background())

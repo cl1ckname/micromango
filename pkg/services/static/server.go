@@ -15,14 +15,12 @@ import (
 )
 
 type Config struct {
-	ServerAddr  string
-	GatewayAddr string
-	StaticDir   string
+	ServerAddr string
+	StaticDir  string
 }
 
 type server struct {
-	staticDir   string
-	gatewayAddr string
+	staticDir string
 	pb.UnimplementedStaticServer
 }
 
@@ -38,7 +36,7 @@ func (s *server) UploadThumbnail(_ context.Context, req *pb.UploadThumbnailReque
 	if err := s.saveThumbnailImage(req.MangaId, filename, img); err != nil {
 		return nil, err
 	}
-	extFileName := s.gatewayAddr + "/static/" + path.Join("manga", req.MangaId, filename)
+	extFileName := "/static/" + path.Join("manga", req.MangaId, filename)
 	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
@@ -63,7 +61,7 @@ func (s *server) UploadPage(_ context.Context, req *pb.UploadPageRequest) (*pb.U
 		return nil, err
 	}
 
-	extFileName := s.gatewayAddr + "/static/" + path.Join("manga", req.MangaId, req.ChapterId, filename)
+	extFileName := "/static/" + path.Join("manga", req.MangaId, req.ChapterId, filename)
 	return &pb.UploadImageResponse{ImageId: extFileName}, nil
 }
 
@@ -99,7 +97,7 @@ func (s *server) UploadProfilePicture(_ context.Context, req *pb.UploadProfilePi
 	if err := SaveImage(profilePicturePath, img); err != nil {
 		return nil, err
 	}
-	extPath := s.gatewayAddr + "/" + path.Join("static", "profile", req.UserId, "profile.jpg")
+	extPath := "/" + path.Join("static", "profile", req.UserId, "profile.jpg")
 	return &pb.UploadImageResponse{ImageId: extPath}, nil
 }
 
@@ -122,7 +120,7 @@ func (s *server) UploadProfileCover(_ context.Context, req *pb.UploadProfileCove
 	if err := SaveImage(coverPicturePath, img); err != nil {
 		return nil, err
 	}
-	extPath := s.gatewayAddr + "/" + path.Join("static", "profile", req.UserId, "cover.jpg")
+	extPath := "/" + path.Join("static", "profile", req.UserId, "cover.jpg")
 	return &pb.UploadImageResponse{ImageId: extPath}, nil
 }
 
@@ -162,8 +160,7 @@ func Run(ctx context.Context, c Config) <-chan error {
 		panic(err)
 	}
 	s := server{
-		staticDir:   c.StaticDir,
-		gatewayAddr: c.GatewayAddr,
+		staticDir: c.StaticDir,
 	}
 	baseServer := grpc.NewServer()
 	pb.RegisterStaticServer(baseServer, &s)
