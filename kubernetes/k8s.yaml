@@ -25,6 +25,7 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+              name: gateway-port
           envFrom:
             - configMapRef:
                 name: micromango-settings
@@ -56,6 +57,11 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_SERVER_ADDR
+              value: "http://127.0.0.1:8080"
+            - name: SERVER_ADDR
+              value: "http://micromango-src:8080"
           envFrom:
             - configMapRef:
                 name: micromango-settings
@@ -107,4 +113,4 @@ data:
   PROFILE_DB_ADDR: "profile.sqlite"
   ACTIVITY_ADDR: "activity-service:50006"
   ACTIVITY_DB_ADDR: "activity.sqlite"
-  NEXT_PUBLIC_SERVER_ADDR: "http://10.102.218.234:8080"
+  NEXT_PUBLIC_SERVER_ADDR: "http://127.0.0.1:8080"

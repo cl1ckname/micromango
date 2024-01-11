@@ -22,6 +22,10 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 50005
+              name: profile-port
+          env:
+            - name: PROFILE_ADDR
+              value: :50005
           envFrom:
             - configMapRef:
                 name: micromango-settings
@@ -41,3 +45,4 @@ spec:
   ports:
     - protocol: TCP
       port: 50005
+      targetPort: profile-port

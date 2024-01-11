@@ -22,6 +22,10 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 50004
+              name: static-port
+          env:
+            - name: STATIC_ADDR
+              value: :50004
           envFrom:
             - configMapRef:
                 name: micromango-settings
@@ -41,3 +45,4 @@ spec:
   ports:
     - protocol: TCP
       port: 50004
+      targetPort: static-port
