@@ -4,20 +4,20 @@ metadata:
   name: micromango-user-dep
   labels:
     app: micromango-app
-    service: user-service
+    service: user
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: micromango-app
-      service: user-service
+      service: user
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: micromango-app
-        service: user-service
+        service: user
     spec:
       containers:
         - name: user-app
@@ -25,6 +25,10 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 50001
+              name: user-port
+          env:
+            - name: USER_ADDR
+              value: ":50001"
           envFrom:
             - configMapRef:
                 name: micromango-settings
@@ -44,3 +48,4 @@ spec:
   ports:
     - protocol: TCP
       port: 50001
+      targetPort: user-port

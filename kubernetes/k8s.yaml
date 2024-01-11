@@ -4,14 +4,20 @@ metadata:
   name: micromango-gateway-dep
   labels:
     app: micromango-app
+    service: gateway-service
+    tier: api
 spec:
   selector:
     matchLabels:
       app: micromango-app
+      service: gateway-service
+      tier: api
   template:
     metadata:
       labels:
         app: micromango-app
+        service: gateway-service
+        tier: api
     spec:
       containers:
         - name: gateway-app
@@ -29,14 +35,20 @@ metadata:
   name: micromango-client-dep
   labels:
     app: micromango-app
+    service: client-service
+    tier: api
 spec:
   selector:
     matchLabels:
       app: micromango-app
+      service: client-service
+      tier: api
   template:
     metadata:
       labels:
         app: micromango-app
+        service: client-service
+        tier: api
     spec:
       containers:
         - name: client-app
@@ -55,25 +67,24 @@ kind: Service
 metadata:
   # Your service name
   name: micromango-src
+  labels:
+    app: micromango-app
+    tier: api
 spec:
   selector:
-    # selector that matches the pod
     app: micromango-app
+    tier: api
   # type of service
   type: LoadBalancer
   ports:
     - protocol: TCP
       # port for exposing the service
       port: 8080
-      # port for exposing the pod
-      targetPort: gateway-app
-      # port for exposing the node
-      nodePort: 31110
+      targetPort: 8080
       name: api
     - protocol: TCP
       port: 3000
-      targetPort: client-app
-      nodePort: 31111
+      targetPort: 3000
       name: client
 ---
 apiVersion: v1
@@ -81,19 +92,19 @@ kind: ConfigMap
 metadata:
   name: micromango-settings
 data:
-  USER_ADDR: ":50001"
+  USER_ADDR: "user-service:50001"
   USER_DB_ADDR: "user.sqlite"
   USER_SALT: "qwerty"
   USER_JWT_SECRET: "to_generate_later"
-  CATALOG_ADDR: ":50002"
+  CATALOG_ADDR: "catalog-service:50002"
   CATALOG_DB_ADDR: "catalog.sqlite"
-  READING_ADDR: ":50003"
+  READING_ADDR: "reading-service:50003"
   READING_DB_ADDR: "reading.sqlite"
-  STATIC_ADDR: ":50004"
+  STATIC_ADDR: "static-service:50004"
   GATEWAY_ADDR: ":8080"
   SERVER_ADDR: "http://10.102.218.234:8080"
-  PROFILE_ADDR: ":50005"
+  PROFILE_ADDR: "profile-service:50005"
   PROFILE_DB_ADDR: "profile.sqlite"
-  ACTIVITY_ADDR: ":50006"
+  ACTIVITY_ADDR: "activity-service:50006"
   ACTIVITY_DB_ADDR: "activity.sqlite"
   NEXT_PUBLIC_SERVER_ADDR: "http://10.102.218.234:8080"

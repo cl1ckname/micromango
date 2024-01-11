@@ -14,7 +14,7 @@ func StartGrpcService(ctx context.Context, addr string, baseServer *grpc.Server)
 	}
 	ok := make(chan error)
 	go func() {
-		log.Info("Starting catalog service on ", addr)
+		log.Info("Starting service on ", addr)
 		if err := baseServer.Serve(lis); err != nil {
 			log.Fatal("Server stopped: ", err.Error())
 			ok <- err
