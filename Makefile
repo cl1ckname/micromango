@@ -15,3 +15,6 @@ down:
 	pm2 stop ecosystem.config.js
 sql:
 	sqlite3 db/catalog.sqlite3 < sql/genres.sql
+
+mk:
+	minikube start --mount --mount-string="./static:/static" --driver=docker

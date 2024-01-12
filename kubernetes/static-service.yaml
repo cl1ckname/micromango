@@ -26,9 +26,18 @@ spec:
           env:
             - name: STATIC_ADDR
               value: :50004
+            - name: STATIC_DIR
+              value: /static
           envFrom:
             - configMapRef:
                 name: micromango-settings
+          volumeMounts:
+            - mountPath: /static
+              name: static
+      volumes:
+        - name: static
+          hostPath:
+            path: /static
 ---
 apiVersion: v1
 kind: Service
@@ -46,3 +55,4 @@ spec:
     - protocol: TCP
       port: 50004
       targetPort: static-port
+---

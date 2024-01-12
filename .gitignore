@@ -6,3 +6,4 @@ vendor
 /static/profile
 micromango-client
 db
+minikube.PID
