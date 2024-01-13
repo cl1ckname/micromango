@@ -10,6 +10,9 @@ services:
       - ./db:/app/db
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   reading:
     build:
       context: .
@@ -20,6 +23,9 @@ services:
       - ./db:/app/db
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   catalog:
     build:
       context: .
@@ -30,6 +36,9 @@ services:
       - ./db:/app/db
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   static:
     build:
       context: .
@@ -38,6 +47,9 @@ services:
       - .docker-env
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   profile:
     build:
       context: .
@@ -48,6 +60,9 @@ services:
       - ./db:/app/db
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   activity:
     build:
       context: .
@@ -58,6 +73,9 @@ services:
       - ./db:/app/db
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   gateway:
     build:
       context: .
@@ -75,6 +93,9 @@ services:
       - reading
       - catalog
       - static
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   client:
     build:
       context: micromango-client/
@@ -86,6 +107,9 @@ services:
       - "3000:3000"
     networks:
       - micromango
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
   grafana:
     image: grafana/grafana:7.5.17
     ports:
@@ -96,11 +120,15 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
+    networks:
+      - grafanaloki
   loki:
     image: grafana/loki:main
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - grafanaloki
   promtail:
     image: grafana/promtail:main
     container_name: promtail
@@ -111,6 +139,9 @@ services:
     command: -config.file=/etc/promtail/promtail.yaml
     depends_on:
       - loki
+    networks:
+      - grafanaloki
 
 networks:
   micromango:
+  grafanaloki:
