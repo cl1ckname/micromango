@@ -5,52 +5,72 @@ services:
       context: .
       dockerfile: docker/user/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    volumes:
+      - ./db:/app/db
+    networks:
+      - micromango
   reading:
     build:
       context: .
       dockerfile: docker/reading/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    volumes:
+      - ./db:/app/db
+    networks:
+      - micromango
   catalog:
     build:
       context: .
       dockerfile: docker/catalog/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    volumes:
+      - ./db:/app/db
+    networks:
+      - micromango
   static:
     build:
       context: .
       dockerfile: docker/static/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    networks:
+      - micromango
   profile:
     build:
       context: .
       dockerfile: docker/profile/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    volumes:
+      - ./db:/app/db
+    networks:
+      - micromango
   activity:
     build:
       context: .
       dockerfile: docker/activity/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    volumes:
+      - ./db:/app/db
+    networks:
+      - micromango
   gateway:
     build:
       context: .
       dockerfile: docker/gateway/Dockerfile
     env_file:
-      - .env
-    network_mode: "host"
+      - .docker-env
+    networks:
+      - micromango
+    ports:
+      - "8080:8080"
     depends_on:
       - activity
+      - profile
       - user
       - reading
       - catalog
@@ -61,4 +81,36 @@ services:
       dockerfile: Dockerfile
     environment:
       - NEXT_PUBLIC_SERVER_ADDR=http://127.0.0.1:8080
-    network_mode: "host"
+      - SERVER_ADDR=http://gateway:8080
+    ports:
+      - "3000:3000"
+    networks:
+      - micromango
+  grafana:
+    image: grafana/grafana:7.5.17
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+  loki:
+    image: grafana/loki:main
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+  promtail:
+    image: grafana/promtail:main
+    container_name: promtail
+    volumes:
+      - ./config/promtail.yaml:/etc/promtail/promtail.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/promtail.yaml
+    depends_on:
+      - loki
+
+networks:
+  micromango:

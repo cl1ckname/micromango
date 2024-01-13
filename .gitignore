@@ -1,5 +1,6 @@
 .idea/
 .env
+.docker-env
 *.sqlite
 vendor
 /static/manga
