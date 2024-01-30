@@ -4,44 +4,27 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"micromango/pkg/common"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/grpc/activity"
 	pb "micromango/pkg/grpc/reading"
 	"micromango/pkg/grpc/static"
 )
 
-type service struct {
+type Service struct {
 	pb.UnimplementedReadingServer
 	db       *gorm.DB
 	static   static.StaticClient
 	activity activity.ActivityClient
 }
 
-func Run(ctx context.Context, c Config) <-chan error {
-	database := Connect(c.DbAddr)
-	conn := utils.GrpcDialOrFatal(c.StaticServiceAddr)
-	staticService := static.NewStaticClient(conn)
-
-	conn = utils.GrpcDialOrFatal(c.ActivityServiceAddr)
-	activityService := activity.NewActivityClient(conn)
-
-	serv := service{
-		db:       database,
-		static:   staticService,
-		activity: activityService,
-	}
-	baseServer := grpc.NewServer()
-	pb.RegisterReadingServer(baseServer, &serv)
-
-	return common.StartGrpcService(ctx, c.Addr, baseServer)
+func New(db *gorm.DB, static static.StaticClient, activity activity.ActivityClient) *Service {
+	return &Service{db: db, static: static, activity: activity}
 }
 
-func (s *service) GetMangaContent(ctx context.Context, req *pb.MangaContentRequest) (*pb.MangaContentResponse, error) {
+func (s *Service) GetMangaContent(ctx context.Context, req *pb.MangaContentRequest) (*pb.MangaContentResponse, error) {
 	m, err := getMangaContent(s.db, req.MangaId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -80,7 +63,7 @@ func (s *service) GetMangaContent(ctx context.Context, req *pb.MangaContentReque
 	return &resp, nil
 }
 
-func (s *service) GetChapter(_ context.Context, req *pb.ChapterRequest) (*pb.ChapterResponse, error) {
+func (s *Service) GetChapter(_ context.Context, req *pb.ChapterRequest) (*pb.ChapterResponse, error) {
 	c, err := getChapter(s.db, req.ChapterId)
 	if err != nil {
 		return nil, err
@@ -88,7 +71,7 @@ func (s *service) GetChapter(_ context.Context, req *pb.ChapterRequest) (*pb.Cha
 	return chapterToPb(c), nil
 }
 
-func (s *service) AddChapter(_ context.Context, req *pb.AddChapterRequest) (*pb.ChapterResponse, error) {
+func (s *Service) AddChapter(_ context.Context, req *pb.AddChapterRequest) (*pb.ChapterResponse, error) {
 	c, err := addChapter(s.db, req)
 	if err != nil {
 		return nil, err
@@ -96,7 +79,7 @@ func (s *service) AddChapter(_ context.Context, req *pb.AddChapterRequest) (*pb.
 	return chapterToPb(c), nil
 }
 
-func (s *service) UpdateChapter(_ context.Context, req *pb.UpdateChapterRequest) (*pb.ChapterResponse, error) {
+func (s *Service) UpdateChapter(_ context.Context, req *pb.UpdateChapterRequest) (*pb.ChapterResponse, error) {
 	c, err := updateChapter(s.db, req)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -126,7 +109,7 @@ func chapterToPb(c Chapter) *pb.ChapterResponse {
 	}
 }
 
-func (s *service) GetPage(_ context.Context, req *pb.PageRequest) (*pb.PageResponse, error) {
+func (s *Service) GetPage(_ context.Context, req *pb.PageRequest) (*pb.PageResponse, error) {
 	p, err := getPage(s.db, req.PageId)
 	if err != nil {
 		return nil, err
@@ -134,7 +117,7 @@ func (s *service) GetPage(_ context.Context, req *pb.PageRequest) (*pb.PageRespo
 	return pageToPB(p), nil
 }
 
-func (s *service) AddPage(ctx context.Context, req *pb.AddPageRequest) (*pb.PageResponse, error) {
+func (s *Service) AddPage(ctx context.Context, req *pb.AddPageRequest) (*pb.PageResponse, error) {
 	var imageUrl string
 	if req.Image != nil {
 		res, err := s.static.UploadPage(ctx, &static.UploadPageRequest{

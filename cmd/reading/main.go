@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"micromango/pkg/services/reading"
+	"micromango/pkg/services/reading/app"
 	"os"
 	"os/signal"
 	"syscall"
@@ -23,7 +24,7 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	ok := reading.Run(ctx, c)
+	ok := app.Run(ctx, c)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
