@@ -1,67 +1,12 @@
 package usecases
 
 import (
-	commonerr "micromango/pkg/common/errors"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/services/reading/entity"
+	"micromango/pkg/services/reading/mock"
 	"reflect"
 	"testing"
 )
-
-var testChapters = map[string]entity.Chapter{
-	"1": {
-		ChapterId: "1",
-		MangaId:   "1",
-		Number:    1,
-		Title:     "title",
-		Pages:     []entity.Page{{PageId: "1", MangaId: "1", ChapterId: "1", Number: 1}},
-	},
-	"2": {
-		ChapterId: "2",
-		MangaId:   "1",
-		Number:    2,
-		Title:     "title2",
-		Pages:     []entity.Page{{PageId: "2", MangaId: "1", ChapterId: "1", Number: 2}},
-	},
-	"3": {
-		ChapterId: "3",
-		MangaId:   "1",
-		Number:    3,
-		Title:     "title3",
-		Pages:     []entity.Page{{PageId: "3", MangaId: "1", ChapterId: "1", Number: 3}},
-	},
-}
-
-// Mock for chapter repository
-type ChapterRepositoryMock struct{}
-
-func (c *ChapterRepositoryMock) GetContent(_ string) ([]entity.Chapter, error) {
-	var chapters []entity.Chapter
-	for _, chapter := range []string{"1", "2", "3"} {
-		chapters = append(chapters, testChapters[chapter])
-	}
-	return chapters, nil
-}
-
-func (c *ChapterRepositoryMock) GetChapter(chapterId string) (entity.Chapter, error) {
-	chapter, ok := testChapters[chapterId]
-	if !ok {
-		return entity.Chapter{}, &commonerr.ErrNotFound{}
-	}
-	return chapter, nil
-}
-
-func (c *ChapterRepositoryMock) SaveChapter(chapter entity.Chapter) (entity.Chapter, error) {
-	chapter.ChapterId = "1"
-	return chapter, nil
-}
-
-// Mock for activity service
-type ActivityServiceMock struct{}
-
-func (a *ActivityServiceMock) GetReadChapters(_ string, _ string) ([]string, error) {
-	return []string{"1", "2"}, nil
-}
 
 func TestChapter_AddChapter(t *testing.T) {
 	type fields struct {
@@ -82,8 +27,8 @@ func TestChapter_AddChapter(t *testing.T) {
 		{
 			name: "Add chapter",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args:    args{chapter: entity.Chapter{MangaId: "1", Number: 3, Title: "Chapter 1"}},
 			want:    entity.Chapter{MangaId: "1", ChapterId: "1", Number: 3, Title: "Chapter 1"},
@@ -92,8 +37,8 @@ func TestChapter_AddChapter(t *testing.T) {
 		{
 			name: "Add chapter 2",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args:    args{chapter: entity.Chapter{MangaId: "1", Number: 2, Title: "Chapter 2"}},
 			want:    entity.Chapter{MangaId: "1", ChapterId: "1", Number: 2, Title: "Chapter 2"},
@@ -136,8 +81,8 @@ func TestChapter_GetChapter(t *testing.T) {
 		{
 			name: "Get chapter",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args: args{chapterId: "1"},
 			want: entity.Chapter{MangaId: "1", ChapterId: "1", Number: 1, Title: "title", Pages: []entity.Page{{
@@ -186,8 +131,8 @@ func TestChapter_GetMangaContent(t *testing.T) {
 		{
 			name: "Get manga content with user",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args: args{mangaId: "1", userId: utils.Ptr("user")},
 			want: []entity.ChapterHead{
@@ -200,8 +145,8 @@ func TestChapter_GetMangaContent(t *testing.T) {
 		{
 			name: "Get manga content without user",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args: args{mangaId: "1", userId: nil},
 			want: []entity.ChapterHead{
@@ -249,8 +194,8 @@ func TestChapter_UpdateChapter(t *testing.T) {
 		{
 			name: "Update chapter",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args: args{chapterId: "1", data: entity.UpdateChapterDto{Number: utils.Ptr[float32](2), Title: utils.Ptr("Chapter 1")}},
 			want: entity.Chapter{MangaId: "1", ChapterId: "1", Number: 2, Title: "Chapter 1", Pages: []entity.Page{{
@@ -264,8 +209,8 @@ func TestChapter_UpdateChapter(t *testing.T) {
 		{
 			name: "Not found for update chapter",
 			fields: fields{
-				Repository: &ChapterRepositoryMock{},
-				Activity:   &ActivityServiceMock{},
+				Repository: &mock.ChapterRepository{},
+				Activity:   &mock.ActivityServiceMock{},
 			},
 			args:    args{chapterId: "5", data: entity.UpdateChapterDto{}},
 			want:    entity.Chapter{},

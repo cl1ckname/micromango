@@ -2,31 +2,11 @@ package usecases
 
 import (
 	"micromango/pkg/common"
-	"micromango/pkg/common/errors"
 	"micromango/pkg/services/reading/entity"
+	"micromango/pkg/services/reading/mock"
 	"reflect"
 	"testing"
 )
-
-type PageRepositoryMock struct{}
-
-func (p *PageRepositoryMock) GetPage(pageId string) (entity.Page, error) {
-	if pageId == "0" {
-		return entity.Page{}, errors.ThrowNotFound("not found")
-	}
-	return entity.Page{PageId: pageId, Number: 1, ChapterId: "1", MangaId: "1"}, nil
-}
-
-func (p *PageRepositoryMock) SavePage(page entity.Page) (entity.Page, error) {
-	page.PageId = "0"
-	return page, nil
-}
-
-type StaticServiceMock struct{}
-
-func (s *StaticServiceMock) UploadPage(_ string, _ string, _ common.File) (string, error) {
-	return "path/to/file", nil
-}
 
 func TestPage_AddPage(t *testing.T) {
 	type fields struct {
@@ -46,8 +26,8 @@ func TestPage_AddPage(t *testing.T) {
 		{
 			name: "Add page without image",
 			fields: fields{
-				Repository: &PageRepositoryMock{},
-				Static:     &StaticServiceMock{},
+				Repository: &mock.PageRepository{},
+				Static:     &mock.StaticServiceMock{},
 			},
 			args: args{dto: entity.AddPageDto{MangaId: "1", ChapterId: "2", Number: 3}},
 			wantRes: entity.Page{
@@ -62,8 +42,8 @@ func TestPage_AddPage(t *testing.T) {
 		{
 			name: "Add page with image",
 			fields: fields{
-				Repository: &PageRepositoryMock{},
-				Static:     &StaticServiceMock{},
+				Repository: &mock.PageRepository{},
+				Static:     &mock.StaticServiceMock{},
 			},
 			args: args{dto: entity.AddPageDto{MangaId: "1", ChapterId: "2", Number: 3, Image: &common.File{}}},
 			wantRes: entity.Page{
@@ -112,8 +92,8 @@ func TestPage_GetPage(t *testing.T) {
 		{
 			name: "Get page 1",
 			fields: fields{
-				Repository: &PageRepositoryMock{},
-				Static:     &StaticServiceMock{},
+				Repository: &mock.PageRepository{},
+				Static:     &mock.StaticServiceMock{},
 			},
 			args:    args{pageId: "1"},
 			want:    entity.Page{PageId: "1", Number: 1, ChapterId: "1", MangaId: "1"},
@@ -122,8 +102,8 @@ func TestPage_GetPage(t *testing.T) {
 		{
 			name: "Get page not found",
 			fields: fields{
-				Repository: &PageRepositoryMock{},
-				Static:     &StaticServiceMock{},
+				Repository: &mock.PageRepository{},
+				Static:     &mock.StaticServiceMock{},
 			},
 			args:    args{pageId: "0"},
 			want:    entity.Page{},
@@ -132,8 +112,8 @@ func TestPage_GetPage(t *testing.T) {
 		{
 			name: "Get page 2",
 			fields: fields{
-				Repository: &PageRepositoryMock{},
-				Static:     &StaticServiceMock{},
+				Repository: &mock.PageRepository{},
+				Static:     &mock.StaticServiceMock{},
 			},
 			args:    args{pageId: "2"},
 			want:    entity.Page{PageId: "2", Number: 1, ChapterId: "1", MangaId: "1"},

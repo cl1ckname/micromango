@@ -36,8 +36,9 @@ func ChapterToHead(c entity.ChapterHead) *pb.MangaContentResponse_ChapterHead {
 
 func PageToPb(p entity.Page) *pb.PageResponse {
 	return &pb.PageResponse{
-		PageId: p.PageId,
-		Number: p.Number,
-		Image:  p.Image,
+		PageId:    p.PageId,
+		Number:    p.Number,
+		ChapterId: p.ChapterId,
+		Image:     p.Image,
 	}
 }
