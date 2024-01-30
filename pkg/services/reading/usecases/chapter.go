@@ -11,16 +11,12 @@ import (
 )
 
 type Chapter struct {
-	repo     ChapterRepository
-	activity ActivityService
-}
-
-func NewCase(repo ChapterRepository, activity ActivityService) Chapter {
-	return Chapter{repo, activity}
+	Repository ChapterRepository
+	Activity   ActivityService
 }
 
 func (c *Chapter) GetMangaContent(mangaId string, userId *string) ([]entity.ChapterHead, error) {
-	m, err := c.repo.GetContent(mangaId)
+	m, err := c.Repository.GetContent(mangaId)
 	if err != nil {
 		if errors.Is(err, &commonerr.ErrNotFound{}) {
 			return nil, status.Error(codes.NotFound, fmt.Sprintf("content for %s not found", mangaId))
@@ -30,7 +26,7 @@ func (c *Chapter) GetMangaContent(mangaId string, userId *string) ([]entity.Chap
 
 	readSet := make(map[string]struct{})
 	if userId != nil {
-		resp, err := c.activity.GetReadChapters(*userId, mangaId)
+		resp, err := c.Activity.GetReadChapters(*userId, mangaId)
 		if err != nil {
 			return nil, err
 		}
@@ -54,19 +50,19 @@ func (c *Chapter) GetMangaContent(mangaId string, userId *string) ([]entity.Chap
 }
 
 func (c *Chapter) GetChapter(chapterId string) (entity.Chapter, error) {
-	return c.repo.GetChapter(chapterId)
+	return c.Repository.GetChapter(chapterId)
 }
 
 func (c *Chapter) AddChapter(chapter entity.Chapter) (entity.Chapter, error) {
-	return c.repo.SaveChapter(chapter)
+	return c.Repository.SaveChapter(chapter)
 }
 
 func (c *Chapter) UpdateChapter(chapterId string, data entity.UpdateChapterDto) (entity.Chapter, error) {
-	chapterToUpdate, err := c.repo.GetChapter(chapterId)
+	chapterToUpdate, err := c.Repository.GetChapter(chapterId)
 	if err != nil {
 		return entity.Chapter{}, err
 	}
 	chapterToUpdate.Title = utils.DerefOrDefault(data.Title, chapterToUpdate.Title)
 	chapterToUpdate.Number = utils.DerefOrDefault(data.Number, chapterToUpdate.Number)
-	return c.repo.SaveChapter(chapterToUpdate)
+	return c.Repository.SaveChapter(chapterToUpdate)
 }

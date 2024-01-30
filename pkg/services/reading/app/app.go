@@ -20,8 +20,10 @@ func Run(ctx context.Context, c reading.Config) <-chan error {
 	activityClient := activity.NewActivityClient(conn)
 	activityService := &daoactivity.Repository{Client: activityClient}
 
-	cs := usecases.NewCase(db, activityService)
-	server := controller.NewServer(cs)
+	chapterCase := usecases.Chapter{Repository: db, Activity: activityService}
+	pageCase := usecases.Page{Repository: db}
+
+	server := &controller.Server{ChapterCase: chapterCase, PageCase: pageCase}
 
 	baseServer := grpc.NewServer()
 	pb.RegisterReadingServer(baseServer, server)
