@@ -8,8 +8,8 @@ import (
 	"micromango/pkg/grpc/activity"
 	pb "micromango/pkg/grpc/reading"
 	"micromango/pkg/services/reading"
-	daoactivity "micromango/pkg/services/reading/dao/activity"
-	"micromango/pkg/services/reading/dao/sqlite"
+	daoactivity "micromango/pkg/services/reading/clients/activity"
+	"micromango/pkg/services/reading/clients/sqlite"
 	controller "micromango/pkg/services/reading/grpc"
 	"micromango/pkg/services/reading/usecases"
 )
