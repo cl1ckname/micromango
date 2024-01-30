@@ -42,6 +42,20 @@ func Connect(connStr string) *DB {
 	return &DB{db}
 }
 
+func (d *DB) GetChapter(chapterId string) (e entity.Chapter, err error) {
+	var c Chapter
+	c.ChapterId, err = uuid.Parse(chapterId)
+	if err != nil {
+		return entity.Chapter{}, err
+	}
+	err = d.db.Model(&c).Preload("Pages").First(&c).Error
+	if err != nil {
+		return entity.Chapter{}, err
+	}
+	e = ChapterToEntity(c)
+	return
+}
+
 const GetContentQuery = `SELECT c.chapter_id, c.number, title, count(p.chapter_id) as pages, created_at  
     FROM chapters c LEFT JOIN pages p on c.chapter_id = p.chapter_id and c.manga_id = p.manga_id
     WHERE c.manga_id = ? GROUP BY c.chapter_id`
@@ -55,14 +69,18 @@ func (d *DB) GetContent(mangaId string) (m []entity.Chapter, err error) {
 	if err = d.db.Raw(GetContentQuery, mangaUUID).Scan(&chapters).Error; err != nil {
 		return nil, err
 	}
-	m = utils.Map(chapters, func(c Chapter) entity.Chapter {
-		return entity.Chapter{
-			ChapterId: c.ChapterId.String(),
-			Number:    c.Number,
-			Title:     c.Title,
-			Pages:     uint32(len(c.Pages)),
-			CreatedAt: c.CreatedAt,
-		}
-	})
+	m = utils.Map(chapters, ChapterToEntity)
 	return
+}
+
+func (d *DB) SaveChapter(chapter entity.Chapter) (entity.Chapter, error) {
+	c, err := ChapterFromEntity(chapter)
+	if err != nil {
+		return entity.Chapter{}, err
+	}
+	err = d.db.Save(&c).Error
+	if err != nil {
+		return entity.Chapter{}, err
+	}
+	return ChapterToEntity(c), nil
 }
