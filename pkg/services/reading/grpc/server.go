@@ -15,6 +15,7 @@ import (
 
 type Server struct {
 	readingCase usecases.Chapter
+	pageCase    usecases.Page
 	pb.UnimplementedReadingServer
 }
 
@@ -66,4 +67,29 @@ func (s *Server) UpdateChapter(_ context.Context, req *pb.UpdateChapterRequest) 
 		return nil, err
 	}
 	return ChapterToPb(updatedChapter), nil
+}
+
+func (s *Server) AddPage(_ context.Context, req *pb.AddPageRequest) (*pb.PageResponse, error) {
+	dto := entity.AddPageDto{
+		MangaId:   req.MangaId,
+		ChapterId: req.ChapterId,
+		Number:    req.Number,
+		Image:     utils.FileFromPb(req.Image),
+	}
+	page, err := s.pageCase.AddPage(dto)
+	if err != nil {
+		return nil, err
+	}
+	return PageToPb(page), nil
+}
+
+func (s *Server) GetPage(_ context.Context, req *pb.PageRequest) (*pb.PageResponse, error) {
+	page, err := s.pageCase.GetPage(req.PageId)
+	if err != nil {
+		if errors.Is(err, &commonerr.ErrNotFound{}) {
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("page %s not found", req.PageId))
+		}
+		return nil, err
+	}
+	return PageToPb(page), nil
 }

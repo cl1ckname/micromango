@@ -84,3 +84,29 @@ func (d *DB) SaveChapter(chapter entity.Chapter) (entity.Chapter, error) {
 	}
 	return ChapterToEntity(c), nil
 }
+
+func (d *DB) SavePage(page entity.Page) (entity.Page, error) {
+	pageModel, err := PageFromEntity(page)
+	if err != nil {
+		return entity.Page{}, err
+	}
+	err = d.db.Save(&pageModel).Error
+	if err != nil {
+		return entity.Page{}, err
+	}
+	return entity.Page{}, err
+}
+
+func (d *DB) GetPage(pageId string) (entity.Page, error) {
+	pageUUID, err := uuid.Parse(pageId)
+	if err != nil {
+		return entity.Page{}, err
+	}
+	var pageModel Page
+	pageModel.PageId = pageUUID
+	err = d.db.Model(&pageModel).First(&pageModel).Error
+	if err != nil {
+		return entity.Page{}, err
+	}
+	return PageToEntity(pageModel), nil
+}

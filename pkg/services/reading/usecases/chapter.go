@@ -11,11 +11,11 @@ import (
 )
 
 type Chapter struct {
-	repo     MangaRepository
+	repo     ChapterRepository
 	activity ActivityService
 }
 
-func NewCase(repo MangaRepository, activity ActivityService) Chapter {
+func NewCase(repo ChapterRepository, activity ActivityService) Chapter {
 	return Chapter{repo, activity}
 }
 

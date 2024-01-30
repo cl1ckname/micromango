@@ -33,3 +33,11 @@ func ChapterToHead(c entity.ChapterHead) *pb.MangaContentResponse_ChapterHead {
 		CreatedAt: c.CreatedAt.String(),
 	}
 }
+
+func PageToPb(p entity.Page) *pb.PageResponse {
+	return &pb.PageResponse{
+		PageId: p.PageId,
+		Number: p.Number,
+		Image:  p.Image,
+	}
+}

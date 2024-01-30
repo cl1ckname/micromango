@@ -44,3 +44,20 @@ func ChapterFromEntity(c entity.Chapter) (Chapter, error) {
 		CreatedAt: c.CreatedAt,
 	}, nil
 }
+
+func PageFromEntity(p entity.Page) (Page, error) {
+	mangaId, err := uuid.Parse(p.MangaId)
+	if err != nil {
+		return Page{}, err
+	}
+	chapterId, err := uuid.Parse(p.ChapterId)
+	if err != nil {
+		return Page{}, err
+	}
+	return Page{
+		MangaId:   mangaId,
+		ChapterId: chapterId,
+		Number:    p.Number,
+		Image:     p.Image,
+	}, nil
+}
