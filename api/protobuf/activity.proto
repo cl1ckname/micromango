@@ -46,7 +46,7 @@ message UserRateRequest {
 }
 
 message UserRateResponse {
-  optional float rate = 1;
+  uint32 rate = 1;
 }
 
 message UserRateListRequest {

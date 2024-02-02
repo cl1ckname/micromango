@@ -1,4 +1,4 @@
-package reading
+package sqlite
 
 import (
 	"github.com/google/uuid"
