@@ -5,13 +5,13 @@ import (
 )
 
 type Read struct {
-	Repository ReadRepository
+	ReadRepository ReadRepository
 }
 
 func (r *Read) ReadChapter(rr entity.ReadRecord) error {
-	return r.Repository.SaveReadRecord(rr)
+	return r.ReadRepository.SaveReadRecord(rr)
 }
 
 func (r *Read) GetReadChapters(userId, mangaId string) ([]string, error) {
-	return r.Repository.GetReadChapters(userId, mangaId)
+	return r.ReadRepository.GetReadChapters(userId, mangaId)
 }

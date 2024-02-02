@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/joho/godotenv"
 	"log"
-	"micromango/pkg/services/activity"
+	"micromango/pkg/services/activity/app"
+	"micromango/pkg/services/activity/config"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,14 +17,14 @@ func main() {
 		log.Println("Error loading .env file")
 	}
 
-	config := activity.Config{
+	cfg := config.Config{
 		Addr:        os.Getenv("ACTIVITY_ADDR"),
 		DbAddr:      os.Getenv("ACTIVITY_DB_ADDR"),
 		CatalogAddr: os.Getenv("CATALOG_ADDR"),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	ok := activity.Run(ctx, config)
+	ok := app.Run(ctx, cfg)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)

@@ -2,15 +2,75 @@ package sqlite
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
 	commonerrors "micromango/pkg/common/errors"
 	"micromango/pkg/common/utils"
 	"micromango/pkg/services/activity/entity"
+	"os"
+	"time"
 )
+
+func Connect(connectionString string) (*DB, error) {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logger.Info, // Log level
+			IgnoreRecordNotFoundError: false,       // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      false,       // Don't include params in the SQL log
+			Colorful:                  false,       // Disable color
+		},
+	)
+	db, err := gorm.Open(sqlite.Open(connectionString), &gorm.Config{
+		Logger: newLogger,
+	})
+	if err != nil {
+		panic(fmt.Errorf("failed to open %s: %v", connectionString, err))
+	}
+	if err := db.AutoMigrate(&LikeRecord{}); err != nil {
+		return nil, err
+	}
+	if err := db.AutoMigrate(&RateRecord{}); err != nil {
+		return nil, err
+	}
+	if err := db.AutoMigrate(&ReadRecord{}); err != nil {
+		return nil, err
+	}
+	return &DB{db}, nil
+}
 
 type DB struct {
 	Db *gorm.DB
+}
+
+func (d *DB) SaveLike(like entity.Like) error {
+	model, err := likeFromEntity(like)
+	if err != nil {
+		return err
+	}
+	return d.Db.Save(&model).Error
+}
+
+func (d *DB) Remove(like entity.Like) error {
+	model, err := likeFromEntity(like)
+	if err != nil {
+		return err
+	}
+	return d.Db.Delete(&model).Error
+}
+
+func (d *DB) FindLikeRecord(like entity.Like) (e entity.Like, err error) {
+	model, err := likeFromEntity(like)
+	if err != nil {
+		return
+	}
+	e = likeToEntity(model)
+	return
 }
 
 func (d *DB) SaveReadRecord(record entity.ReadRecord) error {

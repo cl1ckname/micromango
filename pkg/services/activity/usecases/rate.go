@@ -5,27 +5,27 @@ import (
 )
 
 type Rate struct {
-	Repository    RateRepository
-	CatalogClient CatalogClient
+	RateRepository RateRepository
+	Catalog        CatalogClient
 }
 
 func (r *Rate) RateManga(like entity.Rate) error {
-	if err := r.Repository.SaveRate(like); err != nil {
+	if err := r.RateRepository.SaveRate(like); err != nil {
 		return err
 	}
-	avg, voters, err := r.Repository.AvgRate(like.MangaId)
+	avg, voters, err := r.RateRepository.AvgRate(like.MangaId)
 	if err != nil {
 		return err
 	}
-	return r.CatalogClient.SetAvgRate(like.MangaId, avg, voters)
+	return r.Catalog.SetAvgRate(like.MangaId, avg, voters)
 }
 
 func (r *Rate) GetUserRate(userId, mangaId string) (uint32, error) {
-	return r.Repository.GetRate(userId, mangaId)
+	return r.RateRepository.GetRate(userId, mangaId)
 }
 
 func (r *Rate) GetRateList(userId string, ids []string) (map[string]uint32, error) {
-	rates, err := r.Repository.GetRateList(userId, ids)
+	rates, err := r.RateRepository.GetRateList(userId, ids)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package activity
+package config
 
 type Config struct {
 	Addr        string
