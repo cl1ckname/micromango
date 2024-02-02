@@ -13,4 +13,12 @@ type LikeRepository interface {
 
 type CatalogClient interface {
 	SetLikesNumber(string, uint64) error
+	SetAvgRate(string, float32, uint64) error
+}
+
+type RateRepository interface {
+	Save(userId, mangaId string, rate uint32) error
+	AvgRate(mangaId string) (float32, uint64, error)
+	Get(userId, mangaId string) (uint32, error)
+	GetList(userId string, mangaId []string) ([]entity.Rate, error)
 }
