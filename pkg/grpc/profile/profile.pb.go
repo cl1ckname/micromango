@@ -977,16 +977,16 @@ var file_profile_proto_depIdxs = []int32{
 	13, // 7: ListResponse.ListsEntry.value:type_name -> ListResponse.ListMapField
 	0,  // 8: Profile.Create:input_type -> CreateRequest
 	2,  // 9: Profile.Update:input_type -> UpdateRequest
-	3,  // 10: Profile.Get:input_type -> GetRequest
-	4,  // 11: Profile.GetList:input_type -> GetListRequest
+	3,  // 10: Profile.GetRate:input_type -> GetRequest
+	4,  // 11: Profile.GetRateList:input_type -> GetListRequest
 	6,  // 12: Profile.AddToList:input_type -> AddToListRequest
 	7,  // 13: Profile.RemoveFromList:input_type -> RemoveFromListRequest
 	8,  // 14: Profile.IsInList:input_type -> IsInListRequest
 	10, // 15: Profile.ListStats:input_type -> ListStatsRequests
 	1,  // 16: Profile.Create:output_type -> Response
 	1,  // 17: Profile.Update:output_type -> Response
-	1,  // 18: Profile.Get:output_type -> Response
-	5,  // 19: Profile.GetList:output_type -> ListResponse
+	1,  // 18: Profile.GetRate:output_type -> Response
+	5,  // 19: Profile.GetRateList:output_type -> ListResponse
 	18, // 20: Profile.AddToList:output_type -> Empty
 	18, // 21: Profile.RemoveFromList:output_type -> Empty
 	9,  // 22: Profile.IsInList:output_type -> IsInListResponse

@@ -79,7 +79,7 @@ func TestChapter_GetChapter(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get chapter",
+			name: "GetRate chapter",
 			fields: fields{
 				Repository: &mock.ChapterRepository{},
 				Activity:   &mock.ActivityServiceMock{},
@@ -129,7 +129,7 @@ func TestChapter_GetMangaContent(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get manga content with user",
+			name: "GetRate manga content with user",
 			fields: fields{
 				Repository: &mock.ChapterRepository{},
 				Activity:   &mock.ActivityServiceMock{},
@@ -143,7 +143,7 @@ func TestChapter_GetMangaContent(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Get manga content without user",
+			name: "GetRate manga content without user",
 			fields: fields{
 				Repository: &mock.ChapterRepository{},
 				Activity:   &mock.ActivityServiceMock{},

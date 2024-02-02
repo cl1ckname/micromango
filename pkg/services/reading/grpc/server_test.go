@@ -156,7 +156,7 @@ func TestServer_GetChapter(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get chapter",
+			name: "GetRate chapter",
 			fields: fields{
 				ChapterCase: ChapterCaseMock,
 				PageCase:    PageCaseMock,
@@ -214,7 +214,7 @@ func TestServer_GetMangaContent(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get manga content",
+			name: "GetRate manga content",
 			fields: fields{
 				ChapterCase: ChapterCaseMock,
 				PageCase:    PageCaseMock,
@@ -273,7 +273,7 @@ func TestServer_GetPage(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get page",
+			name: "GetRate page",
 			fields: fields{
 				ChapterCase: ChapterCaseMock,
 				PageCase:    PageCaseMock,

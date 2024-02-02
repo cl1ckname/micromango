@@ -38,7 +38,8 @@ func (c *Controller) HasLike(_ context.Context, req *pb.HasLikeRequest) (*pb.Has
 }
 
 func (c *Controller) RateManga(_ context.Context, req *pb.RateMangaRequest) (*share.Empty, error) {
-	err := c.RateCase.RateManga(req.UserId, req.MangaId, req.Rate)
+	rate := rateFromProto(req)
+	err := c.RateCase.RateManga(rate)
 	return &share.Empty{}, err
 }
 

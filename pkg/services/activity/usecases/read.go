@@ -9,7 +9,7 @@ type Read struct {
 }
 
 func (r *Read) ReadChapter(rr entity.ReadRecord) error {
-	return r.Repository.Save(rr)
+	return r.Repository.SaveReadRecord(rr)
 }
 
 func (r *Read) GetReadChapters(userId, mangaId string) ([]string, error) {

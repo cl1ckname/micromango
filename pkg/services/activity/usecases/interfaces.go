@@ -5,9 +5,9 @@ import (
 )
 
 type LikeRepository interface {
-	Save(entity.LikeRecord) error
-	Remove(entity.LikeRecord) error
-	Find(entity.LikeRecord) (entity.LikeRecord, error)
+	SaveLike(entity.Like) error
+	Remove(entity.Like) error
+	FindLikeRecord(entity.Like) (entity.Like, error)
 	CountByMangaId(string) (uint64, error)
 }
 
@@ -17,13 +17,13 @@ type CatalogClient interface {
 }
 
 type RateRepository interface {
-	Save(userId, mangaId string, rate uint32) error
+	SaveRate(like entity.Rate) error
 	AvgRate(mangaId string) (float32, uint64, error)
-	Get(userId, mangaId string) (uint32, error)
-	GetList(userId string, mangaId []string) ([]entity.Rate, error)
+	GetRate(userId, mangaId string) (uint32, error)
+	GetRateList(userId string, mangaId []string) ([]entity.Rate, error)
 }
 
 type ReadRepository interface {
-	Save(entity.ReadRecord) error
+	SaveReadRecord(entity.ReadRecord) error
 	GetReadChapters(userId string, mangaId string) (chapterIds []string, err error)
 }

@@ -1152,7 +1152,7 @@ var file_catalog_proto_depIdxs = []int32{
 	5,  // 11: micromango.Catalog.AddManga:input_type -> micromango.AddMangaRequest
 	6,  // 12: micromango.Catalog.UpdateManga:input_type -> micromango.UpdateMangaRequest
 	7,  // 13: micromango.Catalog.DeleteManga:input_type -> micromango.DeleteMangaRequest
-	8,  // 14: micromango.Catalog.GetList:input_type -> micromango.GetListRequest
+	8,  // 14: micromango.Catalog.GetRateList:input_type -> micromango.GetListRequest
 	10, // 15: micromango.Catalog.SetAvgRate:input_type -> micromango.SetAvgRateRateRequest
 	11, // 16: micromango.Catalog.SetLikes:input_type -> micromango.SetLikesRequest
 	12, // 17: micromango.Catalog.LastUpdates:input_type -> micromango.LastUpdatesRequest
@@ -1161,7 +1161,7 @@ var file_catalog_proto_depIdxs = []int32{
 	3,  // 20: micromango.Catalog.AddManga:output_type -> micromango.MangaResponse
 	3,  // 21: micromango.Catalog.UpdateManga:output_type -> micromango.MangaResponse
 	0,  // 22: micromango.Catalog.DeleteManga:output_type -> micromango.Empty
-	9,  // 23: micromango.Catalog.GetList:output_type -> micromango.GetListResponse
+	9,  // 23: micromango.Catalog.GetRateList:output_type -> micromango.GetListResponse
 	0,  // 24: micromango.Catalog.SetAvgRate:output_type -> micromango.Empty
 	0,  // 25: micromango.Catalog.SetLikes:output_type -> micromango.Empty
 	13, // 26: micromango.Catalog.LastUpdates:output_type -> micromango.LastUpdatesResponse

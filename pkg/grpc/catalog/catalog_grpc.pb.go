@@ -24,7 +24,7 @@ const (
 	Catalog_AddManga_FullMethodName    = "/micromango.Catalog/AddManga"
 	Catalog_UpdateManga_FullMethodName = "/micromango.Catalog/UpdateManga"
 	Catalog_DeleteManga_FullMethodName = "/micromango.Catalog/DeleteManga"
-	Catalog_GetList_FullMethodName     = "/micromango.Catalog/GetList"
+	Catalog_GetList_FullMethodName     = "/micromango.Catalog/GetRateList"
 	Catalog_SetAvgRate_FullMethodName  = "/micromango.Catalog/SetAvgRate"
 	Catalog_SetLikes_FullMethodName    = "/micromango.Catalog/SetLikes"
 	Catalog_LastUpdates_FullMethodName = "/micromango.Catalog/LastUpdates"
@@ -170,7 +170,7 @@ func (UnimplementedCatalogServer) DeleteManga(context.Context, *DeleteMangaReque
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteManga not implemented")
 }
 func (UnimplementedCatalogServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetRateList not implemented")
 }
 func (UnimplementedCatalogServer) SetAvgRate(context.Context, *SetAvgRateRateRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetAvgRate not implemented")
@@ -384,7 +384,7 @@ var Catalog_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Catalog_DeleteManga_Handler,
 		},
 		{
-			MethodName: "GetList",
+			MethodName: "GetRateList",
 			Handler:    _Catalog_GetList_Handler,
 		},
 		{

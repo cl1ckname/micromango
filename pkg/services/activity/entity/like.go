@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-// LikeRecord is record about a user like a manga.
-type LikeRecord struct {
+// Like is record about a user like a manga.
+type Like struct {
 	MangaId   string
 	UserId    string
 	CreatedAt time.Time

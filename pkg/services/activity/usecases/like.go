@@ -13,11 +13,11 @@ type Like struct {
 }
 
 func (l *Like) Like(userId, mangaId string) error {
-	r := entity.LikeRecord{
+	r := entity.Like{
 		UserId:  userId,
 		MangaId: mangaId,
 	}
-	if err := l.LikeRepository.Save(r); err != nil {
+	if err := l.LikeRepository.SaveLike(r); err != nil {
 		return err
 	}
 	likes, err := l.LikeRepository.CountByMangaId(mangaId)
@@ -28,11 +28,11 @@ func (l *Like) Like(userId, mangaId string) error {
 }
 
 func (l *Like) HasLike(userId, mangaId string) (bool, error) {
-	r := entity.LikeRecord{
+	r := entity.Like{
 		UserId:  userId,
 		MangaId: mangaId,
 	}
-	_, err := l.LikeRepository.Find(r)
+	_, err := l.LikeRepository.FindLikeRecord(r)
 	if err != nil {
 		if errors.Is(err, &commonerrors.ErrNotFound{}) {
 			return false, nil
@@ -43,7 +43,7 @@ func (l *Like) HasLike(userId, mangaId string) (bool, error) {
 }
 
 func (l *Like) Dislike(userId, mangaId string) error {
-	r := entity.LikeRecord{
+	r := entity.Like{
 		UserId:  userId,
 		MangaId: mangaId,
 	}

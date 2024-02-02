@@ -90,7 +90,7 @@ func TestPage_GetPage(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Get page 1",
+			name: "GetRate page 1",
 			fields: fields{
 				Repository: &mock.PageRepository{},
 				Static:     &mock.StaticServiceMock{},
@@ -100,7 +100,7 @@ func TestPage_GetPage(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Get page not found",
+			name: "GetRate page not found",
 			fields: fields{
 				Repository: &mock.PageRepository{},
 				Static:     &mock.StaticServiceMock{},
@@ -110,7 +110,7 @@ func TestPage_GetPage(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Get page 2",
+			name: "GetRate page 2",
 			fields: fields{
 				Repository: &mock.PageRepository{},
 				Static:     &mock.StaticServiceMock{},
