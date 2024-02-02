@@ -22,3 +22,8 @@ type RateRepository interface {
 	Get(userId, mangaId string) (uint32, error)
 	GetList(userId string, mangaId []string) ([]entity.Rate, error)
 }
+
+type ReadRepository interface {
+	Save(entity.ReadRecord) error
+	GetReadChapters(userId string, mangaId string) (chapterIds []string, err error)
+}
